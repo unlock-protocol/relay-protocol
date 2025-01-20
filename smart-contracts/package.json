@@ -50,7 +50,7 @@
     "pinst": "3.0.0",
     "prettier": "3.4.2",
     "prettier-plugin-solidity": "1.4.2",
-    "solhint": "5.0.4",
+    "solhint": "5.0.5",
     "solidity-coverage": "0.8.14",
     "ts-node": "10.9.2",
     "typechain": "8.3.2",
