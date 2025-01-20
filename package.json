@@ -21,7 +21,8 @@
     "packages": "yarn workspaces foreach --recursive --from '{@relay-protocol/types,@relay-protocol/networks,@relay-protocol/helpers}'",
     "packages:clean": "yarn packages --parallel run clean",
     "packages:build": "yarn packages --topological-dev run build",
-    "build": "yarn packages:build"
+    "build": "yarn packages:build",
+    "clean": "yarn packages:clean"
   },
   "engines": {
     "node": ">=20.0.0"

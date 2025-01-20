@@ -8,18 +8,19 @@ export interface NetworkConfig {
       transmitter: string,
       token: string,
     },
-    udt: string,
+    udt?: string,
+    rpc?: string,
     hyperlaneMailbox: string,
     isTestNet: boolean,
-    arb: {
+    arb?: {
       routerGateway: string,
       outbox: string,
       rollup: string,
     },
-    op: {
+    op?: {
       portalProxy: string,
     },
-    weth: string,
+    weth?: string,
   }
 
   export interface NetworkConfigs {
