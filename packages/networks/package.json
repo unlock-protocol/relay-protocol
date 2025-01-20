@@ -1,4 +1,6 @@
 {
+  "description": "Relay Protocol's contract addressess for supported networks",
+  "name": "@relay-protocol/networks",
   "main": "dist/index.js",
   "module": "dist/index.mjs",
   "types": "dist/index.d.ts",
@@ -8,19 +10,21 @@
       "require": "./dist/index.js"
     }
   },
-  "description": "Relay Protocol's contract addressess for supported networks",
-  "name": "@relay-protocol/networks",
   "version": "1.0.0",
   "license": "MIT",
   "scripts": {
     "start": "tsc --watch",
     "lint:fix": "yarn lint --fix",
     "lint": "eslint",
+    "clean": "rm -rf ./dist",
     "build": "tsup src/index.ts --dts --format esm,cjs"
   },
   "devDependencies": {
+    "@relay-protocol/eslint-config": "workspace:^",
     "@relay-protocol/tsconfig": "workspace:^",
+    "@relay-protocol/types": "workspace:^",
     "eslint": "9.17.0",
+    "eslint-plugin-sort-keys-fix": "1.1.2",
     "fs-extra": "11.2.0",
     "tsup": "8.3.5",
     "typescript": "5.7.2"
