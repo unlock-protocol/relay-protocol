@@ -18,12 +18,17 @@
   ],
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "packages": "yarn workspaces foreach --recursive --from '{@relay-protocol/networks,@relay-protocol/helpers}'",
+    "packages": "yarn workspaces foreach --recursive --from '{@relay-protocol/types,@relay-protocol/networks,@relay-protocol/helpers}'",
     "packages:clean": "yarn packages --parallel run clean",
-    "packages:build": "yarn packages --topological-dev run build"
+    "packages:build": "yarn packages --topological-dev run build",
+    "build": "yarn packages:build"
   },
   "engines": {
     "node": ">=20.0.0"
   },
-  "packageManager": "yarn@4.6.0"
+  "packageManager": "yarn@4.6.0",
+  "dependencies": {
+    "husky": "9.1.7",
+    "prettier": "3.4.2"
+  }
 }

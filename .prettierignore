@@ -1,0 +1,7 @@
+**/build
+**/coverage
+**/artifacts
+**/dist
+**/cache
+**/node_modules
+**/typechain-types
