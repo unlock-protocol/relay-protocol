@@ -11,7 +11,7 @@ export interface NetworkConfig {
     udt?: string,
     rpc?: string,
     hyperlaneMailbox: string,
-    isTestNet: boolean,
+    isTestnet: boolean,
     arb?: {
       routerGateway: string,
       outbox: string,

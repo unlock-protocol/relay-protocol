@@ -2,7 +2,7 @@ import { ethers, ignition } from 'hardhat'
 import { expect } from 'chai'
 import { parseUnits, TransactionReceipt, type Signer } from 'ethers'
 import { mintUSDC } from '../utils/hardhat'
-import { getBalance, getEvent } from '../../lib/utils'
+import { getBalance, getEvent } from '@relay-protocol/helpers'
 import { networks } from '@relay-protocol/networks'
 import { reverts } from '../utils/errors'
 

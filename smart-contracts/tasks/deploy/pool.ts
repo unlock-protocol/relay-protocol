@@ -7,7 +7,7 @@ task('deploy:pool', 'Deploy a relay pool')
   .addParam('asset', 'An ERC20 asset')
   .addOptionalParam('yieldPool', 'A yield pool address')
   .setAction(async ({ asset, yieldPool }, { ethers, ignition }) => {
-    const { getStataToken } = await import('../../lib/utils')
+    const { getStataToken } = await import('@relay-protocol/helpers')
 
     // get args value
     const { chainId } = await ethers.provider.getNetwork()

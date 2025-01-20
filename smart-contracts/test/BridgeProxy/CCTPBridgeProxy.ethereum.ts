@@ -5,8 +5,8 @@ import { AbiCoder } from 'ethers'
 import { expect } from 'chai'
 import { type TransactionReceipt } from 'ethers'
 import { CCTPBridgeProxy } from '../../typechain-types'
-import { getBalance, getEvent } from '../../lib/utils'
-import { getCCTPAttestation } from '../../lib/utils/cctp'
+import { getBalance, getEvent } from '@relay-protocol/helpers'
+import { getCCTPAttestation } from '@relay-protocol/helpers/cctp'
 
 const {
   usdc: { messenger, transmitter, token: USDC },

@@ -4,7 +4,7 @@ import { time } from '@nomicfoundation/hardhat-network-helpers'
 import OPStackNativeBridgeProxyModule from '../../ignition/modules/OPStackNativeBridgeProxyModule'
 
 import { AbiCoder } from 'ethers'
-import { buildFinalizeWithdrawal } from '../../lib/utils/op'
+import { buildFinalizeWithdrawal } from '@relay-protocol/helpers/op'
 import { expect } from 'chai'
 import L1StandardBridge from '../../lib/abis/op/L1StandardBridge.json'
 import L1CrossDomainMessenger from '../../lib/abis/L2CrossDomainMessenger.json'

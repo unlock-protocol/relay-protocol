@@ -1,7 +1,7 @@
 import { expect } from 'chai'
 import { AbiCoder } from 'ethers'
 import { ethers, ignition } from 'hardhat'
-import { getBalance, getEvent } from '../../lib/utils'
+import { getBalance, getEvent } from '@relay-protocol/helpers'
 import RelayPoolModule from '../../ignition/modules/RelayPoolModule'
 import { MyToken, MyWeth, MyYieldPool, RelayPool } from '../../typechain-types'
 

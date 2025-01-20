@@ -1,3 +1,5 @@
+import { getCCTPAttestation } from '@relay-protocol/helpers'
+
 /**
  * Script used to claim bridged USDCfrom CCTP bridge
  */
@@ -8,7 +10,6 @@ task('claim:usdc', 'Claim USDC from bridge')
   .addParam('origin', 'Origin chain id')
   .addParam('pool', 'The pool on dest chain')
   .setAction(async ({ txHash, origin, pool }, { ethers }) => {
-    const { getCCTPAttestation } = await import('../../lib/utils/cctp')
     const { attestation, status, messageBytes } = await getCCTPAttestation(
       txHash,
       origin

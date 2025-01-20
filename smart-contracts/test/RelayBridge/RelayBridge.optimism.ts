@@ -1,7 +1,7 @@
 import { ethers, ignition } from 'hardhat'
 import { expect } from 'chai'
 import { mintUSDC, stealERC20 } from '../utils/hardhat'
-import { getEvent } from '../../lib/utils'
+import { getEvent } from '@relay-protocol/helpers'
 
 import ERC20_ABI from '../../lib/abis/ERC20.json'
 import MailboxAbi from '../../lib/abis/Mailbox.json'

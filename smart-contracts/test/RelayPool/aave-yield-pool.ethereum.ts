@@ -2,7 +2,7 @@ import { expect } from 'chai'
 import { ethers } from 'hardhat'
 import { networks } from '@relay-protocol/networks'
 import { IUSDC, ERC4626, RelayPool } from '../../typechain-types'
-import { getStataToken } from '../../lib/utils'
+import { getStataToken } from '@relay-protocol/helpers'
 import { mintUSDC } from '../utils/hardhat'
 
 const {

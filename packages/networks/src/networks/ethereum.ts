@@ -6,7 +6,7 @@ export const ethereum = {
   },
   chainId: 1,
   hyperlaneMailbox: '0xc005dc82818d67AF737725bD4bf75435d065D239',
-  isTestNet: false,
+  isTestnet: false,
   name: 'Ethereum',
   op: {
     portalProxy: '0xbEb5Fc579115071764c7423A4f12eDde41f106Ed',
@@ -20,4 +20,4 @@ export const ethereum = {
     transmitter: '0x0a992d191DEeC32aFe36203Ad87D7d289a738F81',
   },
   weth: '0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2',
-}
+};

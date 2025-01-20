@@ -3,7 +3,7 @@ import { ethers, ignition } from 'hardhat'
 
 import { networks } from '@relay-protocol/networks'
 import { IWETH, RelayPool, RelayPoolNativeGateway } from '../../typechain-types'
-import { getBalance } from '../../lib/utils'
+import { getBalance } from '@relay-protocol/helpers'
 import { reverts } from '../utils/errors'
 const { weth: WETH, hyperlaneMailbox } = networks[1]
 import RelayPoolModule from '../../ignition/modules/RelayPoolModule'
