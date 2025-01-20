@@ -17,18 +17,23 @@
   },
   "scripts": {
     "start": "tsc --watch",
+    "clean": "rm -rf dist",
     "lint:fix": "yarn lint --fix",
     "lint": "eslint",
+    "build": "yarn build:index && yarn build:ts && yarn build:copy-abis",
     "build:ts": "tsup src/index.ts --dts --format esm,cjs",
-    "build": "yarn build:ts && copyfiles -f src/abis dist"
+    "build:copy-abis": "cp -r src/abis dist",
+    "build:index": "tsc && node dist/scripts/buildAbisIndex.js"
   },
   "devDependencies": {
     "@relay-protocol/networks": "workspace:^",
     "@relay-protocol/tsconfig": "workspace:^",
     "@types/copyfiles": "^2",
+    "@types/fs-extra": "^11",
     "copyfiles": "2.4.1",
     "eslint": "9.17.0",
     "tsup": "8.3.5",
+    "fs-extra": "11.3.0",
     "typescript": "5.7.2"
   }
 }
