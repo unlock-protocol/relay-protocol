@@ -44,7 +44,7 @@
     "ethers": "6.13.5",
     "fs-extra": "11.2.0",
     "globals": "15.14.0",
-    "hardhat": "2.22.17",
+    "hardhat": "2.22.18",
     "hardhat-gas-reporter": "2.2.2",
     "husky": "9.1.7",
     "pinst": "3.0.0",
