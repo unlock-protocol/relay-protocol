@@ -1,5 +1,5 @@
 {
-  "name": "relay-protocol",
+  "name": "@relay-protocol/smart-contracts",
   "version": "1.0.0",
   "main": "index.js",
   "repository": {
@@ -14,7 +14,7 @@
   "private": true,
   "workspaces": [
     "packages/**",
-    "contracts"
+    "smart-contracts"
   ],
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
