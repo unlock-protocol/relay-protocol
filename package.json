@@ -1,0 +1,29 @@
+{
+  "name": "relay-protocol",
+  "version": "1.0.0",
+  "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/unlock-protocol/relay-protocol.git"
+  },
+  "bugs": {
+    "url": "https://github.com/relay-protocol/unlock/issues"
+  },
+  "author": "contact@unlock-protocol.com",
+  "license": "MIT",
+  "private": true,
+  "workspaces": [
+    "packages/**",
+    "contracts"
+  ],
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "packages": "yarn workspaces foreach --recursive --from '{@relay-protocol/networks,@relay-protocol/helpers}'",
+    "packages:clean": "yarn packages --parallel run clean",
+    "packages:build": "yarn packages --topological-dev run build"
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "packageManager": "yarn@4.6.0"
+}
