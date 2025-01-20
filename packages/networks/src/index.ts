@@ -1,7 +1,15 @@
-import { mainnets } from './mainnets'
-import { testnets } from './testnets'
+import type { NetworkConfigs } from '@relay-protocol/types'
 
-export * from './mainnets'
-export * from './testnets'
+import * as supportedNetworks from './networks'
 
-export const networks = { ...mainnets, ...testnets }
+export * from './networks'
+
+export const networks: NetworkConfigs = {}
+
+Object.keys(supportedNetworks).forEach((networkName: string) => {
+  // @ts-expect-error Element implicitly has an 'any' type because expression of type 'string' can't be used to index type 'typeof import("/Users/julien/repos/unlock/packages/networks/src/networks/index")'.
+  const network = supportedNetworks[networkName]
+  networks[network.id] = network
+})
+
+export default networks

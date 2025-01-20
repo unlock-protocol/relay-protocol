@@ -1,0 +1,33 @@
+{
+  "name": "@relay-protocol/types",
+  "version": "0.0.1",
+  "main": "dist/src/index.js",
+  "types": "dist/src/index.d.ts",
+  "description": "Relay Protocol shared types",
+  "files": [
+    "tsconfig.json",
+    "dist"
+  ],
+  "keywords": [
+    "tsconfig",
+    "typescript",
+    "ts",
+    "config",
+    "configuration"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/unlock-protocol/relay-protocol.git",
+    "directory": "packages/types"
+  },
+  "scripts": {
+    "build": "tsc",
+    "clean": "rm -rf dist",
+    "lint": "eslint"
+  },
+  "devDependencies": {
+    "@unlock-protocol/tsconfig": "workspace:./packages/tsconfig",
+    "eslint": "9.17.0",
+    "typescript": "5.7.2"
+  }
+}
