@@ -3,8 +3,8 @@ import { expect } from 'chai'
 import { mintUSDC, stealERC20 } from '../utils/hardhat'
 import { getEvent } from '@relay-protocol/helpers'
 
-import ERC20_ABI from '../../lib/abis/ERC20.json'
-import MailboxAbi from '../../lib/abis/Mailbox.json'
+import ERC20_ABI from '@relay-protocol/helpers/dist/abis/ERC20.json'
+import MailboxAbi from '@relay-protocol/helpers/dist/abis/Mailbox.json'
 
 import { ContractTransactionReceipt, Log } from 'ethers'
 

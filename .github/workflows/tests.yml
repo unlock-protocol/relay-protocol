@@ -1,0 +1,43 @@
+name: Run Tests
+
+on:
+  pull_request:
+  push:
+    branches: main
+
+jobs:
+  run-tests:
+    name: 'Run the tests'
+    runs-on: ubuntu-24.04
+    strategy:
+      matrix:
+        folders: []
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Get changed files
+        id: changed-files
+        uses: tj-actions/changed-files@v45
+        with:
+          files: matrix.folders
+
+      - uses: actions/setup-node@v4
+        if: steps.changed-files.outputs.any_changed == 'true'
+        with:
+          node-version: 20
+
+      - run: yarn
+        if: steps.changed-files.outputs.any_changed == 'true'
+        shell: bash
+
+      - name: 'run lint'
+        run: yarn run lint
+        if: steps.changed-files.outputs.any_changed == 'true'
+        shell: bash
+
+      - name: 'run tests'
+        run: yarn run test
+        if: steps.changed-files.outputs.any_changed == 'true'
+        shell: bash
