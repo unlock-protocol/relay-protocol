@@ -8,7 +8,7 @@ export async function getBalance(
   chainId: bigint
 ) {
   let balance
-  const provider = await getProvider(chainId) 
+  const provider = await getProvider(chainId)
 
   if (!tokenAddress || tokenAddress === ethers.ZeroAddress) {
     // ETH balance

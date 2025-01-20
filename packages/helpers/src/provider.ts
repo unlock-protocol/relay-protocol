@@ -8,7 +8,6 @@ export const getProvider = (chainId: bigint | string) => {
   return provider
 }
 
-
 export const fetchRawBlock = async (
   chainId: bigint | string,
   blockHash: string
