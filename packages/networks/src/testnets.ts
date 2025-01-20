@@ -1,0 +1,70 @@
+export const testnets = {
+  11155111: {
+    chainId: 11155111,
+    name: 'Ethereum Sepolia',
+    slug: 'sepolia',
+    usdc: {
+      domain: 0n,
+      messenger: '0x9f3B8679c73C2Fef8b59B4f3444d4e156fb70AA5',
+      transmitter: '0x7865fAfC2db2093669d92c0F33AeEF291086BEFD',
+      token: '0x1c7D4B196Cb0C7B01d743Fbc6116a902379C7238',
+    },
+    udt: '0x4C38B5Dcc47c4990363F22bFeb2add741123914F',
+    isTestnet: true,
+    hyperlaneMailbox: '0xfFAEF09B3cd11D9b20d1a19bECca54EEC2884766',
+    op: {
+      portalProxy: '0x16Fc5058F25648194471939df75CF27A2fdC48BC',
+    },
+    arb: {
+      routerGateway: '0xcE18836b233C83325Cc8848CA4487e94C6288264',
+      outbox: '0x65f07C7D521164a4d5DaC6eB8Fac8DA067A3B78F',
+      rollup: '0x042B2E6C5E99d4c521bd49beeD5E99651D9B0Cf4',
+    },
+    weth: '0x7b79995e5f793A07Bc00c21412e50Ecae098E7f9',
+  },
+  11155420: {
+    chainId: 11155420,
+    name: 'OP Sepolia',
+    slug: 'op-sepolia',
+    usdc: {
+      domain: 2n,
+      messenger: '0x9f3B8679c73C2Fef8b59B4f3444d4e156fb70AA5',
+      transmitter: '0x7865fAfC2db2093669d92c0F33AeEF291086BEFD',
+      token: '0x5fd84259d66Cd46123540766Be93DFE6D43130D7',
+    },
+    isTestnet: true,
+    hyperlaneMailbox: '0x6966b0E55883d49BFB24539356a2f8A673E02039',
+    rpc: 'https://optimism-sepolia.gateway.tenderly.co',
+  },
+  421614: {
+    name: 'Arbitrum Sepolia',
+    slug: 'arbitrum-sepolia',
+    chainId: 421614,
+    usdc: {
+      domain: 3n,
+      messenger: '0x9f3B8679c73C2Fef8b59B4f3444d4e156fb70AA5',
+      transmitter: '0xaCF1ceeF35caAc005e15888dDb8A3515C41B4872',
+      token: '0x75faf114eafb1BDbe2F0316DF893fd58CE46AA4d',
+    },
+    arb: {
+      routerGateway: '0x9fDD1C4E4AA24EEc1d913FABea925594a20d43C7',
+    },
+    udt: '0xeCf77F1D5bB9d40BCc79343DB16ACB86795050fC',
+    isTestnet: true,
+    hyperlaneMailbox: '0x598facE78a4302f11E3de0bee1894Da0b2Cb71F8',
+    rpc: 'https://sepolia-rollup.arbitrum.io/rpc',
+  },
+  84532: {
+    name: 'Base Sepolia',
+    slug: 'base-sepolia',
+    chainId: 84532,
+    usdc: {
+      domain: 6n,
+      messenger: '0x9f3B8679c73C2Fef8b59B4f3444d4e156fb70AA5',
+      transmitter: '0x7865fAfC2db2093669d92c0F33AeEF291086BEFD',
+      token: '0x036CbD53842c5426634e7929541eC2318f3dCF7e',
+    },
+    isTestnet: true,
+    hyperlaneMailbox: '0x6966b0E55883d49BFB24539356a2f8A673E02039',
+  },
+}
