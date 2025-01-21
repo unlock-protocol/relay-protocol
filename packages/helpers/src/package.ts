@@ -36,7 +36,7 @@ export const createIndexFile = async (
   srcFolder: string,
   destFolder: string
 ) => {
-  const fileContent = ['']
+  const fileContent = ['/* eslint-disable */']
   fileContent.push("// This file is generated, please don't edit directly")
   fileContent.push("// Refer to 'yarn build:index' for more\n")
 
