@@ -21,12 +21,13 @@
   },
   "scripts": {
     "start": "tsc --watch",
-    "clean": "rm -rf dist",
+    "clean": "rm -rf dist && rm src/abis/index.ts",
     "lint:fix": "yarn lint --fix",
     "lint": "eslint",
-    "build": "yarn build:index && yarn build:ts",
+    "build": "yarn build:index && yarn build:copy-abis && yarn build:ts",
     "build:ts": "tsup src/index.ts --dts --format esm,cjs",
-    "build:index": "tsc && node dist/scripts/buildAbisIndex.js"
+    "build:copy-abis": "cp -r src/abis dist/src/abis",
+    "build:index": "tsc && node dist/scripts/buildAbisIndex.js && tsc"
   },
   "devDependencies": {
     "@relay-protocol/networks": "workspace:^",
