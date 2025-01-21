@@ -21,7 +21,7 @@ jobs:
         id: changed-files
         uses: tj-actions/changed-files@v45
         with:
-          files: matrix.folders
+          files: ${{ matrix.folders }}
 
       - uses: actions/setup-node@v4
         if: steps.changed-files.outputs.any_changed == 'true'
@@ -38,6 +38,6 @@ jobs:
         shell: bash
 
       - name: 'run tests'
-        run: yarn workspace @relay-protocol/{{matrix.folders}} run test
+        run: yarn workspace @relay-protocol/${{matrix.folders}} run test
         if: steps.changed-files.outputs.any_changed == 'true'
         shell: bash

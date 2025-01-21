@@ -1879,6 +1879,53 @@ __metadata:
   languageName: unknown
   linkType: soft
 
+"@relay-protocol/smart-contracts@workspace:smart-contracts":
+  version: 0.0.0-use.local
+  resolution: "@relay-protocol/smart-contracts@workspace:smart-contracts"
+  dependencies:
+    "@bgd-labs/aave-address-book": "npm:4.8.1"
+    "@eslint/js": "npm:9.18.0"
+    "@eth-optimism/contracts-bedrock": "npm:0.17.3"
+    "@nomicfoundation/hardhat-chai-matchers": "npm:2.0.8"
+    "@nomicfoundation/hardhat-ethers": "npm:3.0.8"
+    "@nomicfoundation/hardhat-ignition": "npm:0.15.9"
+    "@nomicfoundation/hardhat-ignition-ethers": "npm:0.15.9"
+    "@nomicfoundation/hardhat-network-helpers": "npm:1.0.12"
+    "@nomicfoundation/hardhat-toolbox": "npm:5.0.0"
+    "@nomicfoundation/hardhat-verify": "npm:2.0.12"
+    "@openzeppelin/contracts": "npm:5.2.0"
+    "@relay-protocol/helpers": "workspace:*"
+    "@typechain/ethers-v6": "npm:0.5.1"
+    "@typechain/hardhat": "npm:9.1.0"
+    "@types/chai": "npm:5.0.1"
+    "@types/fs-extra": "npm:11.0.4"
+    "@types/mocha": "npm:10.0.10"
+    "@types/node": "npm:22.10.7"
+    chai: "npm:5.1.2"
+    eslint: "npm:9.18.0"
+    eslint-config-prettier: "npm:9.1.0"
+    eslint-plugin-evm-address-to-checksummed: "npm:0.0.6"
+    eslint-plugin-json: "npm:4.0.1"
+    eslint-plugin-mocha: "npm:10.5.0"
+    eslint-plugin-prettier: "npm:5.2.3"
+    ethers: "npm:6.13.5"
+    fs-extra: "npm:11.3.0"
+    globals: "npm:15.14.0"
+    hardhat: "npm:2.22.18"
+    hardhat-gas-reporter: "npm:2.2.2"
+    husky: "npm:9.1.7"
+    pinst: "npm:3.0.0"
+    prettier: "npm:3.4.2"
+    prettier-plugin-solidity: "npm:1.4.2"
+    solhint: "npm:5.0.5"
+    solidity-coverage: "npm:0.8.14"
+    ts-node: "npm:10.9.2"
+    typechain: "npm:8.3.2"
+    typescript: "npm:5.7.3"
+    typescript-eslint: "npm:8.21.0"
+  languageName: unknown
+  linkType: soft
+
 "@relay-protocol/tsconfig@workspace:./packages/tsconfig, @relay-protocol/tsconfig@workspace:^, @relay-protocol/tsconfig@workspace:packages/tsconfig, @unlock-protocol/tsconfig@workspace:./packages/tsconfig":
   version: 0.0.0-use.local
   resolution: "@relay-protocol/tsconfig@workspace:packages/tsconfig"
@@ -7950,53 +7997,6 @@ __metadata:
   checksum: 10/b91575bf9cdf01757afd7b5e521eb8a0b874a49bc972d08e0047cfea0cd3c019f5614521d4bc83d2855e3fcc331db6817dfd533dd8f3d90b16bc76fad2450fc1
   languageName: node
   linkType: hard
-
-"payday-pools@workspace:smart-contracts":
-  version: 0.0.0-use.local
-  resolution: "payday-pools@workspace:smart-contracts"
-  dependencies:
-    "@bgd-labs/aave-address-book": "npm:4.8.1"
-    "@eslint/js": "npm:9.18.0"
-    "@eth-optimism/contracts-bedrock": "npm:0.17.3"
-    "@nomicfoundation/hardhat-chai-matchers": "npm:2.0.8"
-    "@nomicfoundation/hardhat-ethers": "npm:3.0.8"
-    "@nomicfoundation/hardhat-ignition": "npm:0.15.9"
-    "@nomicfoundation/hardhat-ignition-ethers": "npm:0.15.9"
-    "@nomicfoundation/hardhat-network-helpers": "npm:1.0.12"
-    "@nomicfoundation/hardhat-toolbox": "npm:5.0.0"
-    "@nomicfoundation/hardhat-verify": "npm:2.0.12"
-    "@openzeppelin/contracts": "npm:5.2.0"
-    "@relay-protocol/helpers": "workspace:*"
-    "@typechain/ethers-v6": "npm:0.5.1"
-    "@typechain/hardhat": "npm:9.1.0"
-    "@types/chai": "npm:5.0.1"
-    "@types/fs-extra": "npm:11.0.4"
-    "@types/mocha": "npm:10.0.10"
-    "@types/node": "npm:22.10.7"
-    chai: "npm:5.1.2"
-    eslint: "npm:9.18.0"
-    eslint-config-prettier: "npm:9.1.0"
-    eslint-plugin-evm-address-to-checksummed: "npm:0.0.6"
-    eslint-plugin-json: "npm:4.0.1"
-    eslint-plugin-mocha: "npm:10.5.0"
-    eslint-plugin-prettier: "npm:5.2.3"
-    ethers: "npm:6.13.5"
-    fs-extra: "npm:11.3.0"
-    globals: "npm:15.14.0"
-    hardhat: "npm:2.22.18"
-    hardhat-gas-reporter: "npm:2.2.2"
-    husky: "npm:9.1.7"
-    pinst: "npm:3.0.0"
-    prettier: "npm:3.4.2"
-    prettier-plugin-solidity: "npm:1.4.2"
-    solhint: "npm:5.0.5"
-    solidity-coverage: "npm:0.8.14"
-    ts-node: "npm:10.9.2"
-    typechain: "npm:8.3.2"
-    typescript: "npm:5.7.3"
-    typescript-eslint: "npm:8.21.0"
-  languageName: unknown
-  linkType: soft
 
 "pbkdf2@npm:^3.0.17":
   version: 3.1.2
