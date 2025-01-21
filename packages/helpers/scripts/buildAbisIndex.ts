@@ -7,5 +7,7 @@ const main = async () => {
 }
 
 main()
-  .then(() => {})
+  .then(() => {
+    console.log('ABIs index built successfully!')
+  })
   .catch((e) => console.error(e))
