@@ -1914,7 +1914,7 @@ __metadata:
     "@relay-protocol/types": "workspace:./packages/types"
     eslint: "npm:9.17.0"
     eslint-plugin-sort-keys-fix: "npm:1.1.2"
-    fs-extra: "npm:11.2.0"
+    fs-extra: "npm:11.3.0"
     tsup: "npm:8.3.5"
     typescript: "npm:5.7.2"
   languageName: unknown
@@ -5784,17 +5784,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"fs-extra@npm:11.2.0":
-  version: 11.2.0
-  resolution: "fs-extra@npm:11.2.0"
-  dependencies:
-    graceful-fs: "npm:^4.2.0"
-    jsonfile: "npm:^6.0.1"
-    universalify: "npm:^2.0.0"
-  checksum: 10/0579bf6726a4cd054d4aa308f10b483f52478bb16284f32cf60b4ce0542063d551fca1a08a2af365e35db21a3fa5a06cf2a6ed614004b4368982bc754cb816b3
-  languageName: node
-  linkType: hard
-
 "fs-extra@npm:11.3.0, fs-extra@npm:^11.2.0":
   version: 11.3.0
   resolution: "fs-extra@npm:11.3.0"
@@ -8393,7 +8382,7 @@ __metadata:
     eslint-plugin-mocha: "npm:10.5.0"
     eslint-plugin-prettier: "npm:5.2.3"
     ethers: "npm:6.13.5"
-    fs-extra: "npm:11.2.0"
+    fs-extra: "npm:11.3.0"
     globals: "npm:15.14.0"
     hardhat: "npm:2.22.18"
     hardhat-gas-reporter: "npm:2.2.2"
