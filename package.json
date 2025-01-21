@@ -1,5 +1,5 @@
 {
-  "name": "@relay-protocol/smart-contracts",
+  "name": "@relay-protocol/monorepo",
   "version": "1.0.0",
   "main": "index.js",
   "repository": {
@@ -14,7 +14,8 @@
   "private": true,
   "workspaces": [
     "packages/**",
-    "smart-contracts"
+    "smart-contracts",
+    "backend"
   ],
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
