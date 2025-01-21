@@ -38,6 +38,6 @@ jobs:
         shell: bash
 
       - name: 'run tests'
-        run: yarn run test
+        run: yarn workspace @relay-protocol/{{matrix.folders}} run test
         if: steps.changed-files.outputs.any_changed == 'true'
         shell: bash
