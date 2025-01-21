@@ -14,4 +14,4 @@ export const arbitrumOne = {
     token: '0xaf88d065e77c8cC2239327C5EDb3A432268e5831',
     transmitter: '0xC30362313FBBA5cf9163F0bb16a0e01f01A896ca',
   },
-};
+}
