@@ -342,8 +342,8 @@ describe('WETH RelayBridge: when receiving a message from the Hyperlane Mailbox'
     const userBalanceBefore = await getBalance(userAddress, ethers.provider)
     const userWethBalanceBefore = await getBalance(
       userAddress,
-      ethers.provider,
-      await myWeth.getAddress()
+      await myWeth.getAddress(),
+      ethers.provider
     )
     await relayPool
       .connect(hyperlane)
@@ -356,8 +356,8 @@ describe('WETH RelayBridge: when receiving a message from the Hyperlane Mailbox'
     const userBalanceAfter = await getBalance(userAddress, ethers.provider)
     const userWethBalanceAfter = await getBalance(
       userAddress,
-      ethers.provider,
-      await myWeth.getAddress()
+      await myWeth.getAddress(),
+      ethers.provider
     )
 
     expect(userBalanceAfter).to.equal(userBalanceBefore + amount)
