@@ -32,7 +32,10 @@ export const parseExports = async (folderName: string) => {
   return exportsList
 }
 
-export const createIndexFile = async (srcFolder: string) => {
+export const createIndexFile = async (
+  srcFolder: string,
+  destFolder: string
+) => {
   const fileContent = ['']
   fileContent.push("// This file is generated, please don't edit directly")
   fileContent.push("// Refer to 'yarn build:index' for more\n")
@@ -40,9 +43,7 @@ export const createIndexFile = async (srcFolder: string) => {
   const abiFiles = await parseExports(srcFolder)
 
   abiFiles.forEach(({ contractName, exportPath }) =>
-    fileContent.push(
-      `import ${contractName} from '${exportPath}' with { type: 'json' }`
-    )
+    fileContent.push(`import ${contractName} from '${exportPath}'`)
   )
 
   fileContent.push('\n// exports')
@@ -52,7 +53,7 @@ export const createIndexFile = async (srcFolder: string) => {
   )
 
   await fs.outputFile(
-    path.resolve(path.resolve(`dist/${srcFolder}`), 'index.js'),
+    path.resolve(destFolder, srcFolder, 'index.ts'),
     fileContent.join('\n')
   )
 }

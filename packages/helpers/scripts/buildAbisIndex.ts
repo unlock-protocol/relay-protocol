@@ -3,7 +3,7 @@ import { createIndexFile } from '../src/package'
 
 const main = async () => {
   console.log('Building ABIs index...')
-  await createIndexFile('abis')
+  await createIndexFile('abis', 'src')
 }
 
 main()
