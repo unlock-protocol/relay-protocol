@@ -11,7 +11,7 @@ jobs:
     runs-on: ubuntu-24.04
     strategy:
       matrix:
-        folders: ['smart-contracts']
+        folders: ['smart-contracts', 'backend']
     steps:
       - uses: actions/checkout@v4
         with:
@@ -30,6 +30,10 @@ jobs:
           node-version: 20
 
       - run: yarn
+        if: steps.changed-files.outputs.any_changed == 'true'
+        shell: bash
+
+      - run: 'yarn build'
         if: steps.changed-files.outputs.any_changed == 'true'
         shell: bash
 
