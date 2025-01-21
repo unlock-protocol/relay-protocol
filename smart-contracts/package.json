@@ -42,7 +42,7 @@
     "eslint-plugin-mocha": "10.5.0",
     "eslint-plugin-prettier": "5.2.3",
     "ethers": "6.13.5",
-    "fs-extra": "11.2.0",
+    "fs-extra": "11.3.0",
     "globals": "15.14.0",
     "hardhat": "2.22.18",
     "hardhat-gas-reporter": "2.2.2",
