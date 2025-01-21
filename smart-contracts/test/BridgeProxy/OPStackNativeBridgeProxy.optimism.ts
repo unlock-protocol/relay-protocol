@@ -1,6 +1,6 @@
 import { ethers, ignition } from 'hardhat'
-import L2ToL1MessagePasserAbi from '@relay-protocol/helpers/dist/abis/L2ToL1MessagePasser.json'
 import L2CrossDomainMessenger from '@relay-protocol/helpers/dist/abis/L2CrossDomainMessenger.json'
+import L2ToL1MessagePasserAbi from '@relay-protocol/helpers/dist/abis/L2ToL1MessagePasser.json'
 import L2StandardBridge from '@relay-protocol/helpers/dist/abis/L2StandardBridge.json'
 import { expect } from 'chai'
 import { stealERC20 } from '../utils/hardhat'
