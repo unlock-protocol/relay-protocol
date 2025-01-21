@@ -339,10 +339,11 @@ describe('WETH RelayBridge: when receiving a message from the Hyperlane Mailbox'
     const [hyperlane, anotherUser] = await ethers.getSigners()
     const userAddress = await anotherUser.getAddress()
     const amount = ethers.parseUnits('1')
-    const userBalanceBefore = await getBalance(userAddress)
+    const userBalanceBefore = await getBalance(userAddress, ethers.provider)
     const userWethBalanceBefore = await getBalance(
       userAddress,
-      await myWeth.getAddress()
+      await myWeth.getAddress(),
+      ethers.provider
     )
     await relayPool
       .connect(hyperlane)
@@ -352,10 +353,11 @@ describe('WETH RelayBridge: when receiving a message from the Hyperlane Mailbox'
         encodeData(9n, userAddress, amount)
       )
 
-    const userBalanceAfter = await getBalance(userAddress)
+    const userBalanceAfter = await getBalance(userAddress, ethers.provider)
     const userWethBalanceAfter = await getBalance(
       userAddress,
-      await myWeth.getAddress()
+      await myWeth.getAddress(),
+      ethers.provider
     )
 
     expect(userBalanceAfter).to.equal(userBalanceBefore + amount)

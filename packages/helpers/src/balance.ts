@@ -4,11 +4,26 @@ import ERC20_ABI from './abis/ERC20.json'
 
 export async function getBalance(
   account: string,
-  tokenAddress = ethers.ZeroAddress,
-  chainId: bigint
+  tokenAddressOrChainIdOrProvider: string | bigint | ethers.Provider,
+  chainIdOrProvider: bigint | ethers.Provider
 ) {
+  let tokenAddress: string
+  if (typeof tokenAddressOrChainIdOrProvider === 'string') {
+    // If this is an address. then we set it!
+    tokenAddress = tokenAddressOrChainIdOrProvider
+    // and chainIdOrProvider is the 3rd arg
+  } else {
+    chainIdOrProvider = tokenAddressOrChainIdOrProvider
+    tokenAddress = ethers.ZeroAddress
+  }
+
+  let provider
+  if (typeof chainIdOrProvider == 'bigint') {
+    provider = await getProvider(chainIdOrProvider)
+  } else {
+    provider = chainIdOrProvider
+  }
   let balance
-  const provider = await getProvider(chainId)
 
   if (!tokenAddress || tokenAddress === ethers.ZeroAddress) {
     // ETH balance

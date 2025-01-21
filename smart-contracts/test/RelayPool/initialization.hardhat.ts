@@ -1,6 +1,6 @@
 import { expect } from 'chai'
 import { ethers, ignition } from 'hardhat'
-import { mainnets } from '@relay-protocol/networks'
+import networks from '@relay-protocol/networks'
 import RelayPoolModule from '../../ignition/modules/RelayPoolModule'
 import { MyToken, MyYieldPool, RelayPool } from '../../typechain-types'
 
@@ -21,7 +21,7 @@ describe('RelayPool: initialization of ERC20 pool', () => {
     // deploy the pool using ignition
     const parameters = {
       RelayPool: {
-        hyperlaneMailbox: mainnets[1].hyperlaneMailbox,
+        hyperlaneMailbox: networks[1].hyperlaneMailbox,
         asset: await myToken.getAddress(),
         name: `${await myToken.name()} Relay Pool`,
         symbol: `${await myToken.symbol()}-REL`,
@@ -43,7 +43,7 @@ describe('RelayPool: initialization of ERC20 pool', () => {
     expect(await relayPool.totalAssets()).to.equal(0)
     expect(await relayPool.totalSupply()).to.equal(0)
     expect(await relayPool.HYPERLANE_MAILBOX()).to.equal(
-      mainnets[1].hyperlaneMailbox
+      networks[1].hyperlaneMailbox
     )
     expect(await relayPool.outstandingDebt()).to.equal(0)
   })

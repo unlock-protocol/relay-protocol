@@ -61,7 +61,11 @@ describe('CCTPBridgeProxy', function () {
     before(async () => {
       // get some usdc
       await mintUSDC(USDC, await recipient.getAddress(), amount)
-      balanceBefore = await getBalance(await recipient.getAddress(), USDC)
+      balanceBefore = await getBalance(
+        await recipient.getAddress(),
+        USDC,
+        ethers.provider
+      )
       expect(balanceBefore).to.be.equal(amount)
 
       // approve bridge to manipulate our usdc tokens
@@ -81,9 +85,9 @@ describe('CCTPBridgeProxy', function () {
       receipt = await tx.wait()
     })
     it('burnt the balance', async () => {
-      expect(await getBalance(await recipient.getAddress(), USDC)).to.be.equal(
-        balanceBefore - amount
-      )
+      expect(
+        await getBalance(await recipient.getAddress(), USDC, ethers.provider)
+      ).to.be.equal(balanceBefore - amount)
     })
 
     it('burn event is emitted correctly', async () => {

@@ -104,7 +104,11 @@ task('bridge:send-proxy', 'Send tokens across a proxy bridge (test purposes)')
       if (!destChain) destChain = 1
 
       // check balance
-      const balance = await getBalance(userAddress, assetAddress)
+      const balance = await getBalance(
+        userAddress,
+        assetAddress,
+        ethers.provider
+      )
       if (balance < amount) {
         throw Error(
           `Insufficient balance (actual: ${balance}, expected: ${amount})`
