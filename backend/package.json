@@ -21,8 +21,8 @@
   },
   "devDependencies": {
     "@types/node": "22.10.7",
-    "@typescript-eslint/eslint-plugin": "8.21.0",
-    "@typescript-eslint/parser": "8.21.0",
+    "@typescript-eslint/eslint-plugin": "6.21.0",
+    "@typescript-eslint/parser": "6.21.0",
     "eslint": "9.18.0",
     "eslint-config-ponder": "0.8.30",
     "eslint-config-prettier": "10.0.1",
