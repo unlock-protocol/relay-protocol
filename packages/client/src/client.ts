@@ -1,5 +1,7 @@
 import { GraphQLClient } from 'graphql-request'
 import { getSdk } from './generated/graphql'
+import type { DocumentNode } from 'graphql'
+import type { Variables } from 'graphql-request'
 
 /**
  * RelayClient provides a low-level interface for making GraphQL requests to the Relay Protocol vaults API.
@@ -32,5 +34,17 @@ export class RelayClient {
    */
   public get sdk() {
     return getSdk(this.client)
+  }
+
+  /**
+   * Execute a raw GraphQL query
+   *
+   * @internal
+   */
+  async rawQuery<TData = any, TVariables extends Variables = Variables>(
+    query: string | DocumentNode,
+    variables?: TVariables
+  ): Promise<TData> {
+    return this.client.request<TData>(query, variables)
   }
 }

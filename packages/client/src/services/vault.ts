@@ -1,4 +1,6 @@
 import { RelayClient } from '../client'
+import type { DocumentNode } from 'graphql'
+import type { Variables } from 'graphql-request'
 import type {
   GetAllPoolsQuery,
   GetRelayPoolQuery,
@@ -35,6 +37,29 @@ export class RelayVaultService {
       throw new Error('GraphQL endpoint URL is required')
     }
     this.client = new RelayClient(endpoint)
+  }
+
+  /**
+   * Execute a raw GraphQL query with variables
+   *
+   * @param query - The GraphQL query document
+   * @param variables - Query variables (optional)
+   * @returns Promise containing the query result
+   * @throws Will throw an error if the query fails
+   *
+   * @example
+   * ```typescript
+   * const { data } = await vaultService.query(GET_ALL_POOLS)
+   * // Or with variables
+   * const { data } = await vaultService.query(GET_USER_BALANCES, { walletAddress: "0x..." })
+   * ```
+   */
+  async query<TData = any, TVariables extends Variables = Variables>(
+    query: string | DocumentNode,
+    variables?: TVariables
+  ): Promise<{ data: TData }> {
+    const data = await this.client.rawQuery<TData, TVariables>(query, variables)
+    return { data }
   }
 
   /**
