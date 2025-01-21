@@ -54,10 +54,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@bgd-labs/aave-address-book@npm:4.8.0":
-  version: 4.8.0
-  resolution: "@bgd-labs/aave-address-book@npm:4.8.0"
-  checksum: 10/9da300de39dfc10e58457c71cdace4fc2451646e5b4ba55356ec3365bfe937b27ea17fa9b8f44f1711689307a3fb40504e384170e96e0ca315b511147d89272a
+"@bgd-labs/aave-address-book@npm:4.8.1":
+  version: 4.8.1
+  resolution: "@bgd-labs/aave-address-book@npm:4.8.1"
+  checksum: 10/7371935e1c5688ef8bf8850cef7bd5cb9d4735259e4cfd83cf621c4a12f835ffc100fb0a37d0e5c1ceab8a5cca63d85040099bc2344fb03d0f6ab27805d82119
   languageName: node
   linkType: hard
 
@@ -1874,7 +1874,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@relay-protocol/helpers@workspace:packages/helpers"
   dependencies:
-    "@bgd-labs/aave-address-book": "npm:4.8.0"
+    "@bgd-labs/aave-address-book": "npm:4.8.1"
     "@relay-protocol/networks": "workspace:^"
     "@relay-protocol/tsconfig": "workspace:^"
     "@types/copyfiles": "npm:^2"
@@ -8367,7 +8367,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "payday-pools@workspace:smart-contracts"
   dependencies:
-    "@bgd-labs/aave-address-book": "npm:4.8.0"
+    "@bgd-labs/aave-address-book": "npm:4.8.1"
     "@eslint/js": "npm:9.17.0"
     "@eth-optimism/contracts-bedrock": "npm:0.17.3"
     "@nomicfoundation/hardhat-chai-matchers": "npm:2.0.8"
