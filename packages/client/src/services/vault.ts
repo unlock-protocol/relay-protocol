@@ -6,20 +6,13 @@ import type {
 } from '../generated/graphql'
 
 /**
- * Default GraphQL endpoint for the Relay Protocol vaults API
- * Can be overridden by setting the GRAPHQL_ENDPOINT environment variable
- */
-const GRAPHQL_ENDPOINT =
-  process.env.GRAPHQL_ENDPOINT || 'http://localhost:42069/graphql'
-
-/**
  * RelayVaultService provides a high-level interface for interacting with Relay Protocol vaults
  * through the GraphQL API. It abstracts away the complexity of direct GraphQL queries and
  * provides simple, strongly-typed methods for common operations.
  *
  * Usage:
  * ```typescript
- * const vaultService = new RelayVaultService()
+ * const vaultService = new RelayVaultService('https://api.example.com/graphql')
  *
  * // Get all pools
  * const pools = await vaultService.getAllPools()
@@ -31,8 +24,17 @@ const GRAPHQL_ENDPOINT =
 export class RelayVaultService {
   private client: RelayClient
 
-  constructor() {
-    this.client = new RelayClient(GRAPHQL_ENDPOINT)
+  /**
+   * Creates a new RelayVaultService instance
+   *
+   * @param endpoint - The GraphQL API endpoint URL
+   * @throws Will throw an error if the endpoint URL is invalid
+   */
+  constructor(endpoint: string) {
+    if (!endpoint) {
+      throw new Error('GraphQL endpoint URL is required')
+    }
+    this.client = new RelayClient(endpoint)
   }
 
   /**
