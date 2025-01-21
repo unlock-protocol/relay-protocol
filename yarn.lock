@@ -6063,10 +6063,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"hono@npm:4.6.16":
-  version: 4.6.16
-  resolution: "hono@npm:4.6.16"
-  checksum: 10/21e34fa5f54ebee2cc6b7f954b82c2073a19ea27f402e5dc6e6e2de5922f36d11d5bce1703aa55f67a1d77f83c3f7656f741b3b183a25e88c9a0ecc50cd8a180
+"hono@npm:4.6.17":
+  version: 4.6.17
+  resolution: "hono@npm:4.6.17"
+  checksum: 10/58311c4e3b806cc3233e3935fc7a715f833a6c616107975e7d9223d4d10e51c30625b599a544058f29668370461bb345b19f54ddd0b4306e9748abb025d506f4
   languageName: node
   linkType: hard
 
@@ -8661,7 +8661,7 @@ __metadata:
     eslint-config-ponder: "npm:0.8.30"
     eslint-config-prettier: "npm:10.0.1"
     eslint-plugin-prettier: "npm:5.2.3"
-    hono: "npm:4.6.16"
+    hono: "npm:4.6.17"
     husky: "npm:9.1.7"
     jsonc-eslint-parser: "npm:2.4.0"
     lint-staged: "npm:15.4.1"
