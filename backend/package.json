@@ -1,0 +1,45 @@
+{
+  "name": "relay-pools-backend",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "ponder dev",
+    "start": "ponder start",
+    "db": "ponder db",
+    "codegen": "ponder codegen",
+    "serve": "ponder serve",
+    "lint": "eslint \"src/**/*.{js,ts,json}\" \"*.{js,ts,json}\" --fix",
+    "lint:check": "eslint \"src/**/*.{js,ts}\" \"*.{js,ts}\"",
+    "typecheck": "tsc",
+    "prepare": "husky",
+    "lint-staged": "lint-staged"
+  },
+  "dependencies": {
+    "hono": "4.6.16",
+    "ponder": "0.8.27",
+    "viem": "2.22.9"
+  },
+  "devDependencies": {
+    "@types/node": "22.10.7",
+    "@typescript-eslint/eslint-plugin": "8.20.0",
+    "@typescript-eslint/parser": "8.20.0",
+    "eslint": "9.18.0",
+    "eslint-config-ponder": "0.8.27",
+    "eslint-config-prettier": "10.0.1",
+    "eslint-plugin-prettier": "5.2.2",
+    "husky": "9.1.7",
+    "jsonc-eslint-parser": "2.4.0",
+    "lint-staged": "15.4.1",
+    "prettier": "3.4.2",
+    "typescript": "5.7.3"
+  },
+  "engines": {
+    "node": ">=18.14"
+  },
+  "lint-staged": {
+    "*.{js,ts}": [
+      "eslint --fix",
+      "prettier --write"
+    ]
+  }
+}
