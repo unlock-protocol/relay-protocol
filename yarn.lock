@@ -8668,7 +8668,7 @@ __metadata:
     ponder: "npm:0.8.30"
     prettier: "npm:3.4.2"
     typescript: "npm:5.7.3"
-    viem: "npm:2.22.9"
+    viem: "npm:2.22.10"
   languageName: unknown
   linkType: soft
 
@@ -10314,9 +10314,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"viem@npm:2.22.9":
-  version: 2.22.9
-  resolution: "viem@npm:2.22.9"
+"viem@npm:2.22.10":
+  version: 2.22.10
+  resolution: "viem@npm:2.22.10"
   dependencies:
     "@noble/curves": "npm:1.7.0"
     "@noble/hashes": "npm:1.6.1"
@@ -10331,7 +10331,7 @@ __metadata:
   peerDependenciesMeta:
     typescript:
       optional: true
-  checksum: 10/29ddd53851a66946393e0763f87849e467530d8f8bd0e270bcd1f1d5f5c718a7c0ae28a159fbfc0eb38dda6c1ce7cc1c31cf5cc81671140888cbcbbd011c92b8
+  checksum: 10/2cc5c2781d3f75ed1f74ba957e43a5cbf252b2da920066c743c78ded45b0637adae5477c86023de09b69cf8611a94327fb2b2b953cfc1b08f281305caa91cf1a
   languageName: node
   linkType: hard
 
