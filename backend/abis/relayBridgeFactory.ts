@@ -56,4 +56,4 @@ export const relayBridgeFactoryAbi = [
     stateMutability: 'view',
     type: 'function',
   },
-]
+] as const
