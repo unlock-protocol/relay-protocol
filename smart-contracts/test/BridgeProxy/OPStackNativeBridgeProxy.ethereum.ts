@@ -6,10 +6,7 @@ import OPStackNativeBridgeProxyModule from '../../ignition/modules/OPStackNative
 import { AbiCoder } from 'ethers'
 import { buildFinalizeWithdrawal } from '@relay-protocol/helpers'
 import { expect } from 'chai'
-import L1StandardBridge from '@relay-protocol/helpers/dist/abis/op/L1StandardBridge.json'
-import L1CrossDomainMessenger from '@relay-protocol/helpers/dist/abis/L2CrossDomainMessenger.json'
-import Portal2 from '@relay-protocol/helpers/dist/abis/op/Portal2.json'
-import WETH from '@relay-protocol/helpers/dist/abis/WETH.json'
+import * as ABIs from '@relay-protocol/helpers/abis'
 
 const { op, weth } = networks[1]
 
@@ -51,7 +48,7 @@ describe('OPStackNativeBridgeProxy', function () {
           weth,
         ])
         if (log.address === '0x99C9fc46f92E8a1c0deC1b1747d010903E884bE1') {
-          const iface = new ethers.Interface(L1StandardBridge)
+          const iface = new ethers.Interface(ABIs.L1StandardBridge)
           const event = iface.parseLog(log)
           expect(event.name).to.be.oneOf([
             'ETHBridgeFinalized',
@@ -68,14 +65,14 @@ describe('OPStackNativeBridgeProxy', function () {
         } else if (
           log.address === '0x25ace71c97B33Cc4729CF772ae268934F7ab5fA1'
         ) {
-          const iface = new ethers.Interface(L1CrossDomainMessenger)
+          const iface = new ethers.Interface(ABIs.L2CrossDomainMessenger)
           const event = iface.parseLog(log)
           expect(event.name).to.equal('RelayedMessage')
           expect(event.args.msgHash).to.equal(
             '0x9e16c5899d5e4e83897fa35082e0a65ef4b7853bdc573f9a8a3ed645ce4bb473'
           )
         } else if (log.address === op.portalProxy) {
-          const iface = new ethers.Interface(Portal2)
+          const iface = new ethers.Interface(ABIs.Portal2)
           const event = iface.parseLog(log)
           expect(event.name).to.equal('WithdrawalFinalized')
           expect(event.args.withdrawalHash).to.equal(
@@ -83,7 +80,7 @@ describe('OPStackNativeBridgeProxy', function () {
           )
           expect(event.args.success).to.equal(true)
         } else if (log.address === weth) {
-          const iface = new ethers.Interface(WETH)
+          const iface = new ethers.Interface(ABIs.WETH)
           const event = iface.parseLog(log)
           expect(event.name).to.equal('Deposit')
           expect(event.args.dst).to.equal(bridgeAddress)
