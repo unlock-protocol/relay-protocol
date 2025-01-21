@@ -13,7 +13,6 @@ const walk = async (dirPath: string) =>
 
 export const parseExports = async (folderName: string) => {
   const files = await walk(path.resolve('src', folderName))
-  console.log(files.flat())
   const exportsList = files!
     .flat()
     .filter((f: string) => f.includes('.json'))
@@ -24,8 +23,7 @@ export const parseExports = async (folderName: string) => {
       const contractName = path.parse(f).name
       const exportPath = `./${path
         .relative(process.cwd(), f)
-        .replace('src/', '')}`
-      console.log(exportPath)
+        .replace('src/abis/', '')}`
       return {
         contractName,
         exportPath,
@@ -43,7 +41,7 @@ export const createIndexFile = async (srcFolder: string) => {
 
   abiFiles.forEach(({ contractName, exportPath }) =>
     fileContent.push(
-      `import ${contractName} from '${exportPath}'  with { type: "json" }`
+      `import ${contractName} from '${exportPath}' with { type: 'json' }`
     )
   )
 

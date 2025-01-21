@@ -8,6 +8,10 @@
     ".": {
       "import": "./dist/index.mjs",
       "require": "./dist/index.js"
+    },
+    "./abis": {
+      "import": "./dist/abis/index.js",
+      "require": "./dist/abis/index.js"
     }
   },
   "license": "MIT",

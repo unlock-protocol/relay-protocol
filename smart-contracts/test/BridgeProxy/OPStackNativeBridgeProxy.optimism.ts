@@ -1,10 +1,12 @@
 import { ethers, ignition } from 'hardhat'
-import L2CrossDomainMessenger from '@relay-protocol/helpers/dist/abis/L2CrossDomainMessenger.json'
-import L2ToL1MessagePasserAbi from '@relay-protocol/helpers/dist/abis/L2ToL1MessagePasser.json'
-import L2StandardBridge from '@relay-protocol/helpers/dist/abis/L2StandardBridge.json'
+import {
+  L2CrossDomainMessenger,
+  L2ToL1MessagePasserAbi,
+  L2StandardBridge,
+  ERC20_ABI,
+} from '@relay-protocol/helpers/abis'
 import { expect } from 'chai'
 import { stealERC20 } from '../utils/hardhat'
-import ERC20_ABI from '@relay-protocol/helpers/dist/abis/ERC20.json'
 import { networks } from '@relay-protocol/networks'
 import OPStackNativeBridgeProxyModule from '../../ignition/modules/OPStackNativeBridgeProxyModule'
 

@@ -2,9 +2,10 @@
 import { createIndexFile } from '../src/package'
 
 const main = async () => {
+  console.log('Building ABIs index...')
   await createIndexFile('abis')
 }
 
 main()
-  .then(() => console.log('ok.'))
+  .then(() => {})
   .catch((e) => console.error(e))
