@@ -37,13 +37,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@bgd-labs/aave-address-book@npm:4.7.3":
-  version: 4.7.3
-  resolution: "@bgd-labs/aave-address-book@npm:4.7.3"
-  checksum: 10/a3a18548b845c8e606ac3c159d7869e27d51af83b935fb47bfe6a660432d12f54a668e4555c25080f15fcb8efee2ea4461dd70159b029b3a4faaddf134a1fba5
-  languageName: node
-  linkType: hard
-
 "@bgd-labs/aave-address-book@npm:4.8.0":
   version: 4.8.0
   resolution: "@bgd-labs/aave-address-book@npm:4.8.0"
@@ -6409,7 +6402,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "payday-pools@workspace:smart-contracts"
   dependencies:
-    "@bgd-labs/aave-address-book": "npm:4.7.3"
+    "@bgd-labs/aave-address-book": "npm:4.8.0"
     "@eslint/js": "npm:9.17.0"
     "@eth-optimism/contracts-bedrock": "npm:0.17.3"
     "@nomicfoundation/hardhat-chai-matchers": "npm:2.0.8"
