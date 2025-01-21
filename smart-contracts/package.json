@@ -58,7 +58,7 @@
     "typescript-eslint": "8.19.1"
   },
   "dependencies": {
-    "@bgd-labs/aave-address-book": "4.8.0",
+    "@bgd-labs/aave-address-book": "4.8.1",
     "@eth-optimism/contracts-bedrock": "0.17.3",
     "@openzeppelin/contracts": "5.1.0"
   }
