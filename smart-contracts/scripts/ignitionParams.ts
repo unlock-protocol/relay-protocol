@@ -1,6 +1,6 @@
 import fs from 'fs-extra'
 import { toObject } from '../lib/utils'
-import { mainnets } from '@relay-protocol/networks'
+import networks from '@relay-protocol/networks'
 
 import path from 'path'
 const destFolder = path.resolve('./ignition/params')

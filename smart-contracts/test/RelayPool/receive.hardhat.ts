@@ -1,6 +1,6 @@
 import { expect } from 'chai'
 import { ethers, ignition } from 'hardhat'
-import { mainnets } from '@relay-protocol/networks'
+import networks from '@relay-protocol/networks'
 import RelayPoolModule from '../../ignition/modules/RelayPoolModule'
 import { MyWeth } from '../../typechain-types'
 
@@ -25,7 +25,7 @@ describe('RelayBridge: receive', () => {
     // deploy using ignition
     const parameters = {
       RelayPool: {
-        hyperlaneMailbox: mainnets[1].hyperlaneMailbox,
+        hyperlaneMailbox: networks[1].hyperlaneMailbox,
         asset: await myWeth.getAddress(),
         name: `${await myWeth.name()} Relay Pool`,
         symbol: `${await myWeth.symbol()}-REL`,
@@ -63,7 +63,7 @@ describe('RelayBridge: receive', () => {
 
     const thirdPartyPoolAddress = await thirdPartyPool.getAddress()
     const relayPool = await ethers.deployContract('RelayPool', [
-      mainnets[1].hyperlaneMailbox,
+      networks[1].hyperlaneMailbox,
       await myToken.getAddress(),
       `${await myToken.name()} Relay Pool`,
       `${await myToken.symbol()}-REL`,
