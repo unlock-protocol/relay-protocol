@@ -23,9 +23,6 @@ COPY . .
 # Build the application
 RUN cd backend && yarn codegen
 
-# Set working directory to backend
-WORKDIR /app/backend
-
 # Expose the port (Ponder typically runs on 42069)
 EXPOSE 42069
 
@@ -38,5 +35,5 @@ ENV SCHEMA=$RAILWAY_DEPLOYMENT_ID
 HEALTHCHECK --interval=60s --timeout=10s --start-period=5s --retries=3 \
   CMD curl -f http://localhost:42069/health || exit 1
 
-# Start the application with schema
-CMD ["yarn", "start", "--schema", "$RAILWAY_DEPLOYMENT_ID"] 
+# Start the application with schema (using cd command as recommended for monorepos)
+CMD cd backend && yarn start --schema $RAILWAY_DEPLOYMENT_ID 
