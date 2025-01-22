@@ -1,6 +1,6 @@
 import { ethers, JsonRpcApiProvider } from 'ethers'
 import { networks } from '@relay-protocol/networks'
-import { fetchRawBlock, getProvider } from './l1Provider'
+import { fetchRawBlock, getProvider } from './provider'
 import { getEvent } from './events'
 
 import OUTBOX_ABI from './abis/arb/Outbox.json'
