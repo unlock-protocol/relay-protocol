@@ -3,4 +3,7 @@ node_modules
 generated
 dist
 .env*
-*.log 
+*.log
+.git
+.gitignore
+README.md 

@@ -23,7 +23,8 @@
     "packages:clean": "yarn packages --parallel run clean",
     "packages:build": "yarn packages --topological-dev run build",
     "build": "yarn packages:build",
-    "clean": "yarn packages:clean"
+    "clean": "yarn packages:clean",
+    "build:backend": "cd backend && yarn install && yarn build"
   },
   "engines": {
     "node": ">=20.0.0"

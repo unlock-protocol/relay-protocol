@@ -5,23 +5,16 @@ FROM node:20-alpine
 RUN apk add --no-cache python3 make g++
 
 # Set working directory
-WORKDIR /app
-
-# Copy root package files first
-COPY package.json yarn.lock .yarnrc.yml ./
-COPY .yarn ./.yarn
-
-# Copy backend package files
-COPY backend/package.json ./backend/
-
-# Install dependencies using yarn
-RUN yarn install
-
-# Copy backend source code
-COPY backend ./backend
-
-# Set working directory to backend
 WORKDIR /app/backend
+
+# Copy backend package files first
+COPY package.json ./
+
+# Copy backend dependencies
+COPY node_modules ./node_modules
+
+# Copy source code
+COPY . .
 
 # Build the application
 RUN yarn build
