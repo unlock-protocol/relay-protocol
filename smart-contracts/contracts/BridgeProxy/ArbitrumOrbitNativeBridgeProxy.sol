@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.0;
+pragma solidity ^0.8.28;
 
 // https://docs.arbitrum.io/build-decentralized-apps/token-bridging/token-bridge-erc20
 

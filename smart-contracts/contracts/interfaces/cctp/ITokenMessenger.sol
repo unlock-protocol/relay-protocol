@@ -4,7 +4,7 @@
 // stripped version of:
 //   https://github.com/circlefin/evm-cctp-contracts/blob/master/src/MessageTransmitter.sol
 
-pragma solidity ^0.8.0;
+pragma solidity ^0.8.28;
 
 import {IMessageTransmitter} from "./IMessageTransmitter.sol";
 import {ITokenMinter} from "./ITokenMinter.sol";
