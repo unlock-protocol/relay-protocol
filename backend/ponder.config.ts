@@ -72,7 +72,7 @@ export default createConfig({
       abi: relayPoolFactoryAbi,
       network: {
         sepolia: {
-          address: '0xf06fb9fbc957e99d4b527b0a73a894a483ea1c46',
+          address: '0xF06fB9fBC957e99D4B527B0a73a894A483EA1c46',
         },
       },
     },
@@ -80,7 +80,7 @@ export default createConfig({
       abi: relayPoolAbi,
       network: 'sepolia',
       address: factory({
-        address: '0xf06fb9fbc957e99d4b527b0a73a894a483ea1c46',
+        address: '0xF06fB9fBC957e99D4B527B0a73a894A483EA1c46',
         // @ts-expect-error
         event: poolDeployedEvent,
         parameter: 'pool',
@@ -91,7 +91,7 @@ export default createConfig({
       abi: relayBridgeFactoryAbi,
       network: {
         opSepolia: {
-          address: '0xacdffaa0323440e123d68c25a073e99deb82e3fc',
+          address: '0xacDFfaA0323440e123D68C25a073e99DeB82e3fC',
         },
       },
     },
@@ -99,7 +99,7 @@ export default createConfig({
       abi: relayBridgeAbi,
       network: 'sepolia',
       address: factory({
-        address: '0xacdffaa0323440e123d68c25a073e99deb82e3fc',
+        address: '0xacDFfaA0323440e123D68C25a073e99DeB82e3fC',
         event: {
           anonymous: false,
           inputs: [
