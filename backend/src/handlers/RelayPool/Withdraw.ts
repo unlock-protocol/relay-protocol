@@ -43,17 +43,21 @@ export default async function ({
   ])
 
   // Update relay pool with current values from contract
-  await context.db.update(relayPool, { contractAddress: event.log.address }).set({
-    totalAssets,
-    totalShares,
-  })
+  await context.db
+    .update(relayPool, { contractAddress: event.log.address })
+    .set({
+      totalAssets,
+      totalShares,
+    })
 
   // Get user balance
   const balanceId = `${sender}-${event.log.address}` // wallet-pool format
   const user = await context.db.find(userBalance, { id: balanceId })
 
   if (!user) {
-    throw new Error(`User ${sender} attempting to withdraw without existing balance record`)
+    throw new Error(
+      `User ${sender} attempting to withdraw without existing balance record`
+    )
   }
 
   // Update user balance

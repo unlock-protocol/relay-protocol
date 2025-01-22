@@ -38,7 +38,7 @@ jobs:
         shell: bash
 
       - name: 'run lint'
-        run: yarn run lint
+        run: yarn workspace @relay-protocol/${{matrix.folders}} lint
         if: steps.changed-files.outputs.any_changed == 'true'
         shell: bash
 
