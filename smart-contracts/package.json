@@ -6,11 +6,11 @@
   "author": "Julien Genestoux <julien.genestoux@gmail.com>",
   "license": "MIT",
   "scripts": {
-    "test": "yarn run test:optimism && yarn run test:hardhat && yarn run test:ethereum",
+    "test": "yarn run test:optimism && yarn run test:hardhat && yarn run test:ethereum && yarn test:sepolia",
     "test:hardhat": "yarn hardhat test test/**/*.hardhat.ts",
     "test:ethereum": "RPC_URL=https://rpc.unlock-protocol.com/1 yarn hardhat test test/**/*.ethereum.ts",
     "test:optimism": "RPC_URL=https://rpc.unlock-protocol.com/10 yarn hardhat test test/**/*.optimism.ts",
-    "test:arbitrum": "RPC_URL=https://rpc.unlock-protocol.com/42161 yarn hardhat test test/**/*.arbitrum.ts",
+    "test:sepolia": "RPC_URL=https://rpc.unlock-protocol.com/11155111 yarn hardhat test test/**/*.sepolia.ts",
     "lint:contracts": "solhint 'contracts/**/*.sol'",
     "lintFix": "yarn lint:contracts --fix --noPrompt && yarn lint:code --fix",
     "lint:code": "eslint .",

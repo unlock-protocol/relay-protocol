@@ -1,6 +1,6 @@
 import { ethers, JsonRpcApiProvider } from 'ethers'
 import { networks } from '@relay-protocol/networks'
-import { fetchRawBlock, getProvider } from './provider'
+import { fetchRawBlock, getProvider } from './l1Provider'
 import { getEvent } from './events'
 
 import OUTBOX_ABI from './abis/arb/Outbox.json'
@@ -13,7 +13,7 @@ const NODE_INTERFACE_ADDRESS = '0x00000000000000000000000000000000000000C8'
 
 const getLatestConfirmedBlockCoords = async function (chainId: bigint) {
   let rollupAddress: string
-  const provider = await getProvider(chainId)
+  const l1Provider = await getProvider(chainId)
   const { arb: arbContracts, isTestnet } = networks[chainId.toString()]
   if (arbContracts) {
     ;({ rollup: rollupAddress } = arbContracts)
@@ -25,7 +25,7 @@ const getLatestConfirmedBlockCoords = async function (chainId: bigint) {
     // see https://docs.arbitrum.io/how-arbitrum-works/bold/gentle-introduction
     rollupAddress!,
     isTestnet ? ROLLUP_SEPOLIA_ABI : ROLLUP_MAINNET_ABI,
-    provider
+    l1Provider
   )
   const latestConfirmedAssertionId = await rollup.latestConfirmed.staticCall()
 
@@ -44,7 +44,7 @@ const getLatestConfirmedBlockCoords = async function (chainId: bigint) {
     fromBlock: createdAtBlock,
     toBlock: createdAtBlock,
   }
-  const logs = await provider.getLogs(fullFilter)
+  const logs = await l1Provider.getLogs(fullFilter)
   const parsedBlockLog = rollup.interface.parseLog(logs[0])
 
   // decode afterState
@@ -59,24 +59,24 @@ const getLatestConfirmedBlockCoords = async function (chainId: bigint) {
   }
 }
 
-export async function constructProof(
-  transactionHash: string,
-  srcChainId: bigint | string,
-  destChainId = 11155111n, //default to sepolia
-  provider?: JsonRpcApiProvider
+export async function constructArbProof(
+  l2TransactionHash: string,
+  l2ChainId: bigint | string,
+  l1ChainId = 11155111n, //default to sepolia
+  l1Provider?: JsonRpcApiProvider
 ) {
   let outboxAddress: string
 
-  if (!provider) {
-    provider = await getProvider(destChainId)
+  if (!l1Provider) {
+    l1Provider = await getProvider(l1ChainId)
   }
 
-  const arbProvider = await getProvider(srcChainId)
+  const arbProvider = await getProvider(l2ChainId)
   const arbsysInterface = new ethers.Interface(ARBSYS_ABI)
 
   // decode message on origin chain
   const transactionReceipt =
-    await arbProvider.getTransactionReceipt(transactionHash)
+    await arbProvider.getTransactionReceipt(l2TransactionHash)
   const {
     event: {
       args: {
@@ -94,13 +94,17 @@ export async function constructProof(
   } = await getEvent(transactionReceipt!, 'L2ToL1Tx', arbsysInterface)
 
   // make sure its not already spent on L1
-  const { arb: arbContracts } = networks[destChainId.toString()]
+  const { arb: arbContracts } = networks[l1ChainId.toString()]
   if (arbContracts) {
     ;({ outbox: outboxAddress } = arbContracts)
   }
 
   const outboxInterface = new ethers.Interface(OUTBOX_ABI)
-  const outbox = new ethers.Contract(outboxAddress!, outboxInterface, provider)
+  const outbox = new ethers.Contract(
+    outboxAddress!,
+    outboxInterface,
+    l1Provider
+  )
 
   // check if already spent
   const isSpent = await outbox.isSpent.staticCall(leaf)
@@ -113,13 +117,13 @@ export async function constructProof(
   // that makes the merkle computation fails when claiming later from the outbox
   // so we have to get the size directly from the latest "rolled up" block
   const { blockHash: latestConfirmedBlockHash } =
-    await getLatestConfirmedBlockCoords(destChainId)
+    await getLatestConfirmedBlockCoords(l1ChainId)
 
   // fetch raw block
   // NB: we have to use a json rpc call as ethers will filter out
-  // additional block params added by Arbitrumm
+  // additional block params added by Arbitrum
   const latestConfirmededBlock = await fetchRawBlock(
-    srcChainId,
+    l2ChainId,
     latestConfirmedBlockHash
   )
 

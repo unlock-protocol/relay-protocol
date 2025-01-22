@@ -1,5 +1,5 @@
 import { task } from 'hardhat/config'
-import { constructProof } from '@relay-protocol/helpers'
+import { constructArbProof } from '@relay-protocol/helpers'
 
 task('claim:arb', 'Claim ARB from bridge')
   .addParam('txHash', 'Tx hash on origin chain')
@@ -18,7 +18,19 @@ task('claim:arb', 'Claim ARB from bridge')
       timestamp,
       callvalue,
       data,
-    } = await constructProof(txHash, origin)
+    } = await constructArbProof(txHash, origin)
+
+    console.log({
+      proof,
+      leaf, // position/index
+      caller, //l2 sender
+      destination, // to
+      arbBlockNum, //l2block
+      ethBlockNum, // l1block
+      timestamp, //l2 ts
+      callvalue, // value
+      data,
+    })
 
     // now send to outbox
 
@@ -33,48 +45,47 @@ task('claim:arb', 'Claim ARB from bridge')
     // }
 
     // encode args to pass to pool
-    const args = [
-      proof,
-      leaf, // position/index
-      caller, //l2 sender
-      destination, // to
-      arbBlockNum, //l2block
-      ethBlockNum, // l1block
-      timestamp, //l2 ts
-      callvalue, // value
-      data,
-    ]
-    console.log(data)
+    // const args = [
+    //   proof,
+    //   leaf, // position/index
+    //   caller, //l2 sender
+    //   destination, // to
+    //   arbBlockNum, //l2block
+    //   ethBlockNum, // l1block
+    //   timestamp, //l2 ts
+    //   callvalue, // value
+    //   data,
+    // ]
 
     // const relayPool = await ethers.getContractAt('RelayPool', pool)
-    const relayPool = await ethers.getContractAt('RelayPool', pool)
-    const abiCoder = relayPool.interface.getAbiCoder()
+    // const relayPool = await ethers.getContractAt('RelayPool', pool)
+    // const abiCoder = relayPool.interface.getAbiCoder()
 
-    // send claim to the pool
-    const claimArgs = [
-      origin,
-      bridge,
-      abiCoder.encode(
-        [
-          'bytes32[]',
-          'uint256',
-          'address',
-          'address',
-          'uint256',
-          'uint256',
-          'uint256',
-          'uint256',
-          'bytes',
-        ],
-        args
-      ),
-    ]
-    console.log(claimArgs)
-    const tx = await relayPool.claim(...claimArgs)
+    // // send claim to the pool
+    // const claimArgs = [
+    //   origin,
+    //   bridge,
+    //   abiCoder.encode(
+    //     [
+    //       'bytes32[]',
+    //       'uint256',
+    //       'address',
+    //       'address',
+    //       'uint256',
+    //       'uint256',
+    //       'uint256',
+    //       'uint256',
+    //       'bytes',
+    //     ],
+    //     args
+    //   ),
+    // ]
+    // console.log(claimArgs)
+    // const tx = await relayPool.claim(...claimArgs)
 
     // const tx = await outbox.executeTransaction(...args, {
     //   maxFeePerGas: ethers.parseUnits('55', 'gwei'),
     // })
 
-    console.log(tx)
+    // console.log(tx)
   })

@@ -7,7 +7,7 @@ import { networks as nets } from '@relay-protocol/networks'
 import './tasks/pool'
 import './tasks/bridge'
 import './tasks/claim/cctp'
-// import './tasks/claim/arb'
+import './tasks/claim/arb'
 
 // Actual contracts
 import './tasks/deploy/pool'
