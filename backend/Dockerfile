@@ -1,6 +1,9 @@
 # Use Node.js 20 as base image (satisfies both requirements)
 FROM node:20-alpine
 
+# Accept Railway deployment ID as build argument
+ARG RAILWAY_DEPLOYMENT_ID
+
 # Install system dependencies
 RUN apk add --no-cache python3 make g++
 
@@ -18,13 +21,19 @@ RUN yarn install --frozen-lockfile
 COPY . .
 
 # Build the application
-RUN yarn build
+RUN yarn codegen
 
-# Expose the port (assuming Hono runs on 3000)
-EXPOSE 3000
+# Expose the port (Ponder typically runs on 42069)
+EXPOSE 42069
 
 # Set environment variables
 ENV NODE_ENV=production
+ENV PORT=42069
+ENV SCHEMA=$RAILWAY_DEPLOYMENT_ID
 
-# Start the application
-CMD ["yarn", "start"] 
+# Health check
+HEALTHCHECK --interval=60s --timeout=10s --start-period=5s --retries=3 \
+  CMD curl -f http://localhost:42069/health || exit 1
+
+# Start the application with schema
+CMD ["yarn", "ponder", "start", "--schema", "$RAILWAY_DEPLOYMENT_ID"] 
