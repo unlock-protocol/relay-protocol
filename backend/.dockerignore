@@ -1,0 +1,6 @@
+node_modules
+.ponder
+generated
+dist
+.env*
+*.log 
