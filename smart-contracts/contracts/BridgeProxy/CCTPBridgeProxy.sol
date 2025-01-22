@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.0;
+pragma solidity ^0.8.28;
 
 import {ITokenMessenger} from "../interfaces/cctp/ITokenMessenger.sol";
 import {IMessageTransmitter} from "../interfaces/cctp/IMessageTransmitter.sol";
