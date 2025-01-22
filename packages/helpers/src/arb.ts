@@ -1,4 +1,4 @@
-import { ethers } from 'ethers'
+import { ethers, JsonRpcApiProvider } from 'ethers'
 import { networks } from '@relay-protocol/networks'
 import { fetchRawBlock, getProvider } from './provider'
 import { getEvent } from './events'
@@ -33,7 +33,6 @@ const getLatestConfirmedBlockCoords = async function (chainId: bigint) {
   const { createdAtBlock } = isTestnet
     ? await rollup.getAssertion(latestConfirmedAssertionId)
     : await rollup.getNode(ethers.Typed.uint64(latestConfirmedAssertionId))
-  console.log({ createdAtBlock })
 
   // find creation block hash in assertion logs
   const eventFilter = isTestnet
@@ -63,9 +62,15 @@ const getLatestConfirmedBlockCoords = async function (chainId: bigint) {
 export async function constructProof(
   transactionHash: string,
   srcChainId: bigint | string,
-  destChainId = 11155111n //default to sepolia
+  destChainId = 11155111n, //default to sepolia
+  provider?: JsonRpcApiProvider
 ) {
   let outboxAddress: string
+
+  if (!provider) {
+    provider = await getProvider(destChainId)
+  }
+
   const arbProvider = await getProvider(srcChainId)
   const arbsysInterface = new ethers.Interface(ARBSYS_ABI)
 
@@ -94,7 +99,6 @@ export async function constructProof(
     ;({ outbox: outboxAddress } = arbContracts)
   }
 
-  const provider = await getProvider(destChainId)
   const outboxInterface = new ethers.Interface(OUTBOX_ABI)
   const outbox = new ethers.Contract(outboxAddress!, outboxInterface, provider)
 

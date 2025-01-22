@@ -1,21 +1,17 @@
 import { ethers, ignition } from 'hardhat'
+import { type JsonRpcApiProvider } from 'ethers'
 import { expect } from 'chai'
 import { type Signer } from 'ethers'
 
 import { ArbitrumOrbitNativeBridgeProxy } from '../../typechain-types'
 import { networks } from '@relay-protocol/networks'
-import { stealERC20 } from '../utils/hardhat'
-// import ERC20_ABI from '@relay-protocol/helpers/abis/ERC20.json'
-import { getBalance } from '@relay-protocol/helpers'
+import { constructProof, getBalance } from '@relay-protocol/helpers'
 import ArbitrumOrbitNativeBridgeProxyModule from '../../ignition/modules/ArbitrumOrbitNativeBridgeProxyModule'
 
-const { udt: UDT, weth: l1Weth } = networks[1]
+const ARB_CHAIN_ID = 42161n
 const {
-  udt: UDT_ARBITRUM,
-  arb: { routerGateway },
-} = networks[42161]
-
-const amount = ethers.parseEther('1')
+  arb: { routerGateway, outbox },
+} = networks[1]
 
 describe('ArbitrumOrbitNativeBridgeProxy', function () {
   let bridge: ArbitrumOrbitNativeBridgeProxy
@@ -29,7 +25,7 @@ describe('ArbitrumOrbitNativeBridgeProxy', function () {
     const parameters = {
       ArbitrumOrbitNativeBridgeProxy: {
         routerGateway,
-        l1Weth,
+        outbox,
       },
     }
 
@@ -46,23 +42,92 @@ describe('ArbitrumOrbitNativeBridgeProxy', function () {
   })
 
   describe('claim', () => {
-    // https://sepolia.arbiscan.io/tx/0x075f42ae6e150209c543959ca8b0f1e3bedcf146c86fb19a073f783b38ed15f3
-    const withdrawTx =
-      '0x075f42ae6e150209c543959ca8b0f1e3bedcf146c86fb19a073f783b38ed15f3'
-
     describe.skip('using ERC20')
 
-    describe.skip('using ETH', () => {
-      let balanceBefore
+    // we can not test this as constructing the proof
+    // require calls to the precompiled contracts on Arbitrum
+    // and this is not supported by hardhat
+    // (see 'constructProof.ts' in `@relay-protocol/helpers`)
+    it.skip('works using ETH', async () => {
       // https://arbiscan.io/tx/0x650570bd55b1bf54cd64d8882b4cc8b58f06c475ec17fdba93f2fbfa23fca340
-      const withdrawTx =
+      const originTxHash =
         '0x650570bd55b1bf54cd64d8882b4cc8b58f06c475ec17fdba93f2fbfa23fca340'
+      const recipientAddress = '0x246A13358Fb27523642D86367a51C2aEB137Ac6C'
 
-      it('should work', async () => {
-        balanceBefore = await getBalance(await recipient.getAddress())
-        const tx = await bridge.claim()
-        const receipt = await tx.wait()
-      })
+      const balanceBefore = await getBalance(
+        recipientAddress,
+        ethers.ZeroAddress,
+        ethers.provider
+      )
+
+      // construct the actual proof
+      const {
+        proof,
+        leaf,
+        caller,
+        destination,
+        arbBlockNum,
+        ethBlockNum,
+        timestamp,
+        callvalue,
+        data,
+      } = await constructProof(
+        originTxHash,
+        ARB_CHAIN_ID,
+        1n,
+        ethers.provider as JsonRpcApiProvider
+      )
+
+      // encode args to pass to pool
+      const args = [
+        proof,
+        leaf, // position/index
+        caller, //l2 sender
+        destination, // to
+        arbBlockNum, //l2block
+        ethBlockNum, // l1block
+        timestamp, //l2 ts
+        callvalue, // value
+        data,
+      ]
+      console.log(data)
+
+      // const relayPool = await ethers.getContractAt('RelayPool', pool)
+      // const relayPool = await ethers.getContractAt('RelayPool', pool)
+      const abiCoder = bridge.interface.getAbiCoder()
+
+      // send claim to the pool
+      const claimArgs = abiCoder.encode(
+        [
+          'bytes32[]',
+          'uint256',
+          'address',
+          'address',
+          'uint256',
+          'uint256',
+          'uint256',
+          'uint256',
+          'bytes',
+        ],
+        args
+      )
+
+      console.log(claimArgs)
+      const tx = await bridge.claim(ethers.ZeroAddress, claimArgs)
+      const balanceAfter = await getBalance(
+        recipientAddress,
+        ethers.ZeroAddress,
+        ethers.provider
+      )
+
+      expect(balanceAfter).to.equals(
+        balanceBefore + ethers.parseEther('0.000001')
+      )
+
+      // it('should work', async () => {
+      //   const tx = await bridge.claim()
+      //   const receipt = await tx.wait()
+      // })
     })
   })
 })
