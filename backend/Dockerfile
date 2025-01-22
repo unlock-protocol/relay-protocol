@@ -39,4 +39,4 @@ HEALTHCHECK --interval=60s --timeout=10s --start-period=5s --retries=3 \
 WORKDIR /app/backend
 
 # Start the application using the SCHEMA environment variable
-CMD yarn start --schema $SCHEMA
+CMD yarn start:backend --schema $SCHEMA
