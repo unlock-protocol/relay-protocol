@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: Unknown
-pragma solidity ^0.8.0;
+pragma solidity ^0.8.28;
 
 import {BridgeProxy} from "./BridgeProxy.sol";
 import {L2StandardBridge} from "../interfaces/L2StandardBridge.sol";
