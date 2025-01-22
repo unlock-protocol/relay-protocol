@@ -5,7 +5,7 @@
       "phases": {
         "install": {
           "dependsOn": ["setup"],
-          "cmds": ["yarn install --legacy-peer-deps"]
+          "cmds": ["npm install --legacy-peer-deps"]
         }
       }
     }
