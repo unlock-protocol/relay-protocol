@@ -1,13 +1,5 @@
-{
-  "$schema": "https://railway.com/railway.schema.json",
-  "build": {
-    "nixpacksPlan": {
-      "phases": {
-        "install": {
-          "dependsOn": ["setup"],
-          "cmds": ["yarn install --legacy-peer-deps"]
-        }
-      }
-    }
-  }
-}
+schema = "https://railway.com/railway.schema.json"
+
+[build.nixpacksPlan.phases.install]
+dependsOn = ["setup"]
+cmds = ["yarn install --legacy-peer-deps"]
