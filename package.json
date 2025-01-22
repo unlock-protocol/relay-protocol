@@ -24,7 +24,8 @@
     "packages:build": "yarn packages --topological-dev run build",
     "build": "yarn packages:build",
     "clean": "yarn packages:clean",
-    "build:backend": "cd backend && yarn install && yarn build"
+    "build:backend": "cd backend && yarn install && yarn build",
+    "start:backend": "cd backend && yarn start"
   },
   "engines": {
     "node": ">=20.0.0"
