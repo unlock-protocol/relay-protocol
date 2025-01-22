@@ -7,6 +7,7 @@ import { networks as nets } from '@relay-protocol/networks'
 import './tasks/pool'
 import './tasks/bridge'
 import './tasks/claim/cctp'
+// import './tasks/claim/arb'
 
 // Actual contracts
 import './tasks/deploy/pool'
@@ -71,6 +72,7 @@ const etherscan = {
     polygonZkEVM: '8H4ZB9SQBMQ7WA1TCIXFQVCHTVX8DXTY9Y',
     scroll: 'BZEXNPN6KKKJQ8VIMNXZDZNEX7QQZWZQ3P',
     opSepolia: 'V51DWC44XURIGPP49X85VZQGH1DCBAW5EC',
+    'arbitrum-sepolia': 'W5XNFPZS8D6JZ5AXVWD4XCG8B5ZH5JCD4Y',
   },
   customChains: [
     {
@@ -95,6 +97,14 @@ const etherscan = {
       urls: {
         apiURL: 'https://api.basescan.org/api',
         browserURL: 'https://basescan.org/',
+      },
+    },
+    {
+      network: 'arbitrum-sepolia',
+      chainId: 421614,
+      urls: {
+        apiURL: 'https://api-sepolia.arbiscan.io/api',
+        browserURL: 'https://sepolia.arbiscan.io/',
       },
     },
   ],
