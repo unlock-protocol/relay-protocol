@@ -1,5 +1,5 @@
 {
-  "name": "relay-pools-backend",
+  "name": "@relay-protocol/backend",
   "private": true,
   "type": "module",
   "scripts": {
