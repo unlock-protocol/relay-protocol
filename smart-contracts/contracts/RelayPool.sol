@@ -8,7 +8,7 @@ import {ERC20Permit} from "@openzeppelin/contracts/token/ERC20/extensions/ERC20P
 import {IWETH} from "./interfaces/IWETH.sol";
 import {TypeCasts} from "./utils/TypeCasts.sol";
 
-// import "hardhat/console.sol";
+import "hardhat/console.sol";
 
 struct OriginSettings {
   uint256 maxDebt;
@@ -365,7 +365,8 @@ contract RelayPool is ERC4626, ERC20Permit {
 
     // Decode the result
     uint256 amount = abi.decode(result, (uint256));
-
+    console.log("Amount: %d", amount);
+    console.log("outs debt: %d", origin.outstandingDebt);
     // We should have received funds
     // Update the outstanding debts (both for the origin and the pool total)
     origin.outstandingDebt -= amount;
