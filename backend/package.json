@@ -8,7 +8,7 @@
     "db": "ponder db",
     "codegen": "ponder codegen",
     "serve": "ponder serve",
-    "test": "echo 'No tests'; exit 1",
+    "test": "echo 'No tests'; exit 0",
     "lint": "eslint \"src/**/*.{js,ts,json}\" \"*.{js,ts,json}\" --fix",
     "lint:check": "eslint \"src/**/*.{js,ts}\" \"*.{js,ts}\"",
     "typecheck": "tsc",
