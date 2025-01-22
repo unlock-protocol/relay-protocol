@@ -6,4 +6,6 @@ dist
 *.log
 .git
 .gitignore
-README.md 
+README.md
+.husky
+.yarn 

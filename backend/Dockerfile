@@ -7,11 +7,12 @@ RUN apk add --no-cache python3 make g++
 # Set working directory
 WORKDIR /app/backend
 
-# Copy backend package files first
+# Copy package files
 COPY package.json ./
+COPY yarn.lock ./
 
-# Copy backend dependencies
-COPY node_modules ./node_modules
+# Install dependencies
+RUN yarn install --frozen-lockfile
 
 # Copy source code
 COPY . .
