@@ -6,7 +6,6 @@ pragma solidity ^0.8.28;
 import {BridgeProxy} from "./BridgeProxy.sol";
 import {IL2GatewayRouter} from "../interfaces/arb/IArbL2GatewayRouter.sol";
 import {IArbSys} from "../interfaces/arb/IArbSys.sol";
-import {INodeInterface} from "../interfaces/arb/INodeInterface.sol";
 import {IOutbox} from "../interfaces/arb/IOutbox.sol";
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
@@ -74,6 +73,7 @@ contract ArbitrumOrbitNativeBridgeProxy is BridgeProxy {
     // as bytes 'calldata' to later decode the data
     // to finalize transfer in the outbox contract
     BridgeParams calldata params;
+    // solhint-disable-next-line no-inline-assembly
     assembly {
       params := bridgeParams.offset
     }
