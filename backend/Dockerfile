@@ -8,11 +8,11 @@ ARG RAILWAY_DEPLOYMENT_ID
 RUN apk add --no-cache python3 make g++
 
 # Set working directory
-WORKDIR /app/backend
+WORKDIR /app
 
-# Copy package files
-COPY package.json ./
-COPY yarn.lock ./
+# Copy package files from root and backend
+COPY package.json yarn.lock ./
+COPY backend/package.json ./backend/
 
 # Install dependencies
 RUN yarn install --frozen-lockfile
@@ -21,7 +21,10 @@ RUN yarn install --frozen-lockfile
 COPY . .
 
 # Build the application
-RUN yarn codegen
+RUN cd backend && yarn codegen
+
+# Set working directory to backend
+WORKDIR /app/backend
 
 # Expose the port (Ponder typically runs on 42069)
 EXPOSE 42069
@@ -36,4 +39,4 @@ HEALTHCHECK --interval=60s --timeout=10s --start-period=5s --retries=3 \
   CMD curl -f http://localhost:42069/health || exit 1
 
 # Start the application with schema
-CMD ["yarn", "ponder", "start", "--schema", "$RAILWAY_DEPLOYMENT_ID"] 
+CMD ["yarn", "start", "--schema", "$RAILWAY_DEPLOYMENT_ID"] 
