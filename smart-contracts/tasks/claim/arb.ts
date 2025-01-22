@@ -1,6 +1,5 @@
 import { task } from 'hardhat/config'
-import {} from '../../lib/utils'
-// import { networks } from '../../lib/networks'
+import { constructProof } from '@relay-protocol/helpers'
 
 task('claim:arb', 'Claim ARB from bridge')
   .addParam('txHash', 'Tx hash on origin chain')
@@ -8,8 +7,6 @@ task('claim:arb', 'Claim ARB from bridge')
   .addParam('bridge', 'The proxy bridge contract on dest chain')
   .addParam('pool', 'The pool on dest chain')
   .setAction(async ({ txHash, origin, pool, bridge }, { ethers }) => {
-    const { constructProof } = await import('../../lib/utils/arb')
-
     // construct the actual proof
     const {
       proof,

@@ -1,5 +1,5 @@
 import { task } from 'hardhat/config'
-import { networks } from '../../lib/networks'
+import { networks } from '@relay-protocol/networks'
 import { type BaseContract } from 'ethers'
 
 import CCTPBridgeProxyModule from '../../ignition/modules/CCTPBridgeProxyModule'
