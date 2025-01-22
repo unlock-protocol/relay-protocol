@@ -20,4 +20,4 @@ export const ethereum = {
     transmitter: '0x0a992d191DEeC32aFe36203Ad87D7d289a738F81',
   },
   weth: '0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2',
-};
+}

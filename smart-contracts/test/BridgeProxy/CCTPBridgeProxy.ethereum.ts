@@ -5,8 +5,11 @@ import { AbiCoder } from 'ethers'
 import { expect } from 'chai'
 import { type TransactionReceipt } from 'ethers'
 import { CCTPBridgeProxy } from '../../typechain-types'
-import { getBalance, getEvent } from '@relay-protocol/helpers'
-import { getCCTPAttestation } from '@relay-protocol/helpers/cctp'
+import {
+  getBalance,
+  getEvent,
+  getCCTPAttestation,
+} from '@relay-protocol/helpers'
 
 const {
   usdc: { messenger, transmitter, token: USDC },
@@ -34,7 +37,7 @@ describe('CCTPBridgeProxy', function () {
         parameters,
       }))
 
-      balanceBefore = await getBalance(recipient, USDC)
+      balanceBefore = await getBalance(recipient, USDC, ethers.provider)
 
       // bridge tx
       // https://optimistic.etherscan.io/tx/0xcd16cd9c684113ac8060d1f54ad3acd9d5d76730e50474b875d07101636be837
@@ -52,7 +55,9 @@ describe('CCTPBridgeProxy', function () {
       receipt = await tx.wait()
     })
     it('balance updated correctly', async () => {
-      expect(await getBalance(recipient, USDC)).to.equal(balanceBefore + amount)
+      expect(await getBalance(recipient, USDC, ethers.provider)).to.equal(
+        balanceBefore + amount
+      )
     })
     it('message received correctly', async () => {
       // parse interface to decode logs

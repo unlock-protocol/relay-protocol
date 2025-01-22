@@ -68,7 +68,11 @@ describe('RelayPoolNativeGateway', () => {
       const totalAssets = await relayPool.totalAssets()
       const totalSupply = await relayPool.totalSupply()
       const sharesBalance = await relayPool.balanceOf(userAddress)
-      const tokenBalance = await getBalance(await relayPool.getAddress(), WETH)
+      const tokenBalance = await getBalance(
+        await relayPool.getAddress(),
+        WETH!,
+        ethers.provider
+      )
 
       // Preview the deposit
       const newShares = await relayPool.previewDeposit(amount)
@@ -88,9 +92,9 @@ describe('RelayPoolNativeGateway', () => {
         sharesBalance + newShares
       )
       // Balance of assets for the pool should be correct!
-      expect(await getBalance(thirdPartyPoolAddress, WETH)).to.equal(
-        tokenBalance + amount
-      )
+      expect(
+        await getBalance(thirdPartyPoolAddress, WETH, ethers.provider)
+      ).to.equal(tokenBalance + amount)
     })
 
     it('should let user mint shares (by approving assets first)', async () => {
