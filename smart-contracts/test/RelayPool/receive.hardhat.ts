@@ -62,15 +62,21 @@ describe('RelayBridge: receive', () => {
     ])
 
     const thirdPartyPoolAddress = await thirdPartyPool.getAddress()
-    const relayPool = await ethers.deployContract('RelayPool', [
-      networks[1].hyperlaneMailbox,
-      await myToken.getAddress(),
-      `${await myToken.name()} Relay Pool`,
-      `${await myToken.symbol()}-REL`,
-      [],
-      thirdPartyPoolAddress,
-      myWeth,
-    ])
+
+    const parameters = {
+      RelayPool: {
+        hyperlaneMailbox: networks[1].hyperlaneMailbox,
+        asset: await myToken.getAddress(),
+        name: `${await myWeth.name()} Relay Pool`,
+        symbol: `${await myWeth.symbol()}-REL`,
+        origins: [],
+        thirdPartyPool: thirdPartyPoolAddress,
+        weth: await myWeth.getAddress(),
+      },
+    }
+    const { relayPool } = await ignition.deploy(RelayPoolModule, {
+      parameters,
+    })
 
     await expect(
       user.sendTransaction({
