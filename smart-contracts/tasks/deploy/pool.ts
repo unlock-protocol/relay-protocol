@@ -6,8 +6,11 @@ import { networks } from '@relay-protocol/networks'
 task('deploy:pool', 'Deploy a relay pool')
   .addParam('asset', 'An ERC20 asset')
   .addOptionalParam('yieldPool', 'A yield pool address')
-  .setAction(async ({ asset, yieldPool }, { ethers, ignition }) => {
+  .setAction(async ({ asset, yieldPool }, { ethers, ignition, run }) => {
     const { getStataToken } = await import('@relay-protocol/helpers')
+
+    // make sure we are deploying the latest version of the contract
+    await run('compile')
 
     // get args value
     const { chainId } = await ethers.provider.getNetwork()

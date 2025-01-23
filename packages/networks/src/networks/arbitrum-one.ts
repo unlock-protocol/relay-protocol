@@ -5,7 +5,6 @@ export const arbitrumOne = {
   chainId: 42161,
   isTestnet: false,
   name: 'Arbitrum',
-
   slug: 'arbitrum',
   udt: '0xd5d3aA404D7562d09a848F96a8a8d5D65977bF90',
   usdc: {
