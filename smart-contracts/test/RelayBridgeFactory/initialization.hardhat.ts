@@ -2,7 +2,7 @@ import { expect } from 'chai'
 import { ethers, ignition } from 'hardhat'
 import { MyToken, RelayBridgeFactory } from '../../typechain-types'
 import RelayBridgeFactoryModule from '../../ignition/modules/RelayBridgeFactoryModule'
-import { getEvent } from '../../lib/utils'
+import { getEvent } from '@relay-protocol/helpers'
 
 describe('RelayBridgeFactory: deployment', () => {
   let relayBridgeFactory: RelayBridgeFactory
