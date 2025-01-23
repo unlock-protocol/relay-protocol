@@ -1,8 +1,8 @@
 {
   "name": "@relay-protocol/types",
   "version": "0.0.1",
-  "main": "dist/src/index.js",
-  "types": "dist/src/index.d.ts",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "description": "Relay Protocol shared types",
   "files": [
     "tsconfig.json",

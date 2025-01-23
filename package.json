@@ -22,7 +22,7 @@
     "packages": "yarn workspaces foreach --recursive --from '{@relay-protocol/eslint-config,@relay-protocol/helpers,@relay-protocol/networks,@relay-protocol/tsconfig,@relay-protocol/types}'",
     "packages:clean": "yarn packages --parallel run clean",
     "packages:build": "yarn packages --topological-dev run build",
-    "build": "yarn packages:build",
+    "build": "yarn packages:clean && yarn packages:build",
     "clean": "yarn packages:clean",
     "lint": "yarn packages --parallel run lint"
   },
