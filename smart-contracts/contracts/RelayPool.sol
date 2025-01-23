@@ -65,16 +65,16 @@ contract RelayPool is ERC4626, ERC20Permit {
 
   event LoanEmitted(
     uint256 indexed nonce,
-    address recipient,
+    address indexed recipient,
     address asset,
     uint256 amount,
     uint32 bridgeChainId,
-    address bridge
+    address indexed bridge
   );
 
   event BridgeCompleted(
     uint32 chainId,
-    address bridge,
+    address indexed bridge,
     uint256 amount,
     bytes claimParams
   );

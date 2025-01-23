@@ -10,6 +10,7 @@ export const ethereum = {
   name: 'Ethereum',
   op: {
     portalProxy: '0xbEb5Fc579115071764c7423A4f12eDde41f106Ed',
+    disputeGame: '0xe5965Ab5962eDc7477C8520243A95517CD252fA9',
   },
   slug: 'ethereum',
   udt: '0x90DE74265a416e1393A450752175AED98fe11517',
