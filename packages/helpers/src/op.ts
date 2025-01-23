@@ -6,29 +6,24 @@ import Portal2 from './abis/op/Portal2.json'
 import DisputeGameFactory from './abis/op/DisputeGameFactory.json'
 import { getProvider } from './provider'
 
-const providers = {
-  10: 'https://rpc.unlock-protocol.com/10',
-  1: 'https://rpc.unlock-protocol.com/1',
-}
+import { networks } from '@relay-protocol/networks'
+
 const outputRootProofVersion =
   '0x0000000000000000000000000000000000000000000000000000000000000000' as const
 
-const portalAddress = '0xbEb5Fc579115071764c7423A4f12eDde41f106Ed'
-const disputeGameAddress = '0xe5965Ab5962eDc7477C8520243A95517CD252fA9'
-
-export const getGame = async (minL2BlockNumber: number) => {
+export const getGame = async (chainId: number, minL2BlockNumber: number) => {
   const abiCoder = new AbiCoder()
+  const provider = await getProvider(chainId)
+
+  const disputeGameAddress = networks[chainId].op.disputeGame
+  const portalAddress = networks[chainId].op.portalProxy
 
   const disputeGameContract = new ethers.Contract(
     disputeGameAddress,
     DisputeGameFactory,
-    new ethers.JsonRpcProvider(providers[1])
+    provider
   )
-  const portal2Contract = new ethers.Contract(
-    portalAddress,
-    Portal2,
-    new ethers.JsonRpcProvider(providers[1])
-  )
+  const portal2Contract = new ethers.Contract(portalAddress, Portal2, provider)
 
   const [gameCount, gameType] = await Promise.all([
     disputeGameContract.gameCount(),
@@ -49,7 +44,8 @@ export const getGame = async (minL2BlockNumber: number) => {
 
 export const buildProveWithdrawal = async (
   network: number,
-  withdrawalTx: string
+  withdrawalTx: string,
+  l1ChainId: number
 ) => {
   const abiCoder = new AbiCoder()
   const provider = await getProvider(network)
@@ -76,8 +72,7 @@ export const buildProveWithdrawal = async (
   const slot = ethers.keccak256(
     abiCoder.encode(['bytes32', 'uint256'], [withdrawalHash, 0n])
   )
-
-  const game = await getGame(receipt!.blockNumber)
+  const game = await getGame(l1ChainId, receipt!.blockNumber)
 
   // Get the block
   const gameBlockNumber = abiCoder.decode(['uint256'], game[4])[0] as bigint
@@ -91,10 +86,10 @@ export const buildProveWithdrawal = async (
   ])
 
   // encode the root proof
-  // const outputRootProof = abiCoder.encode(
-  //   ['bytes32', 'bytes32', 'bytes32', 'bytes32'],
-  //   [outputRootProofVersion, block?.stateRoot, proof.storageHash, block?.hash],
-  // );
+  const outputRootProof = abiCoder.encode(
+    ['bytes32', 'bytes32', 'bytes32', 'bytes32'],
+    [outputRootProofVersion, block?.stateRoot, proof.storageHash, block?.hash]
+  )
 
   const disputeGameIndex = game[0]
 
@@ -148,6 +143,7 @@ export const buildFinalizeWithdrawal = async (
   const value = event.args.value // '1000000000000000' // Get it from `MessagePassed` event's value
   const gasLimit = event.args.gasLimit // '491310' // Get it from `MessagePassed` event's gasLimit
   const data = event.args.data // ('0xd764ad0b0001000000000000000000000000000000000000000000000000000000005817000000000000000000000000420000000000000000000000000000000000001000000000000000000000000099c9fc46f92e8a1c0dec1b1747d010903e884be100000000000000000000000000000000000000000000000000038d7ea4c680000000000000000000000000000000000000000000000000000000000000030d4000000000000000000000000000000000000000000000000000000000000000c000000000000000000000000000000000000000000000000000000000000000c41635f5fd000000000000000000000000f5c28ce24acf47849988f147d5c75787c0103534000000000000000000000000f5c28ce24acf47849988f147d5c75787c010353400000000000000000000000000000000000000000000000000038d7ea4c680000000000000000000000000000000000000000000000000000000000000000080000000000000000000000000000000000000000000000000000000000000000b737570657262726964676500000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000') // Get it from `MessagePassed` event's data
+
   // encode the transaction
   return abiCoder.encode(
     ['uint256', 'address', 'address', 'uint256', 'uint256', 'bytes'],
@@ -158,7 +154,8 @@ export const buildFinalizeWithdrawal = async (
 const main = async () => {
   await buildProveWithdrawal(
     10,
-    '0x8a8ed32ec52267ba5c5656dc68f459a8be3cdd23d8a1128ed321a2c6df2e8ee3'
+    '0x8a8ed32ec52267ba5c5656dc68f459a8be3cdd23d8a1128ed321a2c6df2e8ee3',
+    1
   )
 }
 

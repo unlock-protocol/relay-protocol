@@ -5,7 +5,7 @@ import { getCCTPAttestation } from '@relay-protocol/helpers'
  */
 import { task } from 'hardhat/config'
 
-task('claim:usdc', 'Claim USDC from bridge')
+task('claim:usdc', 'Claim USDC from bridge for the pool')
   .addParam('txHash', 'Tx hash on origin chain')
   .addParam('origin', 'Origin chain id')
   .addParam('pool', 'The pool on dest chain')

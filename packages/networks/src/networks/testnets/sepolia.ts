@@ -10,6 +10,7 @@ export const sepolia = {
   name: 'Ethereum Sepolia',
   op: {
     portalProxy: '0x16Fc5058F25648194471939df75CF27A2fdC48BC',
+    disputeGame: '0x05F9613aDB30026FFd634f38e5C4dFd30a197Fa1',
   },
   slug: 'sepolia',
   udt: '0x4C38B5Dcc47c4990363F22bFeb2add741123914F',

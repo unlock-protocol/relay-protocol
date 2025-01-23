@@ -8,6 +8,7 @@ import './tasks/pool'
 import './tasks/bridge'
 import './tasks/claim/cctp'
 import './tasks/claim/arb'
+import './tasks/claim/native'
 
 // Actual contracts
 import './tasks/deploy/pool'
