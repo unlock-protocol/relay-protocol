@@ -1,5 +1,5 @@
 {
-  "name": "relay-pools-backend",
+  "name": "@relay-protocol/backend",
   "private": true,
   "type": "module",
   "scripts": {
@@ -8,6 +8,7 @@
     "db": "ponder db",
     "codegen": "ponder codegen",
     "serve": "ponder serve",
+    "test": "echo 'No tests'; exit 0",
     "lint": "eslint \"src/**/*.{js,ts,json}\" \"*.{js,ts,json}\" --fix",
     "lint:check": "eslint \"src/**/*.{js,ts}\" \"*.{js,ts}\"",
     "typecheck": "tsc",
@@ -16,15 +17,15 @@
   },
   "dependencies": {
     "hono": "4.6.17",
-    "ponder": "0.8.30",
-    "viem": "2.22.10"
+    "ponder": "0.8.32",
+    "viem": "2.22.11"
   },
   "devDependencies": {
     "@types/node": "22.10.7",
     "@typescript-eslint/eslint-plugin": "8.21.0",
     "@typescript-eslint/parser": "8.21.0",
     "eslint": "8.56.0",
-    "eslint-config-ponder": "0.8.30",
+    "eslint-config-ponder": "0.8.32",
     "eslint-config-prettier": "10.0.1",
     "eslint-plugin-prettier": "5.2.3",
     "husky": "9.1.7",

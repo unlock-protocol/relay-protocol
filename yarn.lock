@@ -1816,6 +1816,28 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@relay-protocol/backend@workspace:backend":
+  version: 0.0.0-use.local
+  resolution: "@relay-protocol/backend@workspace:backend"
+  dependencies:
+    "@types/node": "npm:22.10.7"
+    "@typescript-eslint/eslint-plugin": "npm:8.21.0"
+    "@typescript-eslint/parser": "npm:8.21.0"
+    eslint: "npm:9.18.0"
+    eslint-config-ponder: "npm:0.8.32"
+    eslint-config-prettier: "npm:10.0.1"
+    eslint-plugin-prettier: "npm:5.2.3"
+    hono: "npm:4.6.17"
+    husky: "npm:9.1.7"
+    jsonc-eslint-parser: "npm:2.4.0"
+    lint-staged: "npm:15.4.1"
+    ponder: "npm:0.8.32"
+    prettier: "npm:3.4.2"
+    typescript: "npm:5.7.3"
+    viem: "npm:2.22.11"
+  languageName: unknown
+  linkType: soft
+
 "@relay-protocol/eslint-config@workspace:^, @relay-protocol/eslint-config@workspace:packages/eslint-config":
   version: 0.0.0-use.local
   resolution: "@relay-protocol/eslint-config@workspace:packages/eslint-config"
@@ -4738,14 +4760,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"eslint-config-ponder@npm:0.8.30":
-  version: 0.8.30
-  resolution: "eslint-config-ponder@npm:0.8.30"
+"eslint-config-ponder@npm:0.8.32":
+  version: 0.8.32
+  resolution: "eslint-config-ponder@npm:0.8.32"
   peerDependencies:
     "@typescript-eslint/eslint-plugin": ^6.3.0
     "@typescript-eslint/parser": ^6.3.0
     eslint: ">= 3"
-  checksum: 10/b193fec8af0790cda8dcba6bc65ebf01fb5fd4b7ba5a47c68623a466252f4e5c6a72fb62b4a8523cd01b1420763689a42c59b1c18b081ce6ffd47642789b9112
+  checksum: 10/5f771c4a0ef00763c663dd7811324e6a2a73c13ddd360bed7fbd5e3b14fbc0ad3c31edeb53d152ca0f4bf00c06538784d71a417cc68b774f8ec04ba242b81711
   languageName: node
   linkType: hard
 
@@ -8176,9 +8198,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"ponder@npm:0.8.30":
-  version: 0.8.30
-  resolution: "ponder@npm:0.8.30"
+"ponder@npm:0.8.32":
+  version: 0.8.32
+  resolution: "ponder@npm:0.8.32"
   dependencies:
     "@babel/code-frame": "npm:^7.23.4"
     "@commander-js/extra-typings": "npm:^12.0.1"
@@ -8221,7 +8243,7 @@ __metadata:
       optional: true
   bin:
     ponder: dist/bin/ponder.js
-  checksum: 10/ccf41859958b68dd44a266c7dc0f71f434f46723b607af68f93ffb2380aceacc5887cc792f8c933d6207433dd87b2dc112b4ed102d8d3d8274d28f01424d2515
+  checksum: 10/edfb6021a1d3e76b117686f750c45d09d23255e874d8d656a4d3e043a6eaaab9a2fdf80c6e546ebcc79d07db631d03296959250c856be6fcbb4fb299dbbdca74
   languageName: node
   linkType: hard
 
@@ -8635,28 +8657,6 @@ __metadata:
   checksum: 10/33712aa1b489aab7aba2191c1cdadfdd71f5bf166d4792d81744a6be332c160bd7d9273af8269d8a01284b9562f14a5b31b7abcf7ad9306c44887ecff51c89ab
   languageName: node
   linkType: hard
-
-"relay-pools-backend@workspace:backend":
-  version: 0.0.0-use.local
-  resolution: "relay-pools-backend@workspace:backend"
-  dependencies:
-    "@types/node": "npm:22.10.7"
-    "@typescript-eslint/eslint-plugin": "npm:8.21.0"
-    "@typescript-eslint/parser": "npm:8.21.0"
-    eslint: "npm:9.18.0"
-    eslint-config-ponder: "npm:0.8.30"
-    eslint-config-prettier: "npm:10.0.1"
-    eslint-plugin-prettier: "npm:5.2.3"
-    hono: "npm:4.6.17"
-    husky: "npm:9.1.7"
-    jsonc-eslint-parser: "npm:2.4.0"
-    lint-staged: "npm:15.4.1"
-    ponder: "npm:0.8.30"
-    prettier: "npm:3.4.2"
-    typescript: "npm:5.7.3"
-    viem: "npm:2.22.10"
-  languageName: unknown
-  linkType: soft
 
 "repeat-string@npm:^1.0.0":
   version: 1.6.1
@@ -10300,9 +10300,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"viem@npm:2.22.10":
-  version: 2.22.10
-  resolution: "viem@npm:2.22.10"
+"viem@npm:2.22.11":
+  version: 2.22.11
+  resolution: "viem@npm:2.22.11"
   dependencies:
     "@noble/curves": "npm:1.7.0"
     "@noble/hashes": "npm:1.6.1"
@@ -10317,7 +10317,7 @@ __metadata:
   peerDependenciesMeta:
     typescript:
       optional: true
-  checksum: 10/2cc5c2781d3f75ed1f74ba957e43a5cbf252b2da920066c743c78ded45b0637adae5477c86023de09b69cf8611a94327fb2b2b953cfc1b08f281305caa91cf1a
+  checksum: 10/70e175798a3ce4885972a1ba6d1b3dbc5fffe4cf42340f7aef77523b90061fde0c25a6b895d77f2112b07c976111f427b64f505193a3e22eb9deb3e7706bfd19
   languageName: node
   linkType: hard
 

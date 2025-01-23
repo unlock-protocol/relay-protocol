@@ -38,7 +38,12 @@ export const poolOrigin = onchainTable(
   }),
   (table) => ({
     pk: primaryKey({
-      columns: [table.chainId, table.pool, table.originChainId, table.originBridge],
+      columns: [
+        table.chainId,
+        table.pool,
+        table.originChainId,
+        table.originBridge,
+      ],
     }),
     poolIdx: index().on(table.chainId, table.pool),
     originIdx: index().on(table.originChainId, table.originBridge),
