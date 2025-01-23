@@ -48,6 +48,7 @@ task('deploy:pool', 'Deploy a relay pool')
         origins,
         thirdPartyPool: yieldPool,
         weth,
+        protocolFee: 0,
       },
     }
     const { relayPool } = await ignition.deploy(RelayPoolModule, {

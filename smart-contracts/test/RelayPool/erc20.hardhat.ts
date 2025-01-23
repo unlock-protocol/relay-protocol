@@ -30,6 +30,7 @@ describe('RelayBridge: when using an ERC20', () => {
         origins: [],
         thirdPartyPool: await thirdPartyPool.getAddress(),
         weth: ethers.ZeroAddress, // Not used in this test
+        protocolFee: 0,
       },
     }
     ;({ relayPool } = await ignition.deploy(RelayPoolModule, {

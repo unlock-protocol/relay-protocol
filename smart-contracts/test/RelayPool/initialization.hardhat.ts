@@ -28,6 +28,7 @@ describe('RelayPool: initialization of ERC20 pool', () => {
         origins: [],
         thirdPartyPool: await thirdPartyPool.getAddress(),
         weth: ethers.ZeroAddress,
+        protocolFee: 0,
       },
     }
     ;({ relayPool } = await ignition.deploy(RelayPoolModule, {

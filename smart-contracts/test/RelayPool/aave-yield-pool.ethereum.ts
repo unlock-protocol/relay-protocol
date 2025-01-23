@@ -47,6 +47,7 @@ describe('RelayBridge: use Aave yield pool (USDC)', () => {
       [],
       await staticAaveUsdc.getAddress(),
       weth,
+      0,
     ])
   })
 

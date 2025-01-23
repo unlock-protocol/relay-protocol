@@ -32,6 +32,7 @@ describe('RelayBridge: receive', () => {
         origins: [],
         thirdPartyPool: thirdPartyPoolAddress,
         weth: await myWeth.getAddress(),
+        protocolFee: 0,
       },
     }
     const { relayPool } = await ignition.deploy(RelayPoolModule, {
@@ -70,6 +71,7 @@ describe('RelayBridge: receive', () => {
       [],
       thirdPartyPoolAddress,
       myWeth,
+      0,
     ])
 
     await expect(

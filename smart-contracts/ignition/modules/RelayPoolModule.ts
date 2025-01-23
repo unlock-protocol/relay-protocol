@@ -10,6 +10,7 @@ export default buildModule('RelayPool', (m) => {
   const origins = m.getParameter('origins')
   const thirdPartyPool = m.getParameter('thirdPartyPool')
   const weth = m.getParameter('weth')
+  const protocolFee = m.getParameter('protocolFee')
 
   const relayPool = m.contract('RelayPool', [
     hyperlaneMailbox,
@@ -19,6 +20,7 @@ export default buildModule('RelayPool', (m) => {
     origins,
     thirdPartyPool,
     weth,
+    protocolFee,
   ])
   return { relayPool }
 })

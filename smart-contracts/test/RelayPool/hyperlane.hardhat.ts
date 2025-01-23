@@ -54,6 +54,7 @@ describe('ERC20 RelayBridge: when receiving a message from the Hyperlane Mailbox
         ],
         thirdPartyPool: await thirdPartyPool.getAddress(),
         weth: await myWeth.getAddress(),
+        protocolFee: 0,
       },
     }
     ;({ relayPool } = await ignition.deploy(RelayPoolModule, {
@@ -324,6 +325,7 @@ describe('WETH RelayBridge: when receiving a message from the Hyperlane Mailbox'
         ],
         thirdPartyPool: await thirdPartyPool.getAddress(),
         weth: await myWeth.getAddress(),
+        protocolFee: 0,
       },
     }
     ;({ relayPool } = await ignition.deploy(RelayPoolModule, {
