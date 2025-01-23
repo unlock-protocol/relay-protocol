@@ -3181,6 +3181,28 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@relay-protocol/backend@workspace:backend":
+  version: 0.0.0-use.local
+  resolution: "@relay-protocol/backend@workspace:backend"
+  dependencies:
+    "@types/node": "npm:22.10.7"
+    "@typescript-eslint/eslint-plugin": "npm:8.21.0"
+    "@typescript-eslint/parser": "npm:8.21.0"
+    eslint: "npm:9.18.0"
+    eslint-config-ponder: "npm:0.8.32"
+    eslint-config-prettier: "npm:10.0.1"
+    eslint-plugin-prettier: "npm:5.2.3"
+    hono: "npm:4.6.17"
+    husky: "npm:9.1.7"
+    jsonc-eslint-parser: "npm:2.4.0"
+    lint-staged: "npm:15.4.1"
+    ponder: "npm:0.8.32"
+    prettier: "npm:3.4.2"
+    typescript: "npm:5.7.3"
+    viem: "npm:2.22.11"
+  languageName: unknown
+  linkType: soft
+
 "@relay-protocol/client@workspace:packages/client":
   version: 0.0.0-use.local
   resolution: "@relay-protocol/client@workspace:packages/client"
@@ -3259,6 +3281,53 @@ __metadata:
     fs-extra: "npm:11.3.0"
     tsup: "npm:8.3.5"
     typescript: "npm:5.7.3"
+  languageName: unknown
+  linkType: soft
+
+"@relay-protocol/smart-contracts@workspace:smart-contracts":
+  version: 0.0.0-use.local
+  resolution: "@relay-protocol/smart-contracts@workspace:smart-contracts"
+  dependencies:
+    "@bgd-labs/aave-address-book": "npm:4.8.1"
+    "@eslint/js": "npm:9.18.0"
+    "@eth-optimism/contracts-bedrock": "npm:0.17.3"
+    "@nomicfoundation/hardhat-chai-matchers": "npm:2.0.8"
+    "@nomicfoundation/hardhat-ethers": "npm:3.0.8"
+    "@nomicfoundation/hardhat-ignition": "npm:0.15.9"
+    "@nomicfoundation/hardhat-ignition-ethers": "npm:0.15.9"
+    "@nomicfoundation/hardhat-network-helpers": "npm:1.0.12"
+    "@nomicfoundation/hardhat-toolbox": "npm:5.0.0"
+    "@nomicfoundation/hardhat-verify": "npm:2.0.12"
+    "@openzeppelin/contracts": "npm:5.2.0"
+    "@relay-protocol/helpers": "workspace:*"
+    "@typechain/ethers-v6": "npm:0.5.1"
+    "@typechain/hardhat": "npm:9.1.0"
+    "@types/chai": "npm:4.3.20"
+    "@types/fs-extra": "npm:11.0.4"
+    "@types/mocha": "npm:10.0.10"
+    "@types/node": "npm:22.10.7"
+    chai: "npm:4.5.0"
+    eslint: "npm:9.18.0"
+    eslint-config-prettier: "npm:10.0.1"
+    eslint-plugin-evm-address-to-checksummed: "npm:0.0.6"
+    eslint-plugin-json: "npm:4.0.1"
+    eslint-plugin-mocha: "npm:10.5.0"
+    eslint-plugin-prettier: "npm:5.2.3"
+    ethers: "npm:6.13.5"
+    fs-extra: "npm:11.3.0"
+    globals: "npm:15.14.0"
+    hardhat: "npm:2.22.18"
+    hardhat-gas-reporter: "npm:2.2.2"
+    husky: "npm:9.1.7"
+    pinst: "npm:3.0.0"
+    prettier: "npm:3.4.2"
+    prettier-plugin-solidity: "npm:1.4.2"
+    solhint: "npm:5.0.5"
+    solidity-coverage: "npm:0.8.14"
+    ts-node: "npm:10.9.2"
+    typechain: "npm:8.3.2"
+    typescript: "npm:5.7.3"
+    typescript-eslint: "npm:8.21.0"
   languageName: unknown
   linkType: soft
 
@@ -4465,10 +4534,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"assertion-error@npm:^2.0.1":
-  version: 2.0.1
-  resolution: "assertion-error@npm:2.0.1"
-  checksum: 10/a0789dd882211b87116e81e2648ccb7f60340b34f19877dd020b39ebb4714e475eb943e14ba3e22201c221ef6645b7bfe10297e76b6ac95b48a9898c1211ce66
+"assertion-error@npm:^1.1.0":
+  version: 1.1.0
+  resolution: "assertion-error@npm:1.1.0"
+  checksum: 10/fd9429d3a3d4fd61782eb3962ae76b6d08aa7383123fca0596020013b3ebd6647891a85b05ce821c47d1471ed1271f00b0545cf6a4326cf2fc91efcc3b0fbecf
   languageName: node
   linkType: hard
 
@@ -9273,10 +9342,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"loupe@npm:^3.1.0":
-  version: 3.1.2
-  resolution: "loupe@npm:3.1.2"
-  checksum: 10/8f5734e53fb64cd914aa7d986e01b6d4c2e3c6c56dcbd5428d71c2703f0ab46b5ab9f9eeaaf2b485e8a1c43f865bdd16ec08ae1a661c8f55acdbd9f4d59c607a
+"loupe@npm:^2.3.6":
+  version: 2.3.7
+  resolution: "loupe@npm:2.3.7"
+  dependencies:
+    get-func-name: "npm:^2.0.1"
+  checksum: 10/635c8f0914c2ce7ecfe4e239fbaf0ce1d2c00e4246fafcc4ed000bfdb1b8f89d05db1a220054175cca631ebf3894872a26fffba0124477fcb562f78762848fb1
   languageName: node
   linkType: hard
 
@@ -11035,28 +11106,6 @@ __metadata:
   checksum: 10/33712aa1b489aab7aba2191c1cdadfdd71f5bf166d4792d81744a6be332c160bd7d9273af8269d8a01284b9562f14a5b31b7abcf7ad9306c44887ecff51c89ab
   languageName: node
   linkType: hard
-
-"relay-pools-backend@workspace:backend":
-  version: 0.0.0-use.local
-  resolution: "relay-pools-backend@workspace:backend"
-  dependencies:
-    "@types/node": "npm:22.10.7"
-    "@typescript-eslint/eslint-plugin": "npm:8.21.0"
-    "@typescript-eslint/parser": "npm:8.21.0"
-    eslint: "npm:9.18.0"
-    eslint-config-ponder: "npm:0.8.30"
-    eslint-config-prettier: "npm:10.0.1"
-    eslint-plugin-prettier: "npm:5.2.3"
-    hono: "npm:4.6.16"
-    husky: "npm:9.1.7"
-    jsonc-eslint-parser: "npm:2.4.0"
-    lint-staged: "npm:15.4.1"
-    ponder: "npm:0.8.30"
-    prettier: "npm:3.4.2"
-    typescript: "npm:5.7.3"
-    viem: "npm:2.22.9"
-  languageName: unknown
-  linkType: soft
 
 "relay-runtime@npm:12.0.0":
   version: 12.0.0
