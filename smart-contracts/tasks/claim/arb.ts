@@ -20,20 +20,6 @@ task('claim:arb', 'Claim ARB from bridge')
       data,
     } = await constructArbProof(txHash, origin)
 
-    console.log({
-      proof,
-      leaf, // position/index
-      caller, //l2 sender
-      destination, // to
-      arbBlockNum, //l2block
-      ethBlockNum, // l1block
-      timestamp, //l2 ts
-      callvalue, // value
-      data,
-    })
-
-    // now send to outbox
-
     // TODO: check if the root hasn't been confirmed yet on L1
     // const { chainId } = await ethers.provider.getNetwork()
     // const {
@@ -45,47 +31,38 @@ task('claim:arb', 'Claim ARB from bridge')
     // }
 
     // encode args to pass to pool
-    // const args = [
-    //   proof,
-    //   leaf, // position/index
-    //   caller, //l2 sender
-    //   destination, // to
-    //   arbBlockNum, //l2block
-    //   ethBlockNum, // l1block
-    //   timestamp, //l2 ts
-    //   callvalue, // value
-    //   data,
-    // ]
+    const args = [
+      proof,
+      leaf, // position/index
+      caller, //l2 sender
+      destination, // to
+      arbBlockNum, //l2block
+      ethBlockNum, // l1block
+      timestamp, //l2 ts
+      callvalue, // value
+      data,
+    ]
 
-    // const relayPool = await ethers.getContractAt('RelayPool', pool)
-    // const relayPool = await ethers.getContractAt('RelayPool', pool)
-    // const abiCoder = relayPool.interface.getAbiCoder()
+    const relayPool = await ethers.getContractAt('RelayPool', pool)
+    const abiCoder = relayPool.interface.getAbiCoder()
 
     // // send claim to the pool
-    // const claimArgs = [
-    //   origin,
-    //   bridge,
-    //   abiCoder.encode(
-    //     [
-    //       'bytes32[]',
-    //       'uint256',
-    //       'address',
-    //       'address',
-    //       'uint256',
-    //       'uint256',
-    //       'uint256',
-    //       'uint256',
-    //       'bytes',
-    //     ],
-    //     args
-    //   ),
-    // ]
-    // console.log(claimArgs)
-    // const tx = await relayPool.claim(...claimArgs)
+    const BridgesParams = abiCoder.encode(
+      [
+        'bytes32[]',
+        'uint256',
+        'address',
+        'address',
+        'uint256',
+        'uint256',
+        'uint256',
+        'uint256',
+        'bytes',
+      ],
+      args
+    )
 
-    // const tx = await outbox.executeTransaction(...args, {
-    //   maxFeePerGas: ethers.parseUnits('55', 'gwei'),
-    // })
+    const tx = await relayPool.claim(origin, bridge, BridgesParams)
 
-    // console.log(tx)
+    console.log(tx)
   })
