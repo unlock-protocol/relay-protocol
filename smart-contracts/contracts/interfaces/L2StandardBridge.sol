@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.0;
+pragma solidity ^0.8.28;
 
 interface L2StandardBridge {
   /// @notice Sends ERC20 tokens to a receiver's address on the other chain.

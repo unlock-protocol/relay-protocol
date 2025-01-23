@@ -46,12 +46,10 @@ export default async function ({
   ])
 
   // Update relay pool with current values from contract
-  await context.db
-    .update(relayPool, { contractAddress: event.log.address })
-    .set({
-      totalAssets,
-      totalShares,
-    })
+  await context.db.update(relayPool, { contractAddress: event.log.address }).set({
+    totalAssets,
+    totalShares,
+  })
 
   // Update user balance - using insert with `onConflictDoUpdate` for atomic operations
   const balanceId = `${sender}-${event.log.address}` // wallet-pool format

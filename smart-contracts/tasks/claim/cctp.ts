@@ -9,7 +9,8 @@ task('claim:usdc', 'Claim USDC from bridge')
   .addParam('txHash', 'Tx hash on origin chain')
   .addParam('origin', 'Origin chain id')
   .addParam('pool', 'The pool on dest chain')
-  .setAction(async ({ txHash, origin, pool }, { ethers }) => {
+  .addParam('bridge', 'The bridge on src chain')
+  .setAction(async ({ txHash, origin, pool, bridge }, { ethers }) => {
     const { attestation, status, messageBytes } = await getCCTPAttestation(
       txHash,
       origin
@@ -21,7 +22,7 @@ task('claim:usdc', 'Claim USDC from bridge')
       const abiCoder = relayPool.interface.getAbiCoder()
       const tx = await relayPool.claim(
         origin,
-        ethers.zeroPadValue(pool, 32),
+        bridge,
         abiCoder.encode(['bytes', 'bytes'], [messageBytes, attestation])
       )
       const receipt = await tx.wait()

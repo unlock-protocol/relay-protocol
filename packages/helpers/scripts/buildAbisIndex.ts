@@ -1,10 +1,13 @@
 // helper to generate index.ts for ABIs
-import { createIndexFile } from '../src/package';
+import { createIndexFile } from '../src/package'
 
 const main = async () => {
-  await createIndexFile('abis');
-};
+  console.log('Building ABIs index...')
+  await createIndexFile('abis', 'src')
+}
 
 main()
-  .then(() => console.log('ok.'))
-  .catch((e) => console.error(e));
+  .then(() => {
+    console.log('ABIs index built successfully!')
+  })
+  .catch((e) => console.error(e))

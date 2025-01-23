@@ -8,6 +8,10 @@
     ".": {
       "import": "./dist/index.mjs",
       "require": "./dist/index.js"
+    },
+    "./abis": {
+      "import": "./dist/src/abis/index.js",
+      "require": "./dist/src/abis/index.js"
     }
   },
   "license": "MIT",
@@ -20,10 +24,10 @@
     "clean": "rm -rf dist",
     "lint:fix": "yarn lint --fix",
     "lint": "eslint",
-    "build": "yarn build:index && yarn build:ts && yarn build:copy-abis",
+    "build": "yarn build:index && yarn build:copy-abis && yarn build:ts",
     "build:ts": "tsup src/index.ts --dts --format esm,cjs",
-    "build:copy-abis": "cp -r src/abis dist",
-    "build:index": "tsc && node dist/scripts/buildAbisIndex.js"
+    "build:copy-abis": "cp -r src/abis dist/src/abis",
+    "build:index": "tsc && node dist/scripts/buildAbisIndex.js && tsc"
   },
   "devDependencies": {
     "@relay-protocol/networks": "workspace:^",

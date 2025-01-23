@@ -3,9 +3,7 @@ import { expect } from 'chai'
 import { mintUSDC, stealERC20 } from '../utils/hardhat'
 import { getEvent } from '@relay-protocol/helpers'
 
-import ERC20_ABI from '@relay-protocol/helpers/dist/abis/ERC20.json'
-import MailboxAbi from '@relay-protocol/helpers/dist/abis/Mailbox.json'
-
+import { Mailbox, ERC20 } from '@relay-protocol/helpers/abis'
 import { ContractTransactionReceipt, Log } from 'ethers'
 
 import { networks } from '@relay-protocol/networks'
@@ -76,7 +74,7 @@ describe('RelayBridge', function () {
       ])
       if (log.address === HYPERLANE_MAILBOX_ON_OPTIMISM) {
         // L2ToL1MessagePasser
-        const iface = new ethers.Interface(MailboxAbi)
+        const iface = new ethers.Interface(Mailbox)
         const event = iface.parseLog(log)
 
         expect(event.name).to.be.oneOf(['Dispatch', 'DispatchId'])
@@ -144,7 +142,7 @@ describe('RelayBridge', function () {
     )
 
     // Approve
-    const erc20Contract = await ethers.getContractAt(ERC20_ABI, UDT_OPTIMISM)
+    const erc20Contract = await ethers.getContractAt(ERC20, UDT_OPTIMISM)
     await erc20Contract.approve(bridgeAddress, amount)
 
     const nonce = await bridge.transferNonce()
@@ -175,7 +173,7 @@ describe('RelayBridge', function () {
       ])
       if (log.address === HYPERLANE_MAILBOX_ON_OPTIMISM) {
         // L2ToL1MessagePasser
-        const iface = new ethers.Interface(MailboxAbi)
+        const iface = new ethers.Interface(Mailbox)
         const event = iface.parseLog(log)
 
         expect(event.name).to.be.oneOf(['Dispatch', 'DispatchId'])
@@ -251,7 +249,7 @@ describe('RelayBridge', function () {
       await mintUSDC(USDC, recipient, amount)
 
       // Approve
-      const erc20Contract = await ethers.getContractAt(ERC20_ABI, USDC)
+      const erc20Contract = await ethers.getContractAt(ERC20, USDC)
       await erc20Contract.approve(bridgeAddress, amount)
 
       const nonce = await bridge.transferNonce()

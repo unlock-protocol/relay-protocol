@@ -1,10 +1,7 @@
 import { ethers, ignition } from 'hardhat'
-import L2ToL1MessagePasserAbi from '@relay-protocol/helpers/dist/abis/L2ToL1MessagePasser.json'
-import L2CrossDomainMessenger from '@relay-protocol/helpers/dist/abis/L2CrossDomainMessenger.json'
-import L2StandardBridge from '@relay-protocol/helpers/dist/abis/L2StandardBridge.json'
+import * as ABIs from '@relay-protocol/helpers/abis'
 import { expect } from 'chai'
 import { stealERC20 } from '../utils/hardhat'
-import ERC20_ABI from '@relay-protocol/helpers/dist/abis/ERC20.json'
 import { networks } from '@relay-protocol/networks'
 import OPStackNativeBridgeProxyModule from '../../ignition/modules/OPStackNativeBridgeProxyModule'
 
@@ -33,7 +30,7 @@ describe('OPStackNativeBridgeProxy', function () {
 
       const crossDomainMessenger = new ethers.Contract(
         '0x4200000000000000000000000000000000000007',
-        L2CrossDomainMessenger,
+        ABIs.L2CrossDomainMessenger,
         user
       )
       const crossDomainMessengerNextNonce =
@@ -41,7 +38,7 @@ describe('OPStackNativeBridgeProxy', function () {
 
       const l2ToL1MessagePasser = new ethers.Contract(
         '0x4200000000000000000000000000000000000016',
-        L2ToL1MessagePasserAbi,
+        ABIs.L2ToL1MessagePasser,
         user
       )
       const l2ToL1MessagePasserNextNonce =
@@ -71,7 +68,7 @@ describe('OPStackNativeBridgeProxy', function () {
         ])
         if (log.address === '0x4200000000000000000000000000000000000016') {
           // L2ToL1MessagePasser
-          const iface = new ethers.Interface(L2ToL1MessagePasserAbi)
+          const iface = new ethers.Interface(ABIs.L2ToL1MessagePasser)
           const event = iface.parseLog(log)
           expect(event.name).to.equal('MessagePassed')
           // nonce
@@ -90,10 +87,9 @@ describe('OPStackNativeBridgeProxy', function () {
           expect(event.args[4]).to.equal(490798)
           // data
           const [nonce, sender, target, value, minGasLimit, message] =
-            new ethers.Interface(L2CrossDomainMessenger).decodeFunctionData(
-              'relayMessage',
-              event.args[5]
-            )
+            new ethers.Interface(
+              ABIs.L2CrossDomainMessenger
+            ).decodeFunctionData('relayMessage', event.args[5])
           expect(nonce).to.equal(crossDomainMessengerNextNonce)
           expect(sender).to.equal('0x4200000000000000000000000000000000000010') // STANDARD_BRIDGE
           expect(target).to.equal('0x99C9fc46f92E8a1c0deC1b1747d010903E884bE1') // L1StandardBridgeProxy
@@ -102,7 +98,7 @@ describe('OPStackNativeBridgeProxy', function () {
 
           // parse the message
           const [relayFrom, relayTo, relayAmount, extraData] =
-            new ethers.Interface(L2StandardBridge).decodeFunctionData(
+            new ethers.Interface(ABIs.L2StandardBridge).decodeFunctionData(
               'finalizeBridgeETH',
               message
             )
@@ -131,7 +127,7 @@ describe('OPStackNativeBridgeProxy', function () {
           log.address === '0x4200000000000000000000000000000000000007'
         ) {
           // L2CrossDomainMessenger
-          const iface = new ethers.Interface(L2CrossDomainMessenger)
+          const iface = new ethers.Interface(ABIs.L2CrossDomainMessenger)
           const event = iface.parseLog(log)
           expect(event.name).to.be.oneOf([
             'SentMessage',
@@ -167,7 +163,7 @@ describe('OPStackNativeBridgeProxy', function () {
         } else if (
           log.address === '0x4200000000000000000000000000000000000010'
         ) {
-          const iface = new ethers.Interface(L2StandardBridge)
+          const iface = new ethers.Interface(ABIs.L2StandardBridge)
           const event = iface.parseLog(log)
           expect(event.name).to.be.oneOf([
             'WithdrawalInitiated',
@@ -223,7 +219,10 @@ describe('OPStackNativeBridgeProxy', function () {
       )
 
       // Approve
-      const erc20Contract = await ethers.getContractAt(ERC20_ABI, UDT_OPTIMISM)
+      const erc20Contract = await ethers.getContractAt(
+        ABIs.ERC20,
+        networks[10].udt
+      )
       await erc20Contract.approve(bridgeAddress, amount)
 
       const tx = await bridge.bridge(
@@ -249,7 +248,7 @@ describe('OPStackNativeBridgeProxy', function () {
         ])
         if (log.address === '0x4200000000000000000000000000000000000016') {
           // L2ToL1MessagePasser
-          const iface = new ethers.Interface(L2ToL1MessagePasserAbi)
+          const iface = new ethers.Interface(ABIs.L2ToL1MessagePasser)
           const event = iface.parseLog(log)
           expect(event.name).to.equal('MessagePassed')
           // nonce
@@ -280,7 +279,7 @@ describe('OPStackNativeBridgeProxy', function () {
           log.address === '0x4200000000000000000000000000000000000007'
         ) {
           // L2CrossDomainMessenger
-          const iface = new ethers.Interface(L2CrossDomainMessenger)
+          const iface = new ethers.Interface(ABIs.L2CrossDomainMessenger)
           const event = iface.parseLog(log)
           expect(event.name).to.be.oneOf([
             'SentMessage',
@@ -316,7 +315,7 @@ describe('OPStackNativeBridgeProxy', function () {
         } else if (
           log.address === '0x4200000000000000000000000000000000000010'
         ) {
-          const iface = new ethers.Interface(L2StandardBridge)
+          const iface = new ethers.Interface(ABIs.L2StandardBridge)
           const event = iface.parseLog(log)
           expect(event.name).to.be.oneOf([
             'WithdrawalInitiated',

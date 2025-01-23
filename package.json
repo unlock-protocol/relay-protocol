@@ -18,12 +18,15 @@
     "backend"
   ],
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "packages": "yarn workspaces foreach --recursive --from '{@relay-protocol/types,@relay-protocol/networks,@relay-protocol/helpers}'",
+    "test": "yarn packages --parallel run test",
+    "packages": "yarn workspaces foreach --recursive --from '{@relay-protocol/eslint-config,@relay-protocol/helpers,@relay-protocol/networks,@relay-protocol/tsconfig,@relay-protocol/types}'",
     "packages:clean": "yarn packages --parallel run clean",
     "packages:build": "yarn packages --topological-dev run build",
-    "build": "yarn packages:build",
-    "clean": "yarn packages:clean"
+    "build": "yarn packages:clean && yarn packages:build",
+    "clean": "yarn packages:clean",
+    "lint": "yarn packages --parallel run lint",
+    "backend:dev": "yarn build && yarn workspace @relay-protocol/backend dev",
+    "backend:start": "yarn build && yarn workspace @relay-protocol/backend start"
   },
   "engines": {
     "node": ">=20.0.0"

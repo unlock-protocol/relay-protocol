@@ -1,2 +1,2 @@
-const unlockProtocolConfig = require('@unlock-protocol/eslint-config')
-module.exports = unlockProtocolConfig
+const unlockProtocolConfig = require('@relay-protocol/eslint-config')
+module.exports = [...unlockProtocolConfig]

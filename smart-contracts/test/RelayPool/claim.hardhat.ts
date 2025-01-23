@@ -56,7 +56,7 @@ describe('RelayBridge: claim', () => {
     // deploy the pool using ignition
     const parameters = {
       RelayPool: {
-        hyperlaneMailbox: userAddress, //mainnets[1].hyperlaneMailbox,
+        hyperlaneMailbox: userAddress, // networks[1].hyperlaneMailbox,
         asset: await myWeth.getAddress(),
         name: `${await myWeth.name()} Relay Pool`,
         symbol: `${await myWeth.symbol()}-REL`,
