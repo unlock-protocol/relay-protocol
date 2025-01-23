@@ -12,14 +12,11 @@
   },
   "scripts": {
     "start": "tsc --watch",
-    "build": "yarn codegen && tsup src/index.ts --dts --format esm,cjs",
-    "dev": "tsup --watch",
     "codegen": "graphql-codegen",
+    "build": "yarn codegen && tsup src/index.ts --dts --format esm,cjs",
     "clean": "rm -rf dist",
     "lint:fix": "yarn lint --fix",
-    "lint": "eslint",
-    "typecheck": "tsc --noEmit",
-    "prepare": "yarn build"
+    "lint": "eslint"
   },
   "dependencies": {
     "graphql": "16.10.0",
