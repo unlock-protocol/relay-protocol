@@ -10,50 +10,37 @@ yarn add @relay-protocol/client
 
 ## Usage
 
-### Basic Usage
-
 ```typescript
 import { RelayVaultService } from '@relay-protocol/client'
 
 // Create service instance with your API endpoint
 const vaultService = new RelayVaultService('https://api.example.com/graphql')
 
-// Get all pools with their details
-const { items: pools } = await vaultService.getAllPools()
+// Execute queries with type safety
+interface PoolsResponse {
+  relayPools: {
+    items: Array<{
+      contractAddress: string
+      asset: string
+      chainId: number
+    }>
+  }
+}
 
-// Get specific pool details
-const pool = await vaultService.getPool({
-  contractAddress: '0x123...',
-})
+const data = await vaultService.query<PoolsResponse>(`
+  query GetAllPools {
+    relayPools(limit: 10) {
+      items {
+        contractAddress
+        asset
+        chainId
+      }
+    }
+  }
+`)
 
-// Get user balances across all pools
-const { items: balances } = await vaultService.getAllUserBalances({
-  walletAddress: '0x456...',
-})
-
-// Get user balance in specific pool
-const { items: poolBalances } = await vaultService.getUserBalanceInPool({
-  walletAddress: '0x456...',
-  poolAddress: '0x123...',
-})
-```
-
-### Custom Queries
-
-The package exports raw GraphQL queries and supports custom query execution:
-
-```typescript
-import { RelayVaultService, GET_USER_BALANCES } from '@relay-protocol/client'
-
-const vaultService = new RelayVaultService('https://api.example.com/graphql')
-
-// Using exported queries
-const { data } = await vaultService.query(GET_USER_BALANCES, {
-  walletAddress: '0x123...',
-})
-
-// With type safety
-interface UserBalancesData {
+// With variables
+interface UserBalancesResponse {
   userBalances: {
     items: Array<{
       relayPool: string
@@ -62,26 +49,24 @@ interface UserBalancesData {
   }
 }
 
-const { data } = await vaultService.query<UserBalancesData>(GET_USER_BALANCES, {
-  walletAddress: '0x123...',
-})
+const balances = await vaultService.query<UserBalancesResponse>(
+  `query GetUserBalances($walletAddress: String!) {
+    userBalances(where: { wallet: $walletAddress }) {
+      items {
+        relayPool
+        balance
+      }
+    }
+  }`,
+  { walletAddress: '0x123...' }
+)
 ```
-
-Available raw queries:
-
-- `GET_ALL_POOLS` - Fetch all relay pools
-- `GET_POOL` - Get specific pool details
-- `GET_USER_BALANCES` - Get user balances across all pools
-- `GET_USER_BALANCE_IN_POOL` - Get user balance in specific pool
 
 ## Development
 
 ```bash
 # Install dependencies
 yarn install
-
-# Generate GraphQL types
-yarn codegen
 
 # Build package
 yarn build

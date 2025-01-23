@@ -1,5 +1,4 @@
 import { GraphQLClient } from 'graphql-request'
-import { getSdk } from './generated/graphql'
 import type { DocumentNode } from 'graphql'
 import type { Variables } from 'graphql-request'
 
@@ -29,19 +28,11 @@ export class RelayClient {
   }
 
   /**
-   * Access to the generated GraphQL SDK which provides type-safe query methods
-   * The SDK is automatically generated from the GraphQL schema and operations
-   */
-  public get sdk() {
-    return getSdk(this.client)
-  }
-
-  /**
    * Execute a raw GraphQL query
    *
    * @internal
    */
-  async rawQuery<TData = any, TVariables extends Variables = Variables>(
+  async query<TData = any, TVariables extends Variables = Variables>(
     query: string | DocumentNode,
     variables?: TVariables
   ): Promise<TData> {
