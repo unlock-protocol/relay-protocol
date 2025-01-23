@@ -1,0 +1,31 @@
+{
+  "name": "@relay-protocol/client",
+  "version": "1.0.0",
+  "main": "dist/index.js",
+  "module": "dist/index.mjs",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.js"
+    }
+  },
+  "scripts": {
+    "build": "tsup src/index.ts --dts --format esm,cjs",
+    "clean": "rm -rf dist",
+    "lint:fix": "yarn lint --fix",
+    "lint": "eslint"
+  },
+  "dependencies": {
+    "graphql": "16.10.0",
+    "graphql-request": "7.1.2",
+    "graphql-tag": "2.12.6"
+  },
+  "devDependencies": {
+    "@relay-protocol/tsconfig": "workspace:*",
+    "@types/node": "20.11.24",
+    "eslint": "9.0.0",
+    "tsup": "8.3.5",
+    "typescript": "5.7.3"
+  }
+}
