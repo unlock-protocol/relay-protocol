@@ -25,8 +25,8 @@
     "build": "yarn packages:build",
     "clean": "yarn packages:clean",
     "lint": "yarn packages --parallel run lint",
-    "backend:dev": "yarn workspace @relay-protocol/backend dev",
-    "backend:start": "yarn workspace @relay-protocol/backend start"
+    "backend:dev": "yarn build && yarn workspace @relay-protocol/backend dev",
+    "backend:start": "yarn build && yarn workspace @relay-protocol/backend start"
   },
   "engines": {
     "node": ">=20.0.0"
