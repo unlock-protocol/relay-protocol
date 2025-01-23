@@ -15,15 +15,19 @@ export const getGame = async (chainId: number, minL2BlockNumber: number) => {
   const abiCoder = new AbiCoder()
   const provider = await getProvider(chainId)
 
-  const disputeGameAddress = networks[chainId].op.disputeGame
-  const portalAddress = networks[chainId].op.portalProxy
+  const network = networks[chainId]
+  let disputeGameAddress: string
+  let portalAddress: string
+  if(network && network.op) {
+    ; ({op: { disputeGame: disputeGameAddress , portalProxy: portalAddress }} = network)
+  }
 
   const disputeGameContract = new ethers.Contract(
-    disputeGameAddress,
+    disputeGameAddress!,
     DisputeGameFactory,
     provider
   )
-  const portal2Contract = new ethers.Contract(portalAddress, Portal2, provider)
+  const portal2Contract = new ethers.Contract(portalAddress!, Portal2, provider)
 
   const [gameCount, gameType] = await Promise.all([
     disputeGameContract.gameCount(),
@@ -86,10 +90,10 @@ export const buildProveWithdrawal = async (
   ])
 
   // encode the root proof
-  const outputRootProof = abiCoder.encode(
-    ['bytes32', 'bytes32', 'bytes32', 'bytes32'],
-    [outputRootProofVersion, block?.stateRoot, proof.storageHash, block?.hash]
-  )
+  // const outputRootProof = abiCoder.encode(
+  //   ['bytes32', 'bytes32', 'bytes32', 'bytes32'],
+  //   [outputRootProofVersion, block?.stateRoot, proof.storageHash, block?.hash]
+  // )
 
   const disputeGameIndex = game[0]
 

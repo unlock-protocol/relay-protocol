@@ -19,6 +19,7 @@ export interface NetworkConfig {
   }
   op?: {
     portalProxy: string
+    disputeGame: string
   }
   weth?: string
 }
