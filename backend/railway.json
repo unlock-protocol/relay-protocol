@@ -3,6 +3,9 @@
   "build": {
     "nixpacksPlan": {
       "phases": {
+        "setup": {
+          "nixPkgs": ["yarn"]
+        },
         "install": {
           "dependsOn": ["setup"],
           "cmds": ["yarn install --frozen-lockfile"]
