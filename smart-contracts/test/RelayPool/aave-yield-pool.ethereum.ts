@@ -1,9 +1,10 @@
 import { expect } from 'chai'
-import { ethers } from 'hardhat'
+import { ethers, ignition } from 'hardhat'
 import { networks } from '@relay-protocol/networks'
 import { IUSDC, ERC4626, RelayPool } from '../../typechain-types'
 import { getStataToken } from '@relay-protocol/helpers'
 import { mintUSDC } from '../utils/hardhat'
+import RelayPoolModule from '../../ignition/modules/RelayPoolModule'
 
 const {
   usdc: { token: USDC },
@@ -18,6 +19,7 @@ describe('RelayBridge: use Aave yield pool (USDC)', () => {
   let userAddress: string
 
   before(async () => {
+    const { chainId } = await ethers.provider.getNetwork()
     const [user] = await ethers.getSigners()
     userAddress = await user.getAddress()
 
@@ -39,15 +41,21 @@ describe('RelayBridge: use Aave yield pool (USDC)', () => {
     aavePoolAddress = await staticAavePoolGetter.aToken()
 
     // deploy the pool
-    relayPool = await ethers.deployContract('RelayPool', [
-      networks[1].hyperlaneMailbox,
-      await usdc.getAddress(),
-      `${await usdc.name()} Relay Pool`,
-      `${await usdc.symbol()}-REL`,
-      [],
-      await staticAaveUsdc.getAddress(),
-      weth,
-    ])
+    const parameters = {
+      RelayPool: {
+        hyperlaneMailbox: networks[1].hyperlaneMailbox,
+        asset: await usdc.getAddress(),
+        name: `${await usdc.name()} Relay Pool`,
+        symbol: `${await usdc.symbol()}-REL`,
+        origins: [],
+        thirdPartyPool: await staticAaveUsdc.getAddress(),
+        weth,
+      },
+    }
+    ;({ relayPool } = await ignition.deploy(RelayPoolModule, {
+      parameters,
+      deploymentId: `RelayPool-${parameters.RelayPool.symbol}-${chainId.toString()}`,
+    }))
   })
 
   it('should deposit tokens into the Aave V3 yield pool when a user deposits funds', async () => {
