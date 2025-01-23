@@ -19,12 +19,15 @@
   ],
   "scripts": {
     "test": "yarn packages --parallel run test",
-    "packages": "yarn workspaces foreach --recursive --from '{@relay-protocol/eslint-config,@relay-protocol/helpers,@relay-protocol/networks,@relay-protocol/tsconfig,@relay-protocol/types}'",
+    "packages": "yarn workspaces foreach --recursive --from '{@relay-protocol/eslint-config,@relay-protocol/helpers,@relay-protocol/networks,@relay-protocol/tsconfig,@relay-protocol/types,@relay-protocol/client}'",
     "packages:clean": "yarn packages --parallel run clean",
     "packages:build": "yarn packages --topological-dev run build",
-    "build": "yarn packages:build",
+    "prebuild": "yarn workspace @relay-protocol/backend codegen",
+    "build": "yarn packages:clean && yarn packages:build",
     "clean": "yarn packages:clean",
-    "lint": "yarn packages --parallel run lint"
+    "lint": "yarn packages --parallel run lint",
+    "backend:dev": "yarn build && yarn workspace @relay-protocol/backend dev",
+    "backend:start": "yarn build && yarn workspace @relay-protocol/backend start"
   },
   "engines": {
     "node": ">=20.0.0"

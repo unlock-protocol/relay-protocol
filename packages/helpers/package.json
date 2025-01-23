@@ -21,7 +21,7 @@
   },
   "scripts": {
     "start": "tsc --watch",
-    "clean": "rm -rf dist && rm src/abis/index.ts",
+    "clean": "rm -rf dist",
     "lint:fix": "yarn lint --fix",
     "lint": "eslint",
     "build": "yarn build:index && yarn build:copy-abis && yarn build:ts",

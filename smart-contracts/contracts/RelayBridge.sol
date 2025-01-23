@@ -34,12 +34,12 @@ contract RelayBridge is IRelayBridge {
 
   event BridgeInitiated(
     uint256 indexed nonce,
-    address sender,
+    address indexed sender,
     address recipient,
     address asset,
     uint256 amount,
     uint32 poolChainId,
-    address pool
+    address indexed pool
   );
 
   constructor(address _asset, address _proxyBridge, address _hyperlaneMailbox) {

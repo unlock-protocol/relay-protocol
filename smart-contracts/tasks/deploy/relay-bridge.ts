@@ -10,8 +10,11 @@ task('deploy:relay-bridge', 'Deploy a bridge proxy')
   .setAction(
     async (
       { asset: assetAddress, proxyBridge: proxyBridgeAddress },
-      { ethers, ignition }
+      { ethers, ignition, run }
     ) => {
+      // make sure we are deploying the latest version of the contract
+      await run('compile')
+
       // get args value
       const { chainId } = await ethers.provider.getNetwork()
       const { hyperlaneMailbox } = networks[chainId.toString()]

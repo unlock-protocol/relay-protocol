@@ -7,11 +7,14 @@ import { networks as nets } from '@relay-protocol/networks'
 import './tasks/pool'
 import './tasks/bridge'
 import './tasks/claim/cctp'
+import './tasks/claim/arb'
+import './tasks/claim/native'
 
 // Actual contracts
 import './tasks/deploy/pool'
 import './tasks/deploy/relay-bridge'
 import './tasks/deploy/bridge-proxy'
+import './tasks/deploy/relay-pool-factory'
 
 // Helpers/tests
 import './tasks/deploy/native-wrapper'
@@ -35,6 +38,7 @@ Object.keys(nets).forEach((id) => {
   const { slug, rpc } = nets[id]
   const network = {
     url: rpc || `https://rpc.unlock-protocol.com/${id}`,
+    chainId: Number(id),
   }
   if (DEPLOYER_PRIVATE_KEY) {
     network.accounts = [DEPLOYER_PRIVATE_KEY]
@@ -71,6 +75,7 @@ const etherscan = {
     polygonZkEVM: '8H4ZB9SQBMQ7WA1TCIXFQVCHTVX8DXTY9Y',
     scroll: 'BZEXNPN6KKKJQ8VIMNXZDZNEX7QQZWZQ3P',
     opSepolia: 'V51DWC44XURIGPP49X85VZQGH1DCBAW5EC',
+    'arbitrum-sepolia': 'W5XNFPZS8D6JZ5AXVWD4XCG8B5ZH5JCD4Y',
   },
   customChains: [
     {
@@ -97,15 +102,36 @@ const etherscan = {
         browserURL: 'https://basescan.org/',
       },
     },
+    {
+      network: 'arbitrum-sepolia',
+      chainId: 421614,
+      urls: {
+        apiURL: 'https://api-sepolia.arbiscan.io/api',
+        browserURL: 'https://sepolia.arbiscan.io/',
+      },
+    },
   ],
 }
 
 const config: HardhatUserConfig = {
-  solidity: '0.8.28',
   networks,
   etherscan,
   sourcify: {
     enabled: true,
+  },
+  solidity: {
+    compilers: [
+      {
+        version: '0.8.28',
+        settings: {
+          optimizer: {
+            enabled: true,
+            runs: 200,
+            details: { yul: false },
+          },
+        },
+      },
+    ],
   },
 }
 
