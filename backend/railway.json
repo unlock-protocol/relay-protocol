@@ -9,7 +9,7 @@
         "install": {
           "dependsOn": ["setup"],
           "cmds": [
-            "cd .. && yarn install --frozen-lockfile && yarn workspace @relay-protocol/tsconfig build && cd backend"
+            "yarn install --frozen-lockfile && yarn packages:build && cd backend"
           ]
         }
       }
