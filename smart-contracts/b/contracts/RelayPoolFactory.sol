@@ -9,9 +9,9 @@ contract RelayPoolFactory {
   address public wrappedEth;
 
   event PoolDeployed(
-    address pool,
-    address creator,
-    address asset,
+    address indexed pool,
+    address indexed creator,
+    address indexed asset,
     string name,
     string symbol,
     OriginParam[] origins,
