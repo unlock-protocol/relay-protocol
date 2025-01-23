@@ -12,7 +12,7 @@
   },
   "scripts": {
     "start": "tsc --watch",
-    "build": "tsup src/index.ts --dts --format esm,cjs",
+    "build": "yarn codegen && tsup src/index.ts --dts --format esm,cjs",
     "dev": "tsup --watch",
     "codegen": "graphql-codegen",
     "clean": "rm -rf dist",
