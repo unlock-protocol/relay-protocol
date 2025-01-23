@@ -11,10 +11,15 @@
     }
   },
   "scripts": {
-    "build": "tsup",
+    "start": "tsc --watch",
+    "build": "tsup src/index.ts --dts --format esm,cjs",
     "dev": "tsup --watch",
     "codegen": "graphql-codegen",
-    "lint": "eslint \"src/**/*.{ts,tsx}\" --fix"
+    "clean": "rm -rf dist",
+    "lint:fix": "yarn lint --fix",
+    "lint": "eslint",
+    "typecheck": "tsc --noEmit",
+    "prepare": "yarn build"
   },
   "dependencies": {
     "graphql": "16.10.0",
