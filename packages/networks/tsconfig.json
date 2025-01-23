@@ -1,7 +1,3 @@
 {
-  "extends": "@relay-protocol/tsconfig",
-  "compilerOptions": {
-    "outDir": "dist"
-  },
-  "exclude": ["dist", "bin"]
+  "extends": "@relay-protocol/tsconfig"
 }
