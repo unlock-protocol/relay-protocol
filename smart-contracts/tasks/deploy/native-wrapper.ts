@@ -4,8 +4,17 @@ import RelayPoolNativeGatewayModule from '../../ignition/modules/RelayPoolNative
 
 task('deploy:native-wrapper', 'Deploy a WETH/Native wrapper for a relay pool')
   .addParam('pool', 'A realy pool address')
-  .addParam('weth', 'Deployed WETH9 contract')
-  .setAction(async ({ pool, weth }, { ethers, ignition }) => {
+  .setAction(async ({ pool }, { ethers, ignition }) => {
+    const { chainId } = await ethers.provider.getNetwork()
+
+    const poolContract = new ethers.Contract(
+      pool,
+      ['function asset() view returns (address)'],
+      ethers.provider
+    )
+
+    const weth = await poolContract.asset()
+
     // deploy the pool using ignition
     const parameters = {
       RelayPoolNativeGateway: {
@@ -13,7 +22,7 @@ task('deploy:native-wrapper', 'Deploy a WETH/Native wrapper for a relay pool')
         weth,
       },
     }
-    const { chainId } = await ethers.provider.getNetwork()
+
     const { nativeGateway } = await ignition.deploy(
       RelayPoolNativeGatewayModule,
       {
