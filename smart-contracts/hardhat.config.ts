@@ -14,6 +14,7 @@ import './tasks/claim/native'
 import './tasks/deploy/pool'
 import './tasks/deploy/relay-bridge'
 import './tasks/deploy/bridge-proxy'
+import './tasks/deploy/relay-pool-factory'
 
 // Helpers/tests
 import './tasks/deploy/native-wrapper'
@@ -37,6 +38,7 @@ Object.keys(nets).forEach((id) => {
   const { slug, rpc } = nets[id]
   const network = {
     url: rpc || `https://rpc.unlock-protocol.com/${id}`,
+    chainId: Number(id),
   }
   if (DEPLOYER_PRIVATE_KEY) {
     network.accounts = [DEPLOYER_PRIVATE_KEY]
@@ -112,11 +114,24 @@ const etherscan = {
 }
 
 const config: HardhatUserConfig = {
-  solidity: '0.8.28',
   networks,
   etherscan,
   sourcify: {
     enabled: true,
+  },
+  solidity: {
+    compilers: [
+      {
+        version: '0.8.28',
+        settings: {
+          optimizer: {
+            enabled: true,
+            runs: 200,
+            details: { yul: false },
+          },
+        },
+      },
+    ],
   },
 }
 

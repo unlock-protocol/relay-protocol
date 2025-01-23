@@ -19,8 +19,25 @@ yarn hardhat deploy:bridge-proxy --network sepolia
 yarn hardhat deploy:dummy-yield-pool --network sepolia --asset 0x7b79995e5f793A07Bc00c21412e50Ecae098E7f9
 
 # Deploy a relay pool on the L1 (here we use WETH as the asset):
-(you may need to manually update the deployment script to include the correct values for the origin)
-yarn hardhat deploy:pool --network sepolia --asset 0x7b79995e5f793A07Bc00c21412e50Ecae098E7f9 --yield-pool 0x3FEB26d09420Bfdbb0E2F6Cf4777aFf0bd7e7953 (you can use the yield pool address from the previous step, or an existing AAVE, Morpho... etc pool)
+# For `yield-pool` you can use the yield pool address from the previous step, or an existing AAVE, Morpho... etc
+# For `origins` you need a stringified JSON object that includes the chainId (L2), bridge contract (L2), max debt from that bridge and the L1 proxy bridge.
+
+yarn hardhat deploy:pool \
+  --network sepolia \
+  --factory 0xF06fB9fBC957e99D4B527B0a73a894A483EA1c46 \
+  --asset 0x7b79995e5f793A07Bc00c21412e50Ecae098E7f9 \
+  --yield-pool 0x3FEB26d09420Bfdbb0E2F6Cf4777aFf0bd7e7953 \
+  --origins '[{
+      "chainId": 11155420,
+      "bridge": "0xD7d4F627C80908Ef9fa70a40E671b155B1A3595f",
+      "maxDebt": 1000000000000,
+      "proxyBridge": "0x22CfA4db4eB5d67D3C022206545A45d1554A8A40"
+    },{
+      "chainId": 421614,
+      "bridge": "0xF241F12506fb6Bf1909c6bC176A199166414007a",
+      "maxDebt": 1000000000000,
+      "proxyBridge": "0xbb3cd7ced6a8d6efda6c1e549a3ca0431390566a"
+    }]'
 ```
 
 You can also use Hardhat Ignition directly

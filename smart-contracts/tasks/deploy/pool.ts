@@ -1,24 +1,20 @@
 import { task } from 'hardhat/config'
 
-import RelayPoolModule from '../../ignition/modules/RelayPoolModule'
 import { networks } from '@relay-protocol/networks'
+import { getStataToken, getEvent } from '@relay-protocol/helpers'
 
 task('deploy:pool', 'Deploy a relay pool')
+  .addParam('factory', 'Address of the factory')
   .addParam('asset', 'An ERC20 asset')
   .addOptionalParam('yieldPool', 'A yield pool address')
-  .setAction(async ({ asset, yieldPool }, { ethers, ignition, run }) => {
-    const { getStataToken } = await import('@relay-protocol/helpers')
-
-    // make sure we are deploying the latest version of the contract
-    await run('compile')
-
+  .addParam(
+    'origins',
+    'Origins, as JSON: {"chainId": 11155420, "bridge": "0xD26c05a33349a6DeD02DD9360e1ef303d1246fb6", "maxDebt": 1000000000000, "proxyBridge": "0x4e46Dc422c61d41Ce835234D29e7f9f1C54968Fb"}'
+  )
+  .setAction(async ({ factory, asset, yieldPool, origins }, { ethers }) => {
     // get args value
     const { chainId } = await ethers.provider.getNetwork()
-    const {
-      hyperlaneMailbox,
-      name: networkName,
-      weth,
-    } = networks[chainId.toString()]
+    const { name: networkName, weth } = networks[chainId.toString()]
     console.log(`deploying on ${networkName} (${chainId})...`)
 
     // get aave yield pool
@@ -28,34 +24,92 @@ task('deploy:pool', 'Deploy a relay pool')
 
     // parse asset metadata
     const assetContract = await ethers.getContractAt('MyToken', asset)
+    const assetSymbol = await assetContract.symbol()
     const name = `${await assetContract.name()} Relay Pool`
-    const symbol = `${await assetContract.symbol()}-REL`
+    const symbol = `${assetSymbol}-REL`
 
-    const origins = []
-    // TODO: make programatic (likely fetched from ignition deployments)
-    const ORIGIN = {
-      chainId: 11155420, // origin chain
-      bridge: '0xD26c05a33349a6DeD02DD9360e1ef303d1246fb6', // relayBridge on L2 chain,
-      maxDebt: ethers.parseUnits('10000000', 6),
-      proxyBridge: '0x4e46Dc422c61d41Ce835234D29e7f9f1C54968Fb', // proxyBridge on local chain (used to claim)
+    // Check that the yield pool asset matche's
+    const yieldPoolContract = await ethers.getContractAt(
+      'MyYieldPool',
+      yieldPool
+    )
+    const yieldPoolAsset = await yieldPoolContract.asset()
+    if (asset !== yieldPoolAsset) {
+      const yeildPoolAssetContract = await ethers.getContractAt(
+        'MyToken',
+        yieldPoolAsset
+      )
+      const originAssetSymbol = await yeildPoolAssetContract.symbol()
+      console.error(
+        `Asset mismatch! The pool expects a different asset (${assetSymbol}) than the yield pool (${originAssetSymbol})!`
+      )
+      process.exit(1)
     }
-    origins.push(ORIGIN)
 
-    // deploy the pool using ignition
-    const parameters = {
-      RelayPool: {
-        hyperlaneMailbox,
-        asset,
-        name,
-        symbol,
-        origins,
-        thirdPartyPool: yieldPool,
-        weth,
-      },
+    const factoryContract = await ethers.getContractAt(
+      'RelayPoolFactory',
+      factory
+    )
+
+    // Check that each origin's asset matches
+    // We need to check the symbols...
+    const authorizedOrigins = JSON.parse(origins)
+    if (authorizedOrigins.length === 0) {
+      console.error('No authorized origins provided!')
+      process.exit(1)
     }
-    const { relayPool } = await ignition.deploy(RelayPoolModule, {
-      parameters,
-      deploymentId: `RelayPool-${symbol}-${chainId.toString()}`,
-    })
-    console.log(`relayPool deployed to: ${await relayPool.getAddress()}`)
+    for (let i = 0; i < authorizedOrigins.length; i++) {
+      const origin = authorizedOrigins[i]
+      const originProvider = await ethers.getDefaultProvider(origin.chainId)
+      const originBridgeContract = new ethers.Contract(
+        origin.bridge,
+        ['function asset() view returns (address)'],
+        originProvider
+      )
+      const originAsset = await originBridgeContract.asset()
+      if (assetSymbol === 'WETH') {
+        if (originAsset !== ethers.ZeroAddress) {
+          console.error(
+            `Asset mismatch! The pool expects the wrapped native token but the origin bridge's ${origin.bridge} asset is not the native token!`
+          )
+          process.exit(1)
+        }
+      } else {
+        if (originAsset === ethers.ZeroAddress) {
+          console.error(
+            `Asset mismatch! The pool expects ${assetSymbol} but the origin bridge's ${origin.bridge} asset is the native token!`
+          )
+          process.exit(1)
+        }
+        const originAssetContract = new ethers.Contract(
+          originAsset,
+          ['function asset() view returns (address)'],
+          originProvider
+        )
+        const originAssetSymbol = await originAssetContract.symbol()
+        if (originAssetSymbol !== assetSymbol) {
+          console.error(
+            `Asset mismatch! The pool expects ${assetSymbol} but the origin bridge's ${origin.bridge} asset is ${originAssetSymbol}`
+          )
+          process.exit(1)
+        }
+      }
+    }
+
+    // deploy the pool
+    const tx = await factoryContract.deployPool(
+      asset,
+      name,
+      symbol,
+      JSON.parse(origins),
+      yieldPool
+    )
+    const receipt = await tx.wait()
+    const event = await getEvent(
+      receipt!,
+      'PoolDeployed',
+      factoryContract.interface
+    )
+
+    console.log(`relayPool deployed to: ${await event.args.pool}`)
   })
