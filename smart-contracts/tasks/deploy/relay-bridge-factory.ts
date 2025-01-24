@@ -1,7 +1,7 @@
 import { task } from 'hardhat/config'
 
-import { networks } from '../../lib/networks'
 import RelayBridgeFactoryModule from '../../ignition/modules/RelayBridgeFactoryModule'
+import networks from '@relay-protocol/networks'
 
 task('deploy:bridge-factory', 'Deploy a relay bridge factory').setAction(
   async (_params, { ethers, ignition }) => {
