@@ -12,4 +12,7 @@ export const optimism = {
     transmitter: '0x4D41f22c5a0e5c74090899E5a8Fb597a8842b3e8',
   },
   weth: '0x4200000000000000000000000000000000000006',
+  uniswapV3: {
+    universalRouterAddress: '0xb555edF5dcF85f42cEeF1f3630a52A108E55A654',
+  },
 }

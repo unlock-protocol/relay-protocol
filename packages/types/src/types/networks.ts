@@ -22,6 +22,9 @@ export interface NetworkConfig {
     disputeGame: string
   }
   weth?: string
+  uniswapV3?: {
+    universalRouterAddress: string
+  }
 }
 
 export interface NetworkConfigs {
