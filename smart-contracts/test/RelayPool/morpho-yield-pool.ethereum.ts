@@ -159,20 +159,20 @@ describe('RelayBridge: use Morpho yield pool (WETH)', () => {
     await (await usdc.connect(user).approve(relayPoolAddress, amount)).wait()
 
     // Deposit tokens to the RelayPool
+    const expectedMorphoDeposit = await morphoUsdcPool.previewDeposit(amount)
     await relayPool.connect(user).deposit(amount, userAddress)
 
     // Check balances
     expect(await usdc.balanceOf(relayPoolAddress)).to.equal(0)
-    const expectedMorphoDeposit = await morphoUsdcPool.previewDeposit(amount)
-    expect(await morphoUsdcPool.balanceOf(relayPoolAddress)).to.be.greaterThan(
+    expect(await morphoUsdcPool.balanceOf(relayPoolAddress)).to.equal(
       morphoBalance + expectedMorphoDeposit
     )
 
     // Withdraw tokens from the RelayPool
     const sharesToRedeem = await relayPool.balanceOf(userAddress)
     const amountToReceive = await relayPool.previewRedeem(sharesToRedeem)
-    const expectedMorphoRedeem =
-      await morphoUsdcPool.previewRedeem(amountToReceive)
+    const expectedMorphoRedeemedShares =
+      await morphoUsdcPool.previewWithdraw(amountToReceive)
 
     await relayPool
       .connect(user)
@@ -182,7 +182,7 @@ describe('RelayBridge: use Morpho yield pool (WETH)', () => {
 
     // back to the same amount of morpho tokens
     expect(await morphoUsdcPool.balanceOf(relayPoolAddress)).to.equal(
-      morphoBalance - expectedMorphoRedeem
+      morphoBalance - expectedMorphoRedeemedShares
     )
   })
 })
