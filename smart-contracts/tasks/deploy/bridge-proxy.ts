@@ -6,7 +6,6 @@ import { AutoComplete } from 'enquirer'
 import CCTPBridgeProxyModule from '../../ignition/modules/CCTPBridgeProxyModule'
 import OPStackNativeBridgeProxyModule from '../../ignition/modules/OPStackNativeBridgeProxyModule'
 import ArbitrumOrbitNativeBridgeProxyModule from '../../ignition/modules/ArbitrumOrbitNativeBridgeProxyModule'
-// import { getAddresses } from '../../lib/utils/deployed'
 
 task('deploy:bridge-proxy', 'Deploy a bridge proxy').setAction(
   async (_, { ethers, ignition }) => {
