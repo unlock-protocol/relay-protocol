@@ -29,7 +29,7 @@ export DEPLOYER_PRIVATE_KEY=...
 
 ### Deploy the factories
 
-The factories are not strictly necessary for the protocol to operator but they provide convenience to identify deployed contracts. There addresses are added to the `../backend` application.
+The factories are not strictly necessary for the protocol to operate but they provide convenience to identify deployed contracts. These addresses are added to the `../backend` application.
 You should not have to deploy factories.
 
 When deploying to a network, make sure you first add the network details in the package `../packages/network` and run `yarn build`.
