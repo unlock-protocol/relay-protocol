@@ -1,7 +1,6 @@
 import { NetworkConfig } from '@relay-protocol/types'
 
 export const arbitrumOne: NetworkConfig = {
-  l1ChainId: 1,
   bridges: {
     arb: {
       routerGateway: '0x5288c571Fd7aD117beA99bF60FE0846C4E84F933',
@@ -15,6 +14,7 @@ export const arbitrumOne: NetworkConfig = {
   chainId: 42161,
   hyperlaneMailbox: '0x979Ca5202784112f4738403dBec5D0F3B9daabB9',
   isTestnet: false,
+  l1ChainId: 1,
   name: 'Arbitrum',
   slug: 'arbitrum',
   assets: {

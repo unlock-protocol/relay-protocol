@@ -1,33 +1,74 @@
 # payday-pools
 
-Contracts used for Relay Vaults & Bridges
+## Contracts used for Relay Vaults & Bridges:
 
-RelayPool let Liquidity Providers (LP) deposit and withdraw a specific asset and receive yield for their deposit. The RelayPool contracts do _not_ hold the liquidity themselves and just "forward" the funds to a "base yield" contract (Aave, Morpho... etc). They also implement a `handle` function and a `claim` function which are respectively used to "loan" funds to another user who has initiated a "fast" withdrawal from an L2 contract, as well as claim the funds once they have effectively crossed the bridge.
-RelayPool aimed at being deployed on L1 (ethereum mainnet) for a specific asset (wrapped ETH, or other ERC20s) and can handle funds coming from multiple sources, as long as it is the same asset. Each origin has its own `BridgeProxy` contract that implements the specific claim for a given L2/Bridge.
-The `handle` function is called by Hyperlane to indicate that a user has initiated an L2->L1 withdrawal and that the user can receive funds (minus fees), since the RelayPool has insurance that the funds will eventually be transfered.
+### RelayPool
 
-RelayPools are deployed thru a `RelayPoolFactory` for convenience. When a pool uses wrapped ETH, we offer a `RelayPoolNativeGateway` which lets users deposit ETH directly without the need to wrap.
+- RelayPool let Liquidity Providers (LP) deposit and withdraw a specific asset and receive yield for their deposit. The RelayPool contracts do _not_ hold the liquidity themselves and just "forward" the funds to a "base yield" contract (Aave, Morpho... etc). They also implement a `handle` function and a `claim` function which are respectively used to "loan" funds to another user who has initiated a "fast" withdrawal from an L2 contract, as well as claim the funds once they have effectively crossed the bridge.
+- RelayPool aimed at being deployed on L1 (ethereum mainnet) for a specific asset (wrapped ETH, or other ERC20s) and can handle funds coming from multiple sources, as long as it is the same asset. Each origin has its own `BridgeProxy` contract that implements the specific claim for a given L2/Bridge.
+- The `handle` function is called by Hyperlane to indicate that a user has initiated an L2->L1 withdrawal and that the user can receive funds (minus fees), since the RelayPool has insurance that the funds will eventually be transfered.
+- RelayPools are deployed thru a `RelayPoolFactory` for convenience. When a pool uses wrapped ETH, we offer a `RelayPoolNativeGateway` which lets users deposit ETH directly without the need to wrap.
+- RelayPools have a curator which is an address that can perform configuration changes (adding new origins, updating the bridge fee, or even chamging the "base yield" contract). It is possible for an attacker to steal funds from LP, which is why it is critical that this address points to a timelock contract (LPs could withdraw their funds before a malicious transaction is submitted). This timelock should itself receive its operations from a multi-sig, or even a governor contract that uses the RelayVault shares to let LP collectively govern the pool if needed.
+
+### RelayBridge
 
 RelayBridge contracts let solvers (or other users) initiate a withdrwal from an L2 to the L1. They are asset-specific. They also call a L2/Bridge specific `BridgeProxy` in order to initiate the withdrwal. When called, the issue both an Hyperlane message and a bridge withdrwal.
 
+### ProxyBridge contracts
 
+The actual bridging logic is abstracted away and implemented in various ProxyBridge contracts for the OPStack, Arbitrum Orbit and others. It is in theory possible to create these bridges for any bridge (native or not).
 
 ## Deploy contracts
+
+For all deployments you need a private key:
 
 ```
 # export your private key to the shell
 export DEPLOYER_PRIVATE_KEY=...
+```
 
-# Deploy a bridge proxy on an L2
+### Deploy the factories
+
+The factories are not strictly necessary for the protocol to operate but they provide convenience to identify deployed contracts. These addresses are added to the `../backend` application.
+You should not have to deploy factories.
+
+When deploying to a network, make sure you first add the network details in the package `../packages/network` and run `yarn build`.
+
+```
+# Bridge factory (deployed on L2)
+yarn run hardhat deploy:bridge-factory --network op-sepolia
+
+# Pool factory (deployed on L1)
+yarn run hardhat deploy:pool-factory --network sepolia
+```
+
+Note: You can verify the pools with a command like
+
+```
+yarn run hardhat ignition verify <name of deployment from ignition/deployments/>
+```
+
+### Deploy protocol contracts
+
+#### Deploy a bridge on an L2
+
+We start with it because we need to provide "origin" addresses on the L1 pool when we will deploy it.
+
+```
+# Deploy a bridge proxy on an L2: here we should OP-sepolia, of type op and sending funds to Sepolia (11155111)
 yarn hardhat deploy:bridge-proxy --network op-sepolia
 
-# Deploy a relay bridge on an L2
-yarn hardhat deploy:relay-bridge --network op-sepolia --proxy-bridge 0x34EbEc0AE80A2d078DE5489f0f5cAa4d3aaEA355 (address from previous step!)
+# Deploy a relay bridge on the same L2
+yarn hardhat deploy:relay-bridge --network op-sepolia
+```
 
+#### Deploy the pool on the L1
+
+```
 # Deploy a bridge proxy on an L1
 yarn hardhat deploy:bridge-proxy --network sepolia
 
-# Optional on testnets: you may want to deploy a yield pool (here we use WETH as the asset):
+# Optional on test networks: you may want to deploy a yield pool (here we use WETH as the asset):
 yarn hardhat deploy:dummy-yield-pool --network sepolia --asset 0x7b79995e5f793A07Bc00c21412e50Ecae098E7f9
 
 # Deploy a relay pool on the L1 (here we use WETH as the asset):

@@ -8,6 +8,9 @@ export const baseSepolia: NetworkConfig = {
   name: 'Base Sepolia',
   slug: 'base-sepolia',
   bridges: {
+    op: {
+      // All settings are hardcoded in the contract because they are shared between all networks!
+    },
     cctp: {
       domain: 6n,
       messenger: '0x9f3B8679c73C2Fef8b59B4f3444d4e156fb70AA5',
