@@ -1,6 +1,7 @@
 import { NetworkConfig } from '@relay-protocol/types'
 
 export const base: NetworkConfig = {
+  l1ChainId: 1,
   chainId: 8453,
   isTestnet: false,
   name: 'Base',

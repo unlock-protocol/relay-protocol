@@ -1,5 +1,6 @@
 export interface NetworkConfig {
   chainId: number | bigint
+  l1ChainId?: number | bigint
   name: string
   slug: string
   bridges: {
