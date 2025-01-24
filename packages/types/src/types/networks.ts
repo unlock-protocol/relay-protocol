@@ -2,11 +2,10 @@ export interface NetworkConfig {
   chainId: number | bigint
   name: string
   slug: string
-  usdc: {
+  cctp: {
     domain: bigint
     messenger: string
     transmitter: string
-    token: string
   }
   udt?: string
   rpc?: string
@@ -22,6 +21,11 @@ export interface NetworkConfig {
     disputeGame: string
   }
   weth?: string
+  assets?: NetworkAssets
+}
+
+interface NetworkAssets {
+  [asset: string]: string
 }
 
 export interface NetworkConfigs {
