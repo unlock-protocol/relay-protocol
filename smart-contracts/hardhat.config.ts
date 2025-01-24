@@ -15,6 +15,7 @@ import './tasks/deploy/pool'
 import './tasks/deploy/relay-bridge'
 import './tasks/deploy/bridge-proxy'
 import './tasks/deploy/relay-pool-factory'
+import './tasks/deploy/relay-bridge-factory'
 
 // Helpers/tests
 import './tasks/deploy/native-wrapper'

@@ -7,8 +7,7 @@ import { mintUSDC } from '../utils/hardhat'
 import RelayPoolModule from '../../ignition/modules/RelayPoolModule'
 
 const {
-  usdc: { token: USDC },
-  weth,
+  assets: { usdc: USDC, weth },
 } = networks[1]
 
 describe('RelayBridge: use Aave yield pool (USDC)', () => {

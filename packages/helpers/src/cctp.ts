@@ -36,5 +36,5 @@ export async function getCCTPAttestation(
   const url = `https://${isTestnet ? 'iris-api-sandbox' : 'iris-api'}.circle.com/attestations/${messageHash}`
   const resp = await fetch(url)
   const { attestation, status } = (await resp.json()) as any
-  return { attestation, status, messageBytes, messageHash }
+  return { attestation, messageBytes, messageHash, status }
 }
