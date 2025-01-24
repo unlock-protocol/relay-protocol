@@ -38,7 +38,7 @@ describe('RelayPoolNativeGateway', () => {
           origins: [],
           thirdPartyPool: thirdPartyPoolAddress,
           weth: WETH,
-          protocolFee: 0,
+          bridgeFee: 0,
         },
       }
       ;({ relayPool } = await ignition.deploy(RelayPoolModule, {

@@ -65,7 +65,7 @@ contract RelayPool is ERC4626, ERC20Permit, Ownable {
   address public yieldPool;
 
   // The protocol fee in basis points
-  uint8 public protocolFee;
+  uint8 public bridgeFee;
 
   event LoanEmitted(
     uint256 indexed nonce,
@@ -98,7 +98,7 @@ contract RelayPool is ERC4626, ERC20Permit, Ownable {
     uint256 outstandingDebt,
     address proxyBridge
   );
-  event ProtocolFeeSet(uint8 previousFee, uint8 newFee);
+  event BridgeFeeSet(uint8 previousFee, uint8 newFee);
 
   // Warning: the owner of the pool should always be a timelock address with a significant delay to reduce the risk of stolen funds
   constructor(
@@ -128,7 +128,7 @@ contract RelayPool is ERC4626, ERC20Permit, Ownable {
     WETH = wrappedEth;
 
     // set protocol fee
-    protocolFee = feeBasisPoints;
+    bridgeFee = feeBasisPoints;
   }
 
   function updateYieldPool(address newPool) public onlyOwner {
@@ -163,10 +163,10 @@ contract RelayPool is ERC4626, ERC20Permit, Ownable {
     );
   }
 
-  function setProtocolFee(uint8 feeBasisPoints) public onlyOwner {
-    uint8 oldFee = protocolFee;
-    protocolFee = feeBasisPoints;
-    emit ProtocolFeeSet(oldFee, feeBasisPoints);
+  function setBridgeFee(uint8 feeBasisPoints) public onlyOwner {
+    uint8 oldFee = bridgeFee;
+    bridgeFee = feeBasisPoints;
+    emit BridgeFeeSet(oldFee, feeBasisPoints);
   }
 
   function increaseOutStandingDebt(uint256 amount) internal {

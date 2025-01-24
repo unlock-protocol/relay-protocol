@@ -151,7 +151,6 @@ describe('ArbitrumOrbitNativeBridgeProxy', function () {
       const { event: wethTransferEvent } = await getEvent(
         receipt!,
         'Transfer',
-        WETH!,
         new Interface(WETH_ABI)
       )
       expect(wethTransferEvent.args.dst).to.equals(recipientAddress)
