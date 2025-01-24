@@ -60,11 +60,15 @@ yarn hardhat deploy:bridge-proxy --network op-sepolia
 
 # Deploy a relay bridge on the same L2
 yarn hardhat deploy:relay-bridge --network op-sepolia
+```
 
+2.2 Deploy the pool on the L1
+
+```
 # Deploy a bridge proxy on an L1
 yarn hardhat deploy:bridge-proxy --network sepolia
 
-# Optional on testnets: you may want to deploy a yield pool (here we use WETH as the asset):
+# Optional on test networks: you may want to deploy a yield pool (here we use WETH as the asset):
 yarn hardhat deploy:dummy-yield-pool --network sepolia --asset 0x7b79995e5f793A07Bc00c21412e50Ecae098E7f9
 
 # Deploy a relay pool on the L1 (here we use WETH as the asset):

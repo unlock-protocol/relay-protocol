@@ -12,11 +12,7 @@ task('deploy:bridge-proxy', 'Deploy a bridge proxy').setAction(
   async (_, { ethers, ignition }) => {
     const { chainId } = await ethers.provider.getNetwork()
 
-    const { bridges, l1ChainId: destChain } = networks[chainId.toString()]
-
-    if (!destChain) {
-      throw new Error('This chain does not have a corresponding L1 chain')
-    }
+    const { bridges } = networks[chainId.toString()]
 
     const type = await new AutoComplete({
       name: 'type',
@@ -51,15 +47,9 @@ task('deploy:bridge-proxy', 'Deploy a bridge proxy').setAction(
       }))
       console.log(`CCTP bridge deployed at: ${await proxyBridge.getAddress()}`)
     } else if (type === 'op') {
-      const {
-        bridges: {
-          op: { portalProxy },
-        },
-      } = networks[destChain]
-
       const parameters = {
         OPStackNativeBridgeProxy: {
-          portalProxy,
+          portalProxy: bridges.op!.portalProxy! || ethers.ZeroAddress, // Only used on the L1 deployments (to claim the assets)
         },
       }
       // deploy OP bridge
@@ -74,16 +64,10 @@ task('deploy:bridge-proxy', 'Deploy a bridge proxy').setAction(
         `OPStack bridge deployed at: ${await proxyBridge.getAddress()}`
       )
     } else if (type === 'arb') {
-      const {
-        bridges: {
-          arb: { routerGateway, outbox },
-        },
-      } = networks[chainId.toString()]
-
       const parameters = {
         ArbitrumOrbitNativeBridgeProxy: {
-          routerGateway,
-          outbox,
+          routerGateway: bridges.arb!.routerGateway,
+          outbox: bridges.arb!.outbox || ethers.ZeroAddress, // Only used on the L1 deployments (to claim the assets)
         },
       }
 
