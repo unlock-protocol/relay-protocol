@@ -7,12 +7,13 @@ import { networks } from '@relay-protocol/networks'
 import { getEvent, getBalance } from '@relay-protocol/helpers'
 import { WETH as WETH_ABI } from '@relay-protocol/helpers/abis'
 import ArbitrumOrbitNativeBridgeProxyModule from '../../ignition/modules/ArbitrumOrbitNativeBridgeProxyModule'
-import RelayPoolModule from '../../ignition/modules/RelayPoolModule'
 
 const ETH_CHAIN_ID = 11155111n
 const ARB_CHAIN_ID = 42161n
 const {
-  arb: { routerGateway, outbox },
+  bridges: {
+    arb: { routerGateway, outbox },
+  },
   assets: { weth: WETH },
 } = networks[ETH_CHAIN_ID.toString()]
 

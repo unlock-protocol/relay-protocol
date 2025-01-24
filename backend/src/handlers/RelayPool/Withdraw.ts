@@ -91,7 +91,7 @@ export default async function ({
 
   // Update user balance
   await context.db.update(userBalance, { id: balanceId }).set({
-    balance: user.balance - assets,
+    shareBalance: user.shareBalance - shares,
     totalWithdrawn: user.totalWithdrawn + assets,
     lastUpdated: timestamp,
   })

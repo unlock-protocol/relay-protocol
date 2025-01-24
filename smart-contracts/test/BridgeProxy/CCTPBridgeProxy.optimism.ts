@@ -12,7 +12,9 @@ import CCTPBridgeProxyModule from '../../ignition/modules/CCTPBridgeProxyModule'
 const chainId = 10
 const destinationChainId = 1
 const {
-  cctp: { messenger, transmitter },
+  bridges: {
+    cctp: { messenger, transmitter },
+  },
   assets,
 } = networks[chainId]
 
@@ -106,7 +108,7 @@ describe('CCTPBridgeProxy', function () {
       expect(args?.burnToken).to.be.equal(assets.usdc)
       expect(args?.amount).to.be.equal(amount)
       expect(args?.destinationDomain).to.be.equal(
-        networks[destinationChainId].cctp.domain
+        networks[destinationChainId].bridges.cctp.domain
       )
       // expect(args?.mintRecipient).to.be.equal(await recipient.getAddress())
     })

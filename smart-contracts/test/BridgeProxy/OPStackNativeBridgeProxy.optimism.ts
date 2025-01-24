@@ -6,7 +6,10 @@ import { networks } from '@relay-protocol/networks'
 import OPStackNativeBridgeProxyModule from '../../ignition/modules/OPStackNativeBridgeProxyModule'
 
 import { AbiCoder, Log } from 'ethers'
-const { assets: ethereumAssets, op } = networks[1]
+const {
+  assets: ethereumAssets,
+  bridges: { op },
+} = networks[1]
 const { assets: op1Assets } = networks[10]
 
 describe('OPStackNativeBridgeProxy', function () {
