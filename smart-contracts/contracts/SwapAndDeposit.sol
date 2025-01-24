@@ -116,9 +116,9 @@ contract SwapAndDeposit {
       uint48(block.timestamp + 60) // expires after 1min
     );
 
-    // by default just swap using token > WETH > asset pool
+    // we swap using shortest path token > asset
     bytes memory defaultPath = abi.encodePacked(
-      wrappedAddress,
+      tokenAddress,
       uniswapPoolFee, // uniswap pool fee
       asset
     );
@@ -127,12 +127,10 @@ contract SwapAndDeposit {
     bytes memory commands = abi.encodePacked(bytes1(uint8(V3_SWAP_EXACT_IN)));
     bytes[] memory inputs = new bytes[](1);
     inputs[0] = abi.encode(
-      pool, // recipient is the pool
+      address(this), // recipient is the pool
       tokenAmount, // amountIn
       0, // amountOutMinimum
-      tokenAddress == wrappedAddress
-        ? defaultPath
-        : abi.encodePacked(tokenAddress, uniswapPoolFee, defaultPath), // path
+      defaultPath,
       true // funds are not coming from PERMIT2
     );
 
@@ -153,7 +151,8 @@ contract SwapAndDeposit {
       );
     }
 
-    // emit event
+    // transfer the swapped asset to the pool
+    IERC20(asset).transfer(pool, amountOut);
     emit SwappedDeposit(pool, tokenAddress, tokenAmount, amountOut);
   }
 
