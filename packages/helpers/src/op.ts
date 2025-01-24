@@ -18,8 +18,10 @@ export const getGame = async (chainId: number, minL2BlockNumber: number) => {
   const network = networks[chainId]
   let disputeGameAddress: string
   let portalAddress: string
-  if(network && network.op) {
-    ; ({op: { disputeGame: disputeGameAddress , portalProxy: portalAddress }} = network)
+  if (network && network.op) {
+    ;({
+      op: { disputeGame: disputeGameAddress, portalProxy: portalAddress },
+    } = network)
   }
 
   const disputeGameContract = new ethers.Contract(
@@ -105,20 +107,20 @@ export const buildProveWithdrawal = async (
   )
 
   return {
+    disputeGameIndex,
+    outputRootProof: {
+      latestBlockhash: block?.hash,
+      messagePasserStorageRoot: proof.storageHash,
+      stateRoot: block?.stateRoot,
+      version: outputRootProofVersion,
+    },
     transaction: {
+      data,
+      gasLimit,
       nonce,
       sender,
       target,
       value,
-      gasLimit,
-      data,
-    },
-    disputeGameIndex,
-    outputRootProof: {
-      version: outputRootProofVersion,
-      stateRoot: block?.stateRoot,
-      messagePasserStorageRoot: proof.storageHash,
-      latestBlockhash: block?.hash,
     },
     withdrawalProof,
   }

@@ -4,10 +4,12 @@ export const baseSepolia = {
   isTestnet: true,
   name: 'Base Sepolia',
   slug: 'base-sepolia',
-  usdc: {
+  cctp: {
     domain: 6n,
     messenger: '0x9f3B8679c73C2Fef8b59B4f3444d4e156fb70AA5',
-    token: '0x036CbD53842c5426634e7929541eC2318f3dCF7e',
     transmitter: '0x7865fAfC2db2093669d92c0F33AeEF291086BEFD',
+  },
+  assets: {
+    usdc: '0x036CbD53842c5426634e7929541eC2318f3dCF7e',
   },
 }
