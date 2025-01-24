@@ -22,9 +22,11 @@
     "graphql-tag": "2.12.6"
   },
   "devDependencies": {
-    "@relay-protocol/tsconfig": "workspace:*",
+    "@relay-protocol/eslint-config": "workspace:^",
+    "@relay-protocol/tsconfig": "workspace:./packages/tsconfig",
+    "@relay-protocol/types": "workspace:./packages/types",
     "@types/node": "20.11.24",
-    "eslint": "9.0.0",
+    "eslint": "9.18.0",
     "tsup": "8.3.5",
     "typescript": "5.7.3"
   }
