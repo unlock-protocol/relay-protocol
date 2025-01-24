@@ -40,7 +40,8 @@ contract RelayPoolFactory {
       origins,
       thirdPartyPool,
       wrappedEth,
-      bridgeFee
+      bridgeFee,
+      msg.sender
     );
 
     emit PoolDeployed(

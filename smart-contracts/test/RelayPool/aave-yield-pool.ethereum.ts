@@ -51,6 +51,7 @@ describe('RelayBridge: use Aave yield pool (USDC)', () => {
         thirdPartyPool: await staticAaveUsdc.getAddress(),
         weth,
         bridgeFee: 0,
+        curator: userAddress,
       },
     }
     ;({ relayPool } = await ignition.deploy(RelayPoolModule, {

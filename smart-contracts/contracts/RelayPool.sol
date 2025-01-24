@@ -9,8 +9,6 @@ import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
 import {IWETH} from "./interfaces/IWETH.sol";
 import {TypeCasts} from "./utils/TypeCasts.sol";
 
-// import "hardhat/console.sol";
-
 struct OriginSettings {
   uint256 maxDebt;
   uint256 outstandingDebt;
@@ -109,7 +107,8 @@ contract RelayPool is ERC4626, ERC20Permit, Ownable {
     OriginParam[] memory origins,
     address thirdPartyPool,
     address wrappedEth,
-    uint8 feeBasisPoints
+    uint8 feeBasisPoints,
+    address curator
   ) ERC20(name, symbol) ERC4626(asset) ERC20Permit(name) Ownable(msg.sender) {
     // TODO: can we verify that the asset is an ERC20?
 
@@ -129,6 +128,9 @@ contract RelayPool is ERC4626, ERC20Permit, Ownable {
 
     // set protocol fee
     bridgeFee = feeBasisPoints;
+
+    // Change the owner to the curator
+    transferOwnership(curator);
   }
 
   function updateYieldPool(address newPool) public onlyOwner {

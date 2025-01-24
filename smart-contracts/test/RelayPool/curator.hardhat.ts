@@ -17,6 +17,8 @@ describe('RelayPool: curator', () => {
   let thirdPartyPool: MyYieldPool
 
   before(async () => {
+    const [user] = await ethers.getSigners()
+    const userAddress = await user.getAddress()
     myToken = await ethers.deployContract('MyToken', ['My Token', 'TOKEN'])
     expect(await myToken.totalSupply()).to.equal(1000000000000000000000000000n)
     // deploy 3rd party pool
@@ -36,6 +38,7 @@ describe('RelayPool: curator', () => {
         thirdPartyPool: await thirdPartyPool.getAddress(),
         weth: ethers.ZeroAddress,
         bridgeFee: 0,
+        curator: userAddress,
       },
     }
     ;({ relayPool } = await ignition.deploy(RelayPoolModule, {

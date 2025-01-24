@@ -20,6 +20,8 @@ describe('RelayPoolNativeGateway', () => {
 
   describe('when using the native token', () => {
     before(async () => {
+      const [user] = await ethers.getSigners()
+      const userAddress = await user.getAddress()
       // deploy 3rd party pool
       const thirdPartyPool = await ethers.deployContract('MyYieldPool', [
         WETH,
@@ -39,6 +41,7 @@ describe('RelayPoolNativeGateway', () => {
           thirdPartyPool: thirdPartyPoolAddress,
           weth: WETH,
           bridgeFee: 0,
+          curator: userAddress,
         },
       }
       ;({ relayPool } = await ignition.deploy(RelayPoolModule, {

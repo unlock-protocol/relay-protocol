@@ -64,6 +64,7 @@ describe('RelayBridge: claim', () => {
         thirdPartyPool: thirdPartyPoolAddress,
         weth: await myWeth.getAddress(),
         bridgeFee: 0,
+        curator: userAddress,
       },
     }
     ;({ relayPool } = await ignition.deploy(RelayPoolModule, {
