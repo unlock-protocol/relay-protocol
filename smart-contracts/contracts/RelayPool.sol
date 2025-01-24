@@ -6,6 +6,7 @@ import {ERC4626} from "@openzeppelin/contracts/token/ERC20/extensions/ERC4626.so
 import {ERC20} from "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import {ERC20Permit} from "@openzeppelin/contracts/token/ERC20/extensions/ERC20Permit.sol";
 import {IWETH} from "./interfaces/IWETH.sol";
+import {ISwapAndDeposit} from "./interfaces/ISwapAndDeposit.sol";
 import {TypeCasts} from "./utils/TypeCasts.sol";
 
 // import "hardhat/console.sol";
@@ -24,6 +25,7 @@ struct OriginParam {
 }
 
 error UnauthorizedCaller(address sender);
+error UnauthorizedSwap(address token);
 error UnauthorizedOrigin(uint32 chainId, address bridge);
 error MessageAlreadyProcessed(uint32 chainId, address bridge, uint256 nonce);
 error TooMuchDebtFromOrigin(
@@ -63,6 +65,9 @@ contract RelayPool is ERC4626, ERC20Permit {
   // The address of the yield pool where funds are deposited
   address public yieldPool;
 
+  // unswap wrapper contract
+  address public swapDepositAddress;
+
   event LoanEmitted(
     uint256 indexed nonce,
     address indexed recipient,
@@ -83,6 +88,7 @@ contract RelayPool is ERC4626, ERC20Permit {
 
   event AssetsDepositedIntoYieldPool(uint256 amount, address yieldPool);
   event AssetsWithdrawnFromYieldPool(uint256 amount, address yieldPool);
+  event SwapDepositChanged(address prevAddress, address newAddress);
 
   constructor(
     address hyperlaneMailbox,
@@ -387,6 +393,31 @@ contract RelayPool is ERC4626, ERC20Permit {
     } else {
       withdrawAssetsFromYieldPool(amount, recipient);
     }
+  }
+
+  /**
+   * Set the Swap and Deposit contract address
+   */
+  function setSwapDeposit(address _swapDepositAddress) external {
+    address prevswapDepositAddress = swapDepositAddress;
+    swapDepositAddress = _swapDepositAddress;
+    emit SwapDepositChanged(prevswapDepositAddress, swapDepositAddress);
+  }
+
+  function swapAndDeposit(
+    address token,
+    uint24 poolFee,
+    uint256 amount
+  ) public {
+    if (token == ERC4626.asset()) {
+      revert UnauthorizedSwap(token);
+    }
+    IERC20(token).transfer(swapDepositAddress, amount);
+    ISwapAndDeposit(swapDepositAddress).swapAndDeposit(
+      address(this),
+      token,
+      poolFee
+    );
   }
 
   receive() external payable {

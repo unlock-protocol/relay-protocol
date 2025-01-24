@@ -23,8 +23,11 @@ contract SwapAndDeposit {
   // make sure we dont exceed type uint160 when casting
   using SafeCast160 for uint256;
 
+  // from '@uniswap/universal-router-sdk'
+  address public immutable PERMIT2_ADDRESS =
+    0x000000000022D473030F116dDEE9F6B43aC78BA3;
+
   // required by Uniswap Universal Router
-  address public permit2;
   address public uniswapUniversalRouter;
 
   // specified in https://docs.uniswap.org/contracts/universal-router/technical-reference#v3_swap_exact_in
@@ -48,24 +51,21 @@ contract SwapAndDeposit {
 
   /**
    * Set the address of Uniswap Permit2 helper contract
-   * @param _permit2Address the address of Uniswap PERMIT2 contract
+   * @param _uniswapUniversalRouter the address of Uniswap Universal Router
    */
-  constructor(address _permit2Address, address _uniswapUniversalRouter) {
-    permit2 = _permit2Address;
+  constructor(address _uniswapUniversalRouter) {
     uniswapUniversalRouter = _uniswapUniversalRouter;
   }
 
   /**
    * Simple helper to retrieve balance in ERC20 or native tokens
    * @param token the address of the token (address(0) for native token)
-   * @param account the address to check balance
    */
-  function getBalance(
-    address token,
-    address account
-  ) internal view returns (uint) {
+  function getBalance(address token) internal view returns (uint) {
     return
-      token == address(0) ? account.balance : IERC20(token).balanceOf(account);
+      token == address(0)
+        ? address(this).balance
+        : IERC20(token).balanceOf(address(this));
   }
 
   /**
@@ -75,14 +75,14 @@ contract SwapAndDeposit {
     address pool,
     address tokenAddress,
     uint24 uniswapPoolFee
-  ) public payable returns (uint amount) {
+  ) public payable returns (uint amountOut) {
     // get info from pool
     address asset = IRelayPool(pool).asset();
     address wrappedAddress = IRelayPool(pool).WETH();
 
     // get total balance of token to swap
-    uint tokenAmount = getBalance(tokenAddress, pool);
-    uint assetAmountBefore = getBalance(asset, pool);
+    uint tokenAmount = getBalance(tokenAddress);
+    uint assetAmountBefore = getBalance(asset);
 
     if (tokenAddress == asset) {
       revert UnauthorizedSwap();
@@ -92,7 +92,7 @@ contract SwapAndDeposit {
     if (tokenAddress == address(0)) {
       IWETH(wrappedAddress).deposit{value: tokenAmount}();
       tokenAddress = wrappedAddress;
-      tokenAmount = getBalance(tokenAddress, pool);
+      tokenAmount = getBalance(tokenAddress);
     }
 
     // approve ERC20 spending
@@ -105,18 +105,18 @@ contract SwapAndDeposit {
       );
 
       // approve PERMIT2 to manipulate the token
-      IERC20(tokenAddress).approve(permit2, tokenAmount);
+      IERC20(tokenAddress).approve(PERMIT2_ADDRESS, tokenAmount);
     }
 
     // issue PERMIT2 Allowance
-    IPermit2(permit2).approve(
+    IPermit2(PERMIT2_ADDRESS).approve(
       tokenAddress,
       uniswapUniversalRouter,
       tokenAmount.toUint160(),
       uint48(block.timestamp + 60) // expires after 1min
     );
 
-    // by default just swap using WETH pool
+    // by default just swap using token > WETH > asset pool
     bytes memory defaultPath = abi.encodePacked(
       wrappedAddress,
       uniswapPoolFee, // uniswap pool fee
@@ -144,7 +144,7 @@ contract SwapAndDeposit {
     );
 
     // check if assets have actually been swapped
-    uint amountOut = getBalance(asset, pool) - assetAmountBefore;
+    amountOut = getBalance(asset) - assetAmountBefore;
     if (amountOut == 0) {
       revert SwappedDepositFailed(
         uniswapUniversalRouter,
