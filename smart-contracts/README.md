@@ -27,7 +27,7 @@ For all deployments you need a private key:
 export DEPLOYER_PRIVATE_KEY=...
 ```
 
-1. Deploy the factories
+### Deploy the factories
 
 The factories are not strictly necessary for the protocol to operator but they provide convenience to identify deployed contracts. There addresses are added to the `../backend` application.
 You should not have to deploy factories.
@@ -48,9 +48,9 @@ Note: You can verify the pools with a command like
 yarn run hardhat ignition verify <name of deployment from ignition/deployments/>
 ```
 
-2. Deploy protocol contracts
+### Deploy protocol contracts
 
-2.1 Deploy a bridge on an L2
+#### Deploy a bridge on an L2
 
 We start with it because we need to provide "origin" addresses on the L1 pool when we will deploy it.
 
@@ -62,7 +62,7 @@ yarn hardhat deploy:bridge-proxy --network op-sepolia
 yarn hardhat deploy:relay-bridge --network op-sepolia
 ```
 
-2.2 Deploy the pool on the L1
+#### Deploy the pool on the L1
 
 ```
 # Deploy a bridge proxy on an L1
