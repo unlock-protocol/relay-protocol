@@ -24,9 +24,9 @@ contract ArbitrumOrbitNativeBridgeProxy is BridgeProxy {
    * params will be stored as immutable values in the bytecode
    * @param routerGateway the ARB router gateway contract
    */
-  constructor(address routerGateway, address outBox) BridgeProxy() {
+  constructor(address routerGateway, address outbox) BridgeProxy() {
     ROUTER = IL2GatewayRouter(routerGateway);
-    OUTBOX = IOutbox(outBox);
+    OUTBOX = IOutbox(outbox);
   }
 
   function bridge(
