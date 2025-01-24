@@ -91,13 +91,13 @@ export default async function ({
       id: balanceId,
       wallet: sender,
       relayPool: event.log.address,
-      balance: assets,
+      shareBalance: shares,
       totalDeposited: assets,
       totalWithdrawn: 0n,
       lastUpdated: timestamp,
     })
     .onConflictDoUpdate((row) => ({
-      balance: row.balance + assets,
+      shareBalance: row.shareBalance + shares,
       totalDeposited: row.totalDeposited + assets,
       lastUpdated: timestamp,
     }))
