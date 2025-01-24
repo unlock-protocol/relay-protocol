@@ -7,7 +7,6 @@ export interface NetworkConfig {
     messenger: string
     transmitter: string
   }
-  udt?: string
   rpc?: string
   hyperlaneMailbox: string
   isTestnet: boolean
@@ -20,8 +19,7 @@ export interface NetworkConfig {
     portalProxy: string
     disputeGame: string
   }
-  weth?: string
-  assets?: NetworkAssets
+  assets: NetworkAssets
 }
 
 interface NetworkAssets {
