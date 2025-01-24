@@ -16,11 +16,12 @@ import { ZeroAddress } from 'ethers'
 
 const {
   usdc: { token: USDC },
-  // weth: WETH,
+  weth: WETH,
   uniswapV3: { universalRouterAddress },
 } = networks[1]
 
 const DAI = '0x6B175474E89094C44Da98b954EedeAC495271d0F'
+const myTokenAddress = DAI
 const MORPHO = '0x58D97B57BB95320F9a05dC918Aef65434969c2B2'
 
 describe('RelayPool / Swap and Deposit', () => {
@@ -30,8 +31,7 @@ describe('RelayPool / Swap and Deposit', () => {
   let swapper: SwapAndDeposit
 
   before(async () => {
-    myToken = await ethers.getContractAt('MyToken', DAI)
-    expect(await myToken.symbol()).to.equal('DAI')
+    myToken = await ethers.getContractAt('MyToken', myTokenAddress)
 
     // deploy 3rd party pool
     thirdPartyPool = await ethers.deployContract('MyYieldPool', [
@@ -85,7 +85,7 @@ describe('RelayPool / Swap and Deposit', () => {
       relayPoolAddress = await relayPool.getAddress()
 
       // get some USDC
-      const morpho = await ethers.getContractAt('IUSDC', MORPHO)
+      const morpho = await ethers.getContractAt('IERC20', MORPHO)
       await stealERC20(
         MORPHO,
         '0x9D03bb2092270648d7480049d0E58d2FcF0E5123', // morpho whale
@@ -107,51 +107,14 @@ describe('RelayPool / Swap and Deposit', () => {
       // swap that amount
       await relayPool.swapAndDeposit(
         MORPHO,
-        3000, // uniswapPoolFee
-        amount
+        amount,
+        3000, // uniswapPoolFee morpho > WETH
+        1000 // uniswapPoolFee WETH > DAI
       )
 
       // no morpho left
       expect(
         await getBalance(relayPoolAddress, MORPHO, ethers.provider)
-      ).to.be.equal(0)
-    })
-  })
-
-  describe.skip('holding native tokens', () => {
-    const amount = ethers.parseUnits('1', 18)
-    let relayPoolAddress: string
-
-    before(async () => {
-      // send some tokens to the pool
-      const [user] = await ethers.getSigners()
-      relayPoolAddress = await relayPool.getAddress()
-
-      // this will fail as pool needs to be WETH
-      await await user.sendTransaction({
-        to: relayPoolAddress,
-        value: amount,
-      })
-    })
-
-    it('should swap to pool asset and transfer it directly into the pool balance', async () => {
-      const balanceBefore = await getBalance(
-        relayPoolAddress,
-        ZeroAddress,
-        ethers.provider
-      )
-      expect(balanceBefore).to.be.equal(amount)
-
-      // swap that amount
-      await relayPool.swapAndDeposit(
-        ZeroAddress,
-        3000, // uniswapPoolFee
-        amount
-      )
-
-      // no usdc left
-      expect(
-        await getBalance(relayPoolAddress, ZeroAddress, ethers.provider)
       ).to.be.equal(0)
     })
   })
@@ -184,8 +147,9 @@ describe('RelayPool / Swap and Deposit', () => {
       // swap that amount
       await relayPool.swapAndDeposit(
         USDC,
+        amount,
         3000, // uniswapPoolFee
-        amount
+        500
       )
 
       // no usdc left

@@ -4,7 +4,7 @@ pragma solidity ^0.8.28;
 interface ISwapAndDeposit {
   function swapAndDeposit(
     address pool,
-    address tokenAddress,
-    uint24 poolFee
+    uint24 uniswapWethPoolFeeToken,
+    uint24 uniswapWethPoolFeeAsset
   ) external payable returns (uint amount);
 }

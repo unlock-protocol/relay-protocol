@@ -406,18 +406,21 @@ contract RelayPool is ERC4626, ERC20Permit {
 
   function swapAndDeposit(
     address token,
-    uint24 poolFee,
-    uint256 amount
+    uint256 amount,
+    uint24 uniswapWethPoolFeeToken,
+    uint24 uniswapWethPoolFeeAsset
   ) public {
     if (token == ERC4626.asset()) {
       revert UnauthorizedSwap(token);
     }
+
     IERC20(token).transfer(swapDepositAddress, amount);
     ISwapAndDeposit(swapDepositAddress).swapAndDeposit(
-      address(this),
       token,
-      poolFee
+      uniswapWethPoolFeeToken,
+      uniswapWethPoolFeeAsset
     );
+    depositAssetsInYieldPool();
   }
 
   receive() external payable {

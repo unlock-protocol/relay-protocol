@@ -4,7 +4,6 @@ pragma solidity ^0.8.0;
 import {TransferHelper} from "@uniswap/v3-periphery/contracts/libraries/TransferHelper.sol";
 import {IUniversalRouter} from "./interfaces/uniswap/IUniversalRouter.sol";
 import {IPermit2} from "./interfaces/uniswap/IPermit2.sol";
-import {IWETH} from "./interfaces/IWETH.sol";
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import {IRelayPool} from "./interfaces/IRelayPool.sol";
 
@@ -62,21 +61,19 @@ contract SwapAndDeposit {
    * @param token the address of the token (address(0) for native token)
    */
   function getBalance(address token) internal view returns (uint) {
-    return
-      token == address(0)
-        ? address(this).balance
-        : IERC20(token).balanceOf(address(this));
+    return IERC20(token).balanceOf(address(this));
   }
 
   /**
    * Swap tokens to UDT and burn the tokens
    */
   function swapAndDeposit(
-    address pool,
     address tokenAddress,
-    uint24 uniswapPoolFee
+    uint24 uniswapWethPoolFeeToken,
+    uint24 uniswapWethPoolFeeAsset
   ) public payable returns (uint amountOut) {
     // get info from pool
+    address pool = msg.sender;
     address asset = IRelayPool(pool).asset();
     address wrappedAddress = IRelayPool(pool).WETH();
 
@@ -88,25 +85,15 @@ contract SwapAndDeposit {
       revert UnauthorizedSwap();
     }
 
-    // wrap native tokens
-    if (tokenAddress == address(0)) {
-      IWETH(wrappedAddress).deposit{value: tokenAmount}();
-      tokenAddress = wrappedAddress;
-      tokenAmount = getBalance(tokenAddress);
-    }
+    // Approve the router to spend src ERC20
+    TransferHelper.safeApprove(
+      tokenAddress,
+      uniswapUniversalRouter,
+      tokenAmount
+    );
 
-    // approve ERC20 spending
-    if (tokenAddress != address(0)) {
-      // Approve the router to spend src ERC20
-      TransferHelper.safeApprove(
-        tokenAddress,
-        uniswapUniversalRouter,
-        tokenAmount
-      );
-
-      // approve PERMIT2 to manipulate the token
-      IERC20(tokenAddress).approve(PERMIT2_ADDRESS, tokenAmount);
-    }
+    // approve PERMIT2 to manipulate the token
+    IERC20(tokenAddress).approve(PERMIT2_ADDRESS, tokenAmount);
 
     // issue PERMIT2 Allowance
     IPermit2(PERMIT2_ADDRESS).approve(
@@ -116,21 +103,23 @@ contract SwapAndDeposit {
       uint48(block.timestamp + 60) // expires after 1min
     );
 
-    // we swap using shortest path token > asset
-    bytes memory defaultPath = abi.encodePacked(
+    // first part of the path is token > WETH
+    bytes memory wethPath = abi.encodePacked(
       tokenAddress,
-      uniswapPoolFee, // uniswap pool fee
-      asset
+      uniswapWethPoolFeeToken, // uniswap pool fee
+      wrappedAddress
     );
 
     // encode parameters for the swap om UniversalRouter
     bytes memory commands = abi.encodePacked(bytes1(uint8(V3_SWAP_EXACT_IN)));
     bytes[] memory inputs = new bytes[](1);
     inputs[0] = abi.encode(
-      address(this), // recipient is the pool
+      address(this), // recipient is this contract
       tokenAmount, // amountIn
       0, // amountOutMinimum
-      defaultPath,
+      asset == wrappedAddress
+        ? wethPath // if asset is WETH then path is token > WETH
+        : abi.encodePacked(wethPath, uniswapWethPoolFeeAsset, asset), // else token > WETH > asset
       true // funds are not coming from PERMIT2
     );
 
