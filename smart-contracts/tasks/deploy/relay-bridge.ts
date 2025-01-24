@@ -41,7 +41,7 @@ task('deploy:relay-bridge', 'Deploy a bridge proxy')
         const asset = await new AutoComplete({
           name: 'asset',
           message:
-            'Please choose the asset bridge from that bridge (make sure it is supported by the proxy bridge you selected):',
+            'Please choose the asset for your relay bridge (make sure it is supported by the proxy bridge you selected):',
           choices: ['native', ...Object.keys(assets)],
         }).run()
         if (asset === 'native') {
