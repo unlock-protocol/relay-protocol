@@ -3,6 +3,7 @@ export const base = {
   isTestnet: false,
   name: 'Base',
   slug: 'base',
+  l1ChainId: 1,
   cctp: {
     domain: 6n,
     messenger: '0x1682Ae6375C4E4A97e4B583BC394c861A46D8962',

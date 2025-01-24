@@ -4,6 +4,7 @@ export const optimism = {
   isTestnet: false,
   name: 'OP Mainnet',
   slug: 'optimism',
+  l1ChainId: 1,
   cctp: {
     domain: 2n,
     messenger: '0x2B4069517957735bE00ceE0fadAE88a26365528f',

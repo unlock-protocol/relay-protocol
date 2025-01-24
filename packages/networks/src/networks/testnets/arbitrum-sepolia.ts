@@ -5,6 +5,7 @@ export const arbSepolia = {
   chainId: 421614,
   hyperlaneMailbox: '0x598facE78a4302f11E3de0bee1894Da0b2Cb71F8',
   isTestnet: true,
+  l1ChainId: 11155111,
   name: 'Arbitrum Sepolia',
   rpc: 'https://sepolia-rollup.arbitrum.io/rpc',
   slug: 'arbitrum-sepolia',

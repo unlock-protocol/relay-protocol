@@ -1,13 +1,11 @@
 import { task } from 'hardhat/config'
 import { networks } from '@relay-protocol/networks'
 import { AutoComplete } from 'enquirer'
-
-import RelayBridgeModule from '../../ignition/modules/RelayBridgeModule'
 import { getAddresses } from '../../lib/utils/deployed'
+import { getEvent } from '@relay-protocol/helpers'
 
 task('deploy:relay-bridge', 'Deploy a bridge proxy')
   .addOptionalParam('proxyBridge', 'The Proxy bridge asset')
-  .addOptionalParam('destChain', 'Destination chain id (default to sepolia)')
   .addOptionalParam('asset', 'An ERC20 asset')
   .setAction(
     async (
@@ -15,17 +13,28 @@ task('deploy:relay-bridge', 'Deploy a bridge proxy')
       { ethers, ignition, run }
     ) => {
       const { chainId } = await ethers.provider.getNetwork()
-      // List proxyBirdges, and select one the!
-      const addresses = (await getAddresses())[chainId.toString()]
-      console.log(addresses)
+      const { BridgeProxy, RelayBridgeFactory } = (await getAddresses())[
+        chainId.toString()
+      ]
+
+      const { assets, l1ChainId } = networks[chainId.toString()]
+
+      if (!l1ChainId) {
+        throw new Error('This chain does not have a corresponding L1 chain')
+      }
+
+      if (!RelayBridgeFactory) {
+        throw new Error('This chain does not have a RelayBridgeFactory')
+      }
 
       if (!proxyBridgeAddress) {
+        // List proxyBirdges, and select one the!
         const proxyBridge = await new AutoComplete({
           name: 'proxyBridge',
           message: 'Please choose a proxy bridge',
-          choices: Object.keys(addresses.BridgeProxy),
+          choices: Object.keys(BridgeProxy),
         }).run()
-        proxyBridgeAddress = addresses.BridgeProxy[proxyBridge]
+        proxyBridgeAddress = BridgeProxy[proxyBridge]
       }
 
       if (!assetAddress) {
@@ -33,42 +42,31 @@ task('deploy:relay-bridge', 'Deploy a bridge proxy')
           name: 'asset',
           message:
             'Please choose the asset bridge from that bridge (make sure it is supported by the proxy bridge you selected):',
-          choices: Object.keys(addresses.MyToken),
+          choices: ['native', ...Object.keys(assets)],
         }).run()
-        assetAddress = addresses.MyToken[asset]
+        if (asset === 'native') {
+          assetAddress = ethers.ZeroAddress
+        } else {
+          assetAddress = assets[asset]
+        }
       }
 
-      // .then((answer) => console.log('Answer:', answer))
-      // .catch(console.error)
+      const factoryContract = await ethers.getContractAt(
+        'RelayBridgeFactory',
+        RelayBridgeFactory
+      )
 
-      console.log('Answer:', proxyBridgeAddress)
-      // make sure we are deploying the latest version of the contract
-      // await run('compile')
+      const tx = await factoryContract.deployBridge(
+        assetAddress,
+        proxyBridgeAddress
+      )
+      const receipt = await tx.wait()
+      const event = await getEvent(
+        receipt!,
+        'BridgeDeployed',
+        factoryContract.interface
+      )
 
-      // // get args value
-      // const { hyperlaneMailbox } = networks[chainId.toString()]
-      // if (!assetAddress) assetAddress = ethers.ZeroAddress
-
-      // // parse asset name for deployment id
-      // let assetName: string
-      // if (assetAddress !== ethers.ZeroAddress) {
-      //   const asset = await ethers.getContractAt('MyToken', assetAddress)
-      //   assetName = await asset.symbol()
-      // } else {
-      //   assetName = 'NATIVE'
-      // }
-
-      // // deploy relay bridge
-      // const { bridge } = await ignition.deploy(RelayBridgeModule, {
-      //   parameters: {
-      //     RelayBridge: {
-      //       asset: assetAddress,
-      //       bridgeProxy: proxyBridgeAddress,
-      //       hyperlaneMailbox,
-      //     },
-      //   },
-      //   deploymentId: `RelayBridge-${assetName.replace(/[^\w\s]/gi, '')}-${chainId.toString()}`,
-      // })
-      // console.log(`RelayBridge deployed to: ${await bridge.getAddress()}`)
+      console.log(`RelayBridge deployed to: ${event.args.bridge}`)
     }
   )

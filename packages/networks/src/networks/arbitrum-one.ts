@@ -4,6 +4,7 @@ export const arbitrumOne = {
   },
   chainId: 42161,
   isTestnet: false,
+  l1ChainId: 1,
   name: 'Arbitrum',
   slug: 'arbitrum',
   cctp: {

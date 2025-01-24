@@ -2,6 +2,7 @@ export const opSepolia = {
   chainId: 11155420,
   hyperlaneMailbox: '0x6966b0E55883d49BFB24539356a2f8A673E02039',
   isTestnet: true,
+  l1ChainId: 11155111,
   name: 'OP Sepolia',
   rpc: 'https://optimism-sepolia.gateway.tenderly.co',
   slug: 'op-sepolia',

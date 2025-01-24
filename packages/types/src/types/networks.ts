@@ -10,6 +10,7 @@ export interface NetworkConfig {
   rpc?: string
   hyperlaneMailbox: string
   isTestnet: boolean
+  l1ChainId?: number
   arb?: {
     routerGateway: string
     outbox: string

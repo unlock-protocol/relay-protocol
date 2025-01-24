@@ -4,6 +4,7 @@ export const baseSepolia = {
   isTestnet: true,
   name: 'Base Sepolia',
   slug: 'base-sepolia',
+  l1ChainId: 11155111,
   cctp: {
     domain: 6n,
     messenger: '0x9f3B8679c73C2Fef8b59B4f3444d4e156fb70AA5',
