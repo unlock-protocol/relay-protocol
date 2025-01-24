@@ -12,7 +12,9 @@ import {
 } from '@relay-protocol/helpers'
 
 const {
-  cctp: { messenger, transmitter },
+  bridges: {
+    cctp: { messenger, transmitter },
+  },
   assets: { usdc: USDC },
 } = networks[1]
 const recipient = '0x246A13358Fb27523642D86367a51C2aEB137Ac6C'

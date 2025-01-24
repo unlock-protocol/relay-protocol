@@ -14,9 +14,12 @@ const NODE_INTERFACE_ADDRESS = '0x00000000000000000000000000000000000000C8'
 const getLatestConfirmedBlockCoords = async function (chainId: bigint) {
   let rollupAddress: string
   const l1Provider = await getProvider(chainId)
-  const { arb: arbContracts, isTestnet } = networks[chainId.toString()]
+  const {
+    bridges: { arb: arbContracts },
+    isTestnet,
+  } = networks[chainId.toString()]
   if (arbContracts) {
-    ;({ rollup: rollupAddress } = arbContracts)
+    rollupAddress = arbContracts.rollup!
   }
 
   // get latest rollup assertion from L2
@@ -94,9 +97,11 @@ export async function constructArbProof(
   } = await getEvent(transactionReceipt!, 'L2ToL1Tx', arbsysInterface)
 
   // make sure its not already spent on L1
-  const { arb: arbContracts } = networks[l1ChainId.toString()]
+  const {
+    bridges: { arb: arbContracts },
+  } = networks[l1ChainId.toString()]
   if (arbContracts) {
-    ;({ outbox: outboxAddress } = arbContracts)
+    outboxAddress = arbContracts.outbox!
   }
 
   const outboxInterface = new ethers.Interface(OUTBOX_ABI)
