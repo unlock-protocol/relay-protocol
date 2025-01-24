@@ -1,6 +1,7 @@
 import { NetworkConfig } from '@relay-protocol/types'
 
 export const optimism: NetworkConfig = {
+  l1ChainId: 1,
   chainId: 10,
   hyperlaneMailbox: '0xd4C1905BB1D26BC93DAC913e13CaCC278CdCC80D',
   isTestnet: false,
