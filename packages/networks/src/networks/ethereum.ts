@@ -13,12 +13,14 @@ export const ethereum = {
     disputeGame: '0xe5965Ab5962eDc7477C8520243A95517CD252fA9',
   },
   slug: 'ethereum',
-  udt: '0x90DE74265a416e1393A450752175AED98fe11517',
   usdc: {
     domain: 0n,
     messenger: '0xBd3fa81B58Ba92a82136038B25aDec7066af3155',
-    token: '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48',
     transmitter: '0x0a992d191DEeC32aFe36203Ad87D7d289a738F81',
   },
-  weth: '0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2',
+  assets: {
+    udt: '0x90DE74265a416e1393A450752175AED98fe11517',
+    usdc: '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48',
+    weth: '0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2',
+  },
 }

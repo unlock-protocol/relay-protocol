@@ -8,7 +8,9 @@ export const opSepolia = {
   usdc: {
     domain: 2n,
     messenger: '0x9f3B8679c73C2Fef8b59B4f3444d4e156fb70AA5',
-    token: '0x5fd84259d66Cd46123540766Be93DFE6D43130D7',
     transmitter: '0x7865fAfC2db2093669d92c0F33AeEF291086BEFD',
+  },
+  assets: {
+    usdc: '0x5fd84259d66Cd46123540766Be93DFE6D43130D7',
   },
 }

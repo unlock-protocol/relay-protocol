@@ -20,6 +20,13 @@ The actual bridging logic is abstracted away and implemented in various ProxyBri
 
 ## Deploy contracts
 
+For all deployments you need a private key:
+
+```
+# export your private key to the shell
+export DEPLOYER_PRIVATE_KEY=...
+```
+
 1. Deploy the factories
 
 The factories are not strictly necessary for the protocol to operator but they provide convenience to identify deployed contracts. There addresses are added to the `../backend` application.
@@ -43,10 +50,11 @@ yarn run hardhat ignition verify <name of deployment from ignition/deployments/>
 
 2. Deploy protocol contracts
 
-```
-# export your private key to the shell
-export DEPLOYER_PRIVATE_KEY=...
+2.1 Deploy a bridge on an L2
 
+We start with it because we need to provide "origin" addresses on the L1 pool when we will deploy it.
+
+```
 # Deploy a bridge proxy on an L2: here we should OP-sepolia, of type op and sending funds to Sepolia (11155111)
 yarn hardhat deploy:bridge-proxy --network op-sepolia --type op --dest-chain 11155111
 

@@ -13,12 +13,14 @@ export const sepolia = {
     disputeGame: '0x05F9613aDB30026FFd634f38e5C4dFd30a197Fa1',
   },
   slug: 'sepolia',
-  udt: '0x4C38B5Dcc47c4990363F22bFeb2add741123914F',
   usdc: {
     domain: 0n,
     messenger: '0x9f3B8679c73C2Fef8b59B4f3444d4e156fb70AA5',
-    token: '0x1c7D4B196Cb0C7B01d743Fbc6116a902379C7238',
     transmitter: '0x7865fAfC2db2093669d92c0F33AeEF291086BEFD',
   },
-  weth: '0x7b79995e5f793A07Bc00c21412e50Ecae098E7f9',
+  assets: {
+    udt: '0x4C38B5Dcc47c4990363F22bFeb2add741123914F',
+    usdc: '0x1c7D4B196Cb0C7B01d743Fbc6116a902379C7238',
+    weth: '0x7b79995e5f793A07Bc00c21412e50Ecae098E7f9',
+  },
 }
