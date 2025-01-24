@@ -1,5 +1,6 @@
 import { Context, Event } from 'ponder:registry'
-import { poolAction, relayPool, userBalance } from 'ponder:schema'
+import { poolAction, relayPool, userBalance, yieldPool } from 'ponder:schema'
+import { erc4626Abi } from 'viem'
 
 export default async function ({
   event,
@@ -13,23 +14,18 @@ export default async function ({
   const transactionHash = event.transaction.hash
   const timestamp = event.block.timestamp
 
-  // Record pool action
-  await context.db.insert(poolAction).values({
-    id: `${transactionHash}-${event.log.logIndex}`,
-    type: 'WITHDRAW',
-    user: sender,
-    receiver,
-    owner,
-    relayPool: event.log.address,
-    assets,
-    shares,
-    timestamp,
-    blockNumber,
-    transactionHash,
+  // Get the relay pool to find its yield pool
+  const pool = await context.db.find(relayPool, {
+    contractAddress: event.log.address,
   })
 
-  // Fetch current totalAssets and totalShares from contract
-  const [totalAssets, totalShares] = await Promise.all([
+  // Fetch current state from both pools
+  const [
+    relayTotalAssets,
+    relayTotalShares,
+    yieldTotalAssets,
+    yieldTotalShares,
+  ] = await Promise.all([
     context.client.readContract({
       abi: context.contracts.RelayPool.abi,
       address: event.log.address,
@@ -40,15 +36,48 @@ export default async function ({
       address: event.log.address,
       functionName: 'totalSupply',
     }),
+    context.client.readContract({
+      abi: erc4626Abi,
+      address: pool.yieldPool,
+      functionName: 'totalAssets',
+    }),
+    context.client.readContract({
+      abi: erc4626Abi,
+      address: pool.yieldPool,
+      functionName: 'totalSupply',
+    }),
   ])
 
-  // Update relay pool with current values from contract
-  await context.db
-    .update(relayPool, { contractAddress: event.log.address })
-    .set({
-      totalAssets,
-      totalShares,
-    })
+  // Update both pools atomically
+  await Promise.all([
+    // Update relay pool
+    context.db.update(relayPool, { contractAddress: event.log.address }).set({
+      totalAssets: relayTotalAssets,
+      totalShares: relayTotalShares,
+    }),
+
+    // Update yield pool
+    context.db.update(yieldPool, { contractAddress: pool.yieldPool }).set({
+      totalAssets: yieldTotalAssets,
+      totalShares: yieldTotalShares,
+      lastUpdated: BigInt(timestamp),
+    }),
+
+    // Record pool action
+    context.db.insert(poolAction).values({
+      id: `${transactionHash}-${event.log.logIndex}`,
+      type: 'WITHDRAW',
+      user: sender,
+      receiver,
+      owner,
+      relayPool: event.log.address,
+      assets,
+      shares,
+      timestamp,
+      blockNumber,
+      transactionHash,
+    }),
+  ])
 
   // Get user balance
   const balanceId = `${sender}-${event.log.address}` // wallet-pool format

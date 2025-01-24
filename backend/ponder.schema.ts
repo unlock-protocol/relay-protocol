@@ -1,6 +1,24 @@
 import { index, onchainTable, primaryKey, relations } from 'ponder'
 
 /**
+ * Track yield pools
+ * - contractAddress: Contract address
+ * - asset: Asset (token) address
+ * - name: Pool name
+ * - totalAssets: Total assets in pool
+ * - totalShares: Total shares issued
+ * - lastUpdated: Last time the pool was updated
+ */
+export const yieldPool = onchainTable('yield_pool', (t) => ({
+  contractAddress: t.hex().primaryKey(),
+  asset: t.hex().notNull(),
+  name: t.text().notNull(),
+  totalAssets: t.bigint().notNull(),
+  totalShares: t.bigint().notNull(),
+  lastUpdated: t.bigint().notNull(),
+}))
+
+/**
  * Track relay pools
  * - contractAddress: Contract address
  * - creator: Address of the creator
@@ -13,18 +31,24 @@ import { index, onchainTable, primaryKey, relations } from 'ponder'
  * - createdAt: Block timestamp of creation
  * - createdAtBlock: Block number of creation
  */
-export const relayPool = onchainTable('relay_pool', (t) => ({
-  contractAddress: t.hex().primaryKey(),
-  creator: t.hex().notNull(),
-  asset: t.hex().notNull(),
-  yieldPool: t.hex().notNull(),
-  outstandingDebt: t.bigint().notNull(),
-  totalAssets: t.bigint().notNull(),
-  totalShares: t.bigint().notNull(),
-  chainId: t.integer().notNull(),
-  createdAt: t.bigint().notNull(),
-  createdAtBlock: t.bigint().notNull(),
-}))
+export const relayPool = onchainTable(
+  'relay_pool',
+  (t) => ({
+    contractAddress: t.hex().primaryKey(),
+    creator: t.hex().notNull(),
+    asset: t.hex().notNull(),
+    yieldPool: t.hex().notNull(),
+    outstandingDebt: t.bigint().notNull(),
+    totalAssets: t.bigint().notNull(),
+    totalShares: t.bigint().notNull(),
+    chainId: t.integer().notNull(),
+    createdAt: t.bigint().notNull(),
+    createdAtBlock: t.bigint().notNull(),
+  }),
+  (table) => ({
+    yieldPoolIdx: index().on(table.yieldPool),
+  })
+)
 
 export const poolOrigin = onchainTable(
   'pool_origin',
