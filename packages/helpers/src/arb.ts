@@ -146,15 +146,15 @@ export async function constructArbProof(
     )
 
   const values = {
-    proof: proof.toArray(),
-    leaf,
-    caller,
-    destination,
     arbBlockNum,
-    ethBlockNum,
-    timestamp,
+    caller,
     callvalue,
     data,
+    destination,
+    ethBlockNum,
+    leaf,
+    proof: proof.toArray(),
+    timestamp,
   }
 
   return values

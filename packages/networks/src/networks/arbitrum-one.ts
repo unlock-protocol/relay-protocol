@@ -6,7 +6,7 @@ export const arbitrumOne = {
   isTestnet: false,
   name: 'Arbitrum',
   slug: 'arbitrum',
-  usdc: {
+  cctp: {
     domain: 3n,
     messenger: '0x19330d10D9Cc8751218eaf51E8885D058642E08A',
     transmitter: '0xC30362313FBBA5cf9163F0bb16a0e01f01A896ca',

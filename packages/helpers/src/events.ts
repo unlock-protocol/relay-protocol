@@ -38,7 +38,7 @@ export const getEvent = async (
   const events = await getEvents(receipt, eventName, interfaceOrAddress, iface)
   const event = (events.events || [])[0] as LogDescription
   const { args } = event || {}
-  return { event, args, ...events }
+  return { args, event, ...events }
 }
 
 export const getEvents = async (
@@ -59,5 +59,5 @@ export const getEvents = async (
   const events = decodeLogs(logs, iface).filter(
     (log) => (log as LogDescription)?.name === eventName
   )
-  return { hash, events, blockNumber }
+  return { blockNumber, events, hash }
 }

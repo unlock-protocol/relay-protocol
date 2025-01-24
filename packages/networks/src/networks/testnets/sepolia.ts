@@ -13,7 +13,7 @@ export const sepolia = {
     disputeGame: '0x05F9613aDB30026FFd634f38e5C4dFd30a197Fa1',
   },
   slug: 'sepolia',
-  usdc: {
+  cctp: {
     domain: 0n,
     messenger: '0x9f3B8679c73C2Fef8b59B4f3444d4e156fb70AA5',
     transmitter: '0x7865fAfC2db2093669d92c0F33AeEF291086BEFD',

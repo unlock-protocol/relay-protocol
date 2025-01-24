@@ -2,13 +2,11 @@ export interface NetworkConfig {
   chainId: number | bigint
   name: string
   slug: string
-  usdc: {
+  cctp: {
     domain: bigint
     messenger: string
     transmitter: string
-    token: string
   }
-  udt?: string
   rpc?: string
   hyperlaneMailbox: string
   isTestnet: boolean
@@ -21,7 +19,11 @@ export interface NetworkConfig {
     portalProxy: string
     disputeGame: string
   }
-  weth?: string
+  assets: NetworkAssets
+}
+
+interface NetworkAssets {
+  [asset: string]: string
 }
 
 export interface NetworkConfigs {

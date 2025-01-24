@@ -5,7 +5,7 @@ export const opSepolia = {
   name: 'OP Sepolia',
   rpc: 'https://optimism-sepolia.gateway.tenderly.co',
   slug: 'op-sepolia',
-  usdc: {
+  cctp: {
     domain: 2n,
     messenger: '0x9f3B8679c73C2Fef8b59B4f3444d4e156fb70AA5',
     transmitter: '0x7865fAfC2db2093669d92c0F33AeEF291086BEFD',

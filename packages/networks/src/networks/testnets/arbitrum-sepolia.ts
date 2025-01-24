@@ -8,7 +8,7 @@ export const arbSepolia = {
   name: 'Arbitrum Sepolia',
   rpc: 'https://sepolia-rollup.arbitrum.io/rpc',
   slug: 'arbitrum-sepolia',
-  usdc: {
+  cctp: {
     domain: 3n,
     messenger: '0x9f3B8679c73C2Fef8b59B4f3444d4e156fb70AA5',
     transmitter: '0xaCF1ceeF35caAc005e15888dDb8A3515C41B4872',
