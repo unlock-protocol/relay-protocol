@@ -13,7 +13,9 @@ import CCTPBridgeProxyModule from '../../ignition/modules/CCTPBridgeProxyModule'
 
 const {
   hyperlaneMailbox: HYPERLANE_MAILBOX_ON_OPTIMISM,
-  cctp: { transmitter, messenger },
+  bridges: {
+    cctp: { transmitter, messenger },
+  },
   assets,
 } = networks[10]
 
@@ -278,7 +280,9 @@ describe('RelayBridge', function () {
       const { args } = event
       expect(args?.burnToken).to.be.equal(networks[10].assets.usdc)
       expect(args?.amount).to.be.equal(amount)
-      expect(args?.destinationDomain).to.be.equal(networks[1].cctp.domain)
+      expect(args?.destinationDomain).to.be.equal(
+        networks[1].bridges.cctp.domain
+      )
     })
 
     it('fire MessageSent event', async () => {

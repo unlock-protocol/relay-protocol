@@ -18,10 +18,10 @@ export const getGame = async (chainId: number, minL2BlockNumber: number) => {
   const network = networks[chainId]
   let disputeGameAddress: string
   let portalAddress: string
-  if (network && network.op) {
+  if (network && network.bridges.op) {
     ;({
       op: { disputeGame: disputeGameAddress, portalProxy: portalAddress },
-    } = network)
+    } = network.bridges)
   }
 
   const disputeGameContract = new ethers.Contract(

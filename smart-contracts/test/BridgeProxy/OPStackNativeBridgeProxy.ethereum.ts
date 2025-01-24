@@ -9,7 +9,7 @@ import { expect } from 'chai'
 import * as ABIs from '@relay-protocol/helpers/abis'
 
 const {
-  op,
+  bridges: { op },
   assets: { weth },
 } = networks[1]
 
