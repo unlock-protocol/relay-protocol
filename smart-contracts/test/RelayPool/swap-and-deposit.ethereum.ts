@@ -12,6 +12,7 @@ import {
 } from '../../typechain-types'
 import SwapAndDepositModule from '../../ignition/modules/SwapAndDepositModule'
 import { getBalance } from '@relay-protocol/helpers'
+import { ZeroAddress } from 'ethers'
 
 const {
   usdc: { token: USDC },
@@ -22,7 +23,7 @@ const {
 const DAI = '0x6B175474E89094C44Da98b954EedeAC495271d0F'
 const MORPHO = '0x58D97B57BB95320F9a05dC918Aef65434969c2B2'
 
-describe('Swap and Deposit', () => {
+describe('RelayPool / Swap and Deposit', () => {
   let relayPool: RelayPool
   let myToken: MyToken
   let thirdPartyPool: MyYieldPool
@@ -60,6 +61,12 @@ describe('Swap and Deposit', () => {
     ;({ swapper } = await ignition.deploy(SwapAndDepositModule, {
       parameters,
     }))
+
+    // set SwapDeposit contract
+    await relayPool.setSwapDeposit(await swapper.getAddress())
+    expect(await swapper.getAddress()).to.equal(
+      await relayPool.swapDepositAddress()
+    )
   })
 
   it('has correct constructor params', async () => {
@@ -68,8 +75,8 @@ describe('Swap and Deposit', () => {
     )
   })
 
-  describe('swap MORPHO correctly', () => {
-    const amount = ethers.parseUnits('100', 18)
+  describe('holding MORPHO', () => {
+    const amount = ethers.parseUnits('1', 18)
     let relayPoolAddress: string
 
     before(async () => {
@@ -89,18 +96,13 @@ describe('Swap and Deposit', () => {
       await morpho.connect(user).transfer(relayPoolAddress, amount)
     })
 
-    it('should swap MORPHO into DAI and transfer it directly into the pool balance', async () => {
+    it('should swap to pool asset and transfer it directly into the pool balance', async () => {
       const balanceBefore = await getBalance(
         relayPoolAddress,
         MORPHO,
         ethers.provider
       )
       expect(balanceBefore).to.be.equal(amount)
-      // set SwapDeposit contract
-      await relayPool.setSwapDeposit(await swapper.getAddress())
-      expect(await swapper.getAddress()).to.equal(
-        await relayPool.swapDepositAddress()
-      )
 
       // swap that amount
       await relayPool.swapAndDeposit(
@@ -109,14 +111,52 @@ describe('Swap and Deposit', () => {
         amount
       )
 
-      // no usdc left
+      // no morpho left
       expect(
         await getBalance(relayPoolAddress, MORPHO, ethers.provider)
       ).to.be.equal(0)
     })
   })
 
-  describe('swap USDC correctly', () => {
+  describe.skip('holding native tokens', () => {
+    const amount = ethers.parseUnits('1', 18)
+    let relayPoolAddress: string
+
+    before(async () => {
+      // send some tokens to the pool
+      const [user] = await ethers.getSigners()
+      relayPoolAddress = await relayPool.getAddress()
+
+      // this will fail as pool needs to be WETH
+      await await user.sendTransaction({
+        to: relayPoolAddress,
+        value: amount,
+      })
+    })
+
+    it('should swap to pool asset and transfer it directly into the pool balance', async () => {
+      const balanceBefore = await getBalance(
+        relayPoolAddress,
+        ZeroAddress,
+        ethers.provider
+      )
+      expect(balanceBefore).to.be.equal(amount)
+
+      // swap that amount
+      await relayPool.swapAndDeposit(
+        ZeroAddress,
+        3000, // uniswapPoolFee
+        amount
+      )
+
+      // no usdc left
+      expect(
+        await getBalance(relayPoolAddress, ZeroAddress, ethers.provider)
+      ).to.be.equal(0)
+    })
+  })
+
+  describe('holding USDC', () => {
     const amount = ethers.parseUnits('100', 6)
     let relayPoolAddress: string
 
@@ -133,18 +173,13 @@ describe('Swap and Deposit', () => {
       await usdc.connect(user).transfer(relayPoolAddress, amount)
     })
 
-    it('should swap USDC into DAI and transfer it directly into the pool balance', async () => {
+    it('should swap to pool asset and transfer it directly into the pool balance', async () => {
       const balanceBefore = await getBalance(
         relayPoolAddress,
         USDC,
         ethers.provider
       )
       expect(balanceBefore).to.be.equal(amount)
-      // set SwapDeposit contract
-      await relayPool.setSwapDeposit(await swapper.getAddress())
-      expect(await swapper.getAddress()).to.equal(
-        await relayPool.swapDepositAddress()
-      )
 
       // swap that amount
       await relayPool.swapAndDeposit(
