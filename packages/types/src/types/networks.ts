@@ -15,8 +15,8 @@ export interface NetworkConfig {
       rollup?: string
     }
     op?: {
-      portalProxy: string
-      disputeGame: string
+      portalProxy?: string
+      disputeGame?: string
     }
   }
   rpc?: string

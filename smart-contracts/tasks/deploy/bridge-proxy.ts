@@ -12,7 +12,6 @@ task('deploy:bridge-proxy', 'Deploy a bridge proxy').setAction(
   async (_, { ethers, ignition }) => {
     const { chainId } = await ethers.provider.getNetwork()
 
-    console.log(networks[chainId.toString()])
     const { bridges, l1ChainId: destChain } = networks[chainId.toString()]
 
     if (!destChain) {
@@ -24,7 +23,6 @@ task('deploy:bridge-proxy', 'Deploy a bridge proxy').setAction(
       message: 'Please choose a proxy type?',
       choices: Object.keys(bridges),
     }).run()
-    console.log({ type })
 
     // get args value
     const { name } = networks[chainId.toString()]
@@ -34,7 +32,10 @@ task('deploy:bridge-proxy', 'Deploy a bridge proxy').setAction(
     let proxyBridge: BaseContract
     if (type === 'cctp') {
       const {
-        usdc: { token: USDC, messenger, transmitter },
+        bridges: {
+          cctp: { messenger, transmitter },
+        },
+        assets: { usdc: USDC },
       } = networks[chainId.toString()]
       const parameters = {
         CCTPBridgeProxy: {
@@ -51,7 +52,9 @@ task('deploy:bridge-proxy', 'Deploy a bridge proxy').setAction(
       console.log(`CCTP bridge deployed at: ${await proxyBridge.getAddress()}`)
     } else if (type === 'op') {
       const {
-        op: { portalProxy },
+        bridges: {
+          op: { portalProxy },
+        },
       } = networks[destChain]
 
       const parameters = {
@@ -72,7 +75,9 @@ task('deploy:bridge-proxy', 'Deploy a bridge proxy').setAction(
       )
     } else if (type === 'arb') {
       const {
-        arb: { routerGateway, outbox },
+        bridges: {
+          arb: { routerGateway, outbox },
+        },
       } = networks[chainId.toString()]
 
       const parameters = {

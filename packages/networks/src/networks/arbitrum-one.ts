@@ -1,7 +1,6 @@
 import { NetworkConfig } from '@relay-protocol/types'
 
 export const arbitrumOne: NetworkConfig = {
-  l1ChainId: 1,
   bridges: {
     arb: {
       routerGateway: '0x5288c571Fd7aD117beA99bF60FE0846C4E84F933',

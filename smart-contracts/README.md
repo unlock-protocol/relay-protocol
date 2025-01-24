@@ -56,7 +56,7 @@ We start with it because we need to provide "origin" addresses on the L1 pool wh
 
 ```
 # Deploy a bridge proxy on an L2: here we should OP-sepolia, of type op and sending funds to Sepolia (11155111)
-yarn hardhat deploy:bridge-proxy --network op-sepolia --type op --dest-chain 11155111
+yarn hardhat deploy:bridge-proxy --network op-sepolia
 
 # Deploy a relay bridge on the same L2
 yarn hardhat deploy:relay-bridge --network op-sepolia --proxy-bridge 0x34EbEc0AE80A2d078DE5489f0f5cAa4d3aaEA355 (address from previous step!)

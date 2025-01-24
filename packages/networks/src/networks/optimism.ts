@@ -8,6 +8,9 @@ export const optimism: NetworkConfig = {
   name: 'OP Mainnet',
   slug: 'optimism',
   bridges: {
+    op: {
+      // All settings are hardcoded in the contract because they are shared between all networks!
+    },
     cctp: {
       domain: 2n,
       messenger: '0x2B4069517957735bE00ceE0fadAE88a26365528f',

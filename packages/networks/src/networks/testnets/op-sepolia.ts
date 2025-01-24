@@ -1,7 +1,6 @@
 import { NetworkConfig } from '@relay-protocol/types'
 
 export const opSepolia: NetworkConfig = {
-  l1ChainId: 11155111,
   chainId: 11155420,
   hyperlaneMailbox: '0x6966b0E55883d49BFB24539356a2f8A673E02039',
   isTestnet: true,
@@ -10,6 +9,9 @@ export const opSepolia: NetworkConfig = {
   rpc: 'https://optimism-sepolia.gateway.tenderly.co',
   slug: 'op-sepolia',
   bridges: {
+    op: {
+      // All settings are hardcoded in the contract because they are shared between all networks!
+    },
     cctp: {
       domain: 2n,
       messenger: '0x9f3B8679c73C2Fef8b59B4f3444d4e156fb70AA5',

@@ -1,7 +1,6 @@
 import { NetworkConfig } from '@relay-protocol/types'
 
 export const arbSepolia: NetworkConfig = {
-  l1ChainId: 11155111,
   bridges: {
     arb: {
       routerGateway: '0x9fDD1C4E4AA24EEc1d913FABea925594a20d43C7',

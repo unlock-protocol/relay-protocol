@@ -8,6 +8,9 @@ export const base: NetworkConfig = {
   slug: 'base',
   hyperlaneMailbox: '0xeA87ae93Fa0019a82A727bfd3eBd1cFCa8f64f1D',
   bridges: {
+    op: {
+      // All settings are hardcoded in the contract because they are shared between all networks!
+    },
     cctp: {
       domain: 6n,
       messenger: '0x1682Ae6375C4E4A97e4B583BC394c861A46D8962',
