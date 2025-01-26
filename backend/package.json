@@ -16,7 +16,7 @@
     "lint-staged": "lint-staged"
   },
   "dependencies": {
-    "hono": "4.6.17",
+    "hono": "4.6.19",
     "ponder": "0.8.32",
     "viem": "2.22.11"
   },
