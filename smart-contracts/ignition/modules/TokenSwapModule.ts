@@ -1,9 +1,9 @@
 import { buildModule } from '@nomicfoundation/hardhat-ignition/modules'
 
-export default buildModule('SwapAndDeposit', (m) => {
+export default buildModule('TokenSwap', (m) => {
   // get params
   const uniswapUniversalRouter = m.getParameter('uniswapUniversalRouter')
 
-  const swapper = m.contract('SwapAndDeposit', [uniswapUniversalRouter])
-  return { swapper }
+  const tokenSwap = m.contract('TokenSwap', [uniswapUniversalRouter])
+  return { tokenSwap }
 })

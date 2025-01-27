@@ -7,7 +7,7 @@ import {ERC20} from "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import {ERC20Permit} from "@openzeppelin/contracts/token/ERC20/extensions/ERC20Permit.sol";
 import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
 import {IWETH} from "./interfaces/IWETH.sol";
-import {ISwapAndDeposit} from "./interfaces/ISwapAndDeposit.sol";
+import {ITokenSwap} from "./interfaces/ITokenSwap.sol";
 import {TypeCasts} from "./utils/TypeCasts.sol";
 
 struct OriginSettings {
@@ -65,7 +65,7 @@ contract RelayPool is ERC4626, ERC20Permit, Ownable {
   address public yieldPool;
 
   // unswap wrapper contract
-  address public swapDepositAddress;
+  address public tokenSwapAddress;
 
   // The protocol fee in basis points
   uint8 public bridgeFee;
@@ -90,7 +90,7 @@ contract RelayPool is ERC4626, ERC20Permit, Ownable {
 
   event AssetsDepositedIntoYieldPool(uint256 amount, address yieldPool);
   event AssetsWithdrawnFromYieldPool(uint256 amount, address yieldPool);
-  event SwapDepositChanged(address prevAddress, address newAddress);
+  event TokenSwapChanged(address prevAddress, address newAddress);
 
   event YieldPoolChanged(address oldPool, address newPool);
 
@@ -454,10 +454,10 @@ contract RelayPool is ERC4626, ERC20Permit, Ownable {
   /**
    * Set the Swap and Deposit contract address
    */
-  function setSwapDeposit(address _swapDepositAddress) external {
-    address prevswapDepositAddress = swapDepositAddress;
-    swapDepositAddress = _swapDepositAddress;
-    emit SwapDepositChanged(prevswapDepositAddress, swapDepositAddress);
+  function setTokenSwap(address _tokenSwapAddress) external {
+    address prevTokenSwapAddress = tokenSwapAddress;
+    tokenSwapAddress = _tokenSwapAddress;
+    emit TokenSwapChanged(prevTokenSwapAddress, tokenSwapAddress);
   }
 
   function swapAndDeposit(
@@ -470,8 +470,8 @@ contract RelayPool is ERC4626, ERC20Permit, Ownable {
       revert UnauthorizedSwap(token);
     }
 
-    IERC20(token).transfer(swapDepositAddress, amount);
-    ISwapAndDeposit(swapDepositAddress).swapAndDeposit(
+    IERC20(token).transfer(tokenSwapAddress, amount);
+    ITokenSwap(tokenSwapAddress).swap(
       token,
       uniswapWethPoolFeeToken,
       uniswapWethPoolFeeAsset

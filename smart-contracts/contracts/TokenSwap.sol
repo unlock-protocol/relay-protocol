@@ -18,7 +18,11 @@ library SafeCast160 {
   }
 }
 
-contract SwapAndDeposit {
+/**
+ * @title TokenSwap
+ * @notice A helper contract to swap tokens
+ */
+contract TokenSwap {
   // make sure we dont exceed type uint160 when casting
   using SafeCast160 for uint256;
 
@@ -67,7 +71,7 @@ contract SwapAndDeposit {
   /**
    * Swap tokens to UDT and burn the tokens
    */
-  function swapAndDeposit(
+  function swap(
     address tokenAddress,
     uint24 uniswapWethPoolFeeToken,
     uint24 uniswapWethPoolFeeAsset

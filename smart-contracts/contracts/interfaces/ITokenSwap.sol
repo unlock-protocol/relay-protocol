@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.28;
 
-interface ISwapAndDeposit {
-  function swapAndDeposit(
+interface ITokenSwap {
+  function swap(
     address pool,
     uint24 uniswapWethPoolFeeToken,
     uint24 uniswapWethPoolFeeAsset

@@ -8,15 +8,14 @@ import {
   MyToken,
   MyYieldPool,
   RelayPool,
-  SwapAndDeposit,
+  TokenSwap,
 } from '../../typechain-types'
-import SwapAndDepositModule from '../../ignition/modules/SwapAndDepositModule'
+import TokenSwapModule from '../../ignition/modules/TokenSwapModule'
 import { getBalance } from '@relay-protocol/helpers'
 import { ZeroAddress } from 'ethers'
 
 const {
-  usdc: { token: USDC },
-  weth: WETH,
+  assets: { weth: WETH, usdc: USDC },
   uniswapV3: { universalRouterAddress },
 } = networks[1]
 
@@ -28,9 +27,12 @@ describe('RelayPool / Swap and Deposit', () => {
   let relayPool: RelayPool
   let myToken: MyToken
   let thirdPartyPool: MyYieldPool
-  let swapper: SwapAndDeposit
+  let tokenSwap: TokenSwap
+  let curatorAddress: string
 
   before(async () => {
+    const [curator] = await ethers.getSigners()
+    curatorAddress = await curator.getAddress()
     myToken = await ethers.getContractAt('MyToken', myTokenAddress)
 
     // deploy 3rd party pool
@@ -50,27 +52,29 @@ describe('RelayPool / Swap and Deposit', () => {
         origins: [],
         thirdPartyPool: await thirdPartyPool.getAddress(),
         weth: ethers.ZeroAddress, // Not used in this test
+        bridgeFee: 0,
+        curator: curatorAddress,
       },
-      SwapAndDeposit: {
+      TokenSwap: {
         uniswapUniversalRouter: universalRouterAddress,
       },
     }
     ;({ relayPool } = await ignition.deploy(RelayPoolModule, {
       parameters,
     }))
-    ;({ swapper } = await ignition.deploy(SwapAndDepositModule, {
+    ;({ tokenSwap } = await ignition.deploy(TokenSwapModule, {
       parameters,
     }))
 
-    // set SwapDeposit contract
-    await relayPool.setSwapDeposit(await swapper.getAddress())
-    expect(await swapper.getAddress()).to.equal(
-      await relayPool.swapDepositAddress()
+    // set TokenSwap contract
+    await relayPool.connect(curator).setTokenSwap(await tokenSwap.getAddress())
+    expect(await tokenSwap.getAddress()).to.equal(
+      await relayPool.tokenSwapAddress()
     )
   })
 
   it('has correct constructor params', async () => {
-    expect(await swapper.uniswapUniversalRouter()).to.equal(
+    expect(await tokenSwap.uniswapUniversalRouter()).to.equal(
       universalRouterAddress
     )
   })
