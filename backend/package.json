@@ -18,7 +18,7 @@
   "dependencies": {
     "hono": "4.6.17",
     "ponder": "0.8.32",
-    "viem": "2.22.11"
+    "viem": "2.22.15"
   },
   "devDependencies": {
     "@types/node": "22.10.7",

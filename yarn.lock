@@ -1265,16 +1265,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@noble/curves@npm:1.7.0, @noble/curves@npm:~1.7.0":
-  version: 1.7.0
-  resolution: "@noble/curves@npm:1.7.0"
-  dependencies:
-    "@noble/hashes": "npm:1.6.0"
-  checksum: 10/2a11ef4895907d0b241bd3b72f9e6ebe56f0e705949bfd5efe003f25233549f620d287550df2d24ad56a1f953b82ec5f7cf4bd7cb78b1b2e76eb6dd516d44cf8
-  languageName: node
-  linkType: hard
-
-"@noble/curves@npm:^1.6.0, @noble/curves@npm:~1.8.1":
+"@noble/curves@npm:1.8.1, @noble/curves@npm:^1.6.0, @noble/curves@npm:~1.8.1":
   version: 1.8.1
   resolution: "@noble/curves@npm:1.8.1"
   dependencies:
@@ -1301,20 +1292,6 @@ __metadata:
   version: 1.4.0
   resolution: "@noble/hashes@npm:1.4.0"
   checksum: 10/e156e65794c473794c52fa9d06baf1eb20903d0d96719530f523cc4450f6c721a957c544796e6efd0197b2296e7cd70efeb312f861465e17940a3e3c7e0febc6
-  languageName: node
-  linkType: hard
-
-"@noble/hashes@npm:1.6.0":
-  version: 1.6.0
-  resolution: "@noble/hashes@npm:1.6.0"
-  checksum: 10/b44b043b02adbecd33596adeed97d9f9864c24a2410f7ac3b847986c2ecf1f6f0df76024b3f1b14d6ea954932960d88898fe551fb9d39844a8b870e9f9044ea1
-  languageName: node
-  linkType: hard
-
-"@noble/hashes@npm:1.6.1, @noble/hashes@npm:~1.6.0":
-  version: 1.6.1
-  resolution: "@noble/hashes@npm:1.6.1"
-  checksum: 10/74d9ad7b1437a22ba3b877584add3367587fbf818113152f293025d20d425aa74c191d18d434797312f2270458bc9ab3241c34d14ec6115fb16438b3248f631f
   languageName: node
   linkType: hard
 
@@ -1834,7 +1811,7 @@ __metadata:
     ponder: "npm:0.8.32"
     prettier: "npm:3.4.2"
     typescript: "npm:5.7.3"
-    viem: "npm:2.22.11"
+    viem: "npm:2.22.15"
   languageName: unknown
   linkType: soft
 
@@ -2128,7 +2105,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@scure/base@npm:~1.2.1, @scure/base@npm:~1.2.2, @scure/base@npm:~1.2.4":
+"@scure/base@npm:~1.2.2, @scure/base@npm:~1.2.4":
   version: 1.2.4
   resolution: "@scure/base@npm:1.2.4"
   checksum: 10/4b61679209af40143b49ce7b7570e1d9157c19df311ea6f57cd212d764b0b82222dbe3707334f08bec181caf1f047aca31aa91193c678d6548312cb3f9c82ab1
@@ -2168,18 +2145,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@scure/bip32@npm:1.6.0":
-  version: 1.6.0
-  resolution: "@scure/bip32@npm:1.6.0"
-  dependencies:
-    "@noble/curves": "npm:~1.7.0"
-    "@noble/hashes": "npm:~1.6.0"
-    "@scure/base": "npm:~1.2.1"
-  checksum: 10/2efb81ed9a7b8d5d35233e10abebc114544a3783a2a32b9fb60e1e9a67965b272c9d17910e1649083b69c8ceb80241b05b59dbeb7a5b18ea34e497aed3f16709
-  languageName: node
-  linkType: hard
-
-"@scure/bip32@npm:^1.5.0":
+"@scure/bip32@npm:1.6.2, @scure/bip32@npm:^1.5.0":
   version: 1.6.2
   resolution: "@scure/bip32@npm:1.6.2"
   dependencies:
@@ -2220,17 +2186,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@scure/bip39@npm:1.5.0":
-  version: 1.5.0
-  resolution: "@scure/bip39@npm:1.5.0"
-  dependencies:
-    "@noble/hashes": "npm:~1.6.0"
-    "@scure/base": "npm:~1.2.1"
-  checksum: 10/b795ee31ac4c10603bf3b726cc0e5cf43834a68f05a535e0baf2162772bac100de470b4c6cf7ddbecb95d7a3fb82b8a959badced406c329ab696cd89104194bc
-  languageName: node
-  linkType: hard
-
-"@scure/bip39@npm:^1.4.0":
+"@scure/bip39@npm:1.5.4, @scure/bip39@npm:^1.4.0":
   version: 1.5.4
   resolution: "@scure/bip39@npm:1.5.4"
   dependencies:
@@ -2793,9 +2749,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"abitype@npm:1.0.7":
-  version: 1.0.7
-  resolution: "abitype@npm:1.0.7"
+"abitype@npm:1.0.8, abitype@npm:^1.0.6":
+  version: 1.0.8
+  resolution: "abitype@npm:1.0.8"
   peerDependencies:
     typescript: ">=5.0.4"
     zod: ^3 >=3.22.0
@@ -2804,7 +2760,7 @@ __metadata:
       optional: true
     zod:
       optional: true
-  checksum: 10/6c2c3390a2f90186bf0df73f20cf257dfd9b62d1eb266de6ddf362030dcbd79cd113b4110e52f7802d7b042ea8fdb7ee2f113751b883787c2d9589d56fb4273b
+  checksum: 10/878e74fbac6a971953649b6216950437aa5834a604e9fa833a5b275a6967cff59857c7e43594ae906387d2fb7cad9370138dec4298eb8814815a3ffb6365902c
   languageName: node
   linkType: hard
 
@@ -2820,21 +2776,6 @@ __metadata:
     zod:
       optional: true
   checksum: 10/6eefcd8a63e2ecfaa9089125734d4542e8094160b43b38469eba3dfece167947ef8754c895be1a6b312088012fdc1740f7e338918e7ec7775a62807daec33ef5
-  languageName: node
-  linkType: hard
-
-"abitype@npm:^1.0.6":
-  version: 1.0.8
-  resolution: "abitype@npm:1.0.8"
-  peerDependencies:
-    typescript: ">=5.0.4"
-    zod: ^3 >=3.22.0
-  peerDependenciesMeta:
-    typescript:
-      optional: true
-    zod:
-      optional: true
-  checksum: 10/878e74fbac6a971953649b6216950437aa5834a604e9fa833a5b275a6967cff59857c7e43594ae906387d2fb7cad9370138dec4298eb8814815a3ffb6365902c
   languageName: node
   linkType: hard
 
@@ -7855,9 +7796,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"ox@npm:0.6.5":
-  version: 0.6.5
-  resolution: "ox@npm:0.6.5"
+"ox@npm:0.6.7":
+  version: 0.6.7
+  resolution: "ox@npm:0.6.7"
   dependencies:
     "@adraffy/ens-normalize": "npm:^1.10.1"
     "@noble/curves": "npm:^1.6.0"
@@ -7871,7 +7812,7 @@ __metadata:
   peerDependenciesMeta:
     typescript:
       optional: true
-  checksum: 10/60ca483cd8ae98335857ed971febdc524e79b42f7db610893c71566e4b6d0bbd9ff009a762dde29762801fd4ff0c4d5d375213b95a4eced676eb60b681131fa9
+  checksum: 10/442fb31e1afb68922bf942025930d8cd6d8c677696e9a6de308008b3608669f22127cadbc0f77181e012d23d7b74318e5f85e63b06b16eecbc887d7fac32a6dc
   languageName: node
   linkType: hard
 
@@ -10355,24 +10296,24 @@ __metadata:
   languageName: node
   linkType: hard
 
-"viem@npm:2.22.11":
-  version: 2.22.11
-  resolution: "viem@npm:2.22.11"
+"viem@npm:2.22.15":
+  version: 2.22.15
+  resolution: "viem@npm:2.22.15"
   dependencies:
-    "@noble/curves": "npm:1.7.0"
-    "@noble/hashes": "npm:1.6.1"
-    "@scure/bip32": "npm:1.6.0"
-    "@scure/bip39": "npm:1.5.0"
-    abitype: "npm:1.0.7"
+    "@noble/curves": "npm:1.8.1"
+    "@noble/hashes": "npm:1.7.1"
+    "@scure/bip32": "npm:1.6.2"
+    "@scure/bip39": "npm:1.5.4"
+    abitype: "npm:1.0.8"
     isows: "npm:1.0.6"
-    ox: "npm:0.6.5"
+    ox: "npm:0.6.7"
     ws: "npm:8.18.0"
   peerDependencies:
     typescript: ">=5.0.4"
   peerDependenciesMeta:
     typescript:
       optional: true
-  checksum: 10/70e175798a3ce4885972a1ba6d1b3dbc5fffe4cf42340f7aef77523b90061fde0c25a6b895d77f2112b07c976111f427b64f505193a3e22eb9deb3e7706bfd19
+  checksum: 10/28d770a5f76d0b5a57d7180431d210bee80638f44d3a3bcbe44a169df563696fbb13023737e9006a265f315608411daa3641c9109617be6e57f757fa0c8aec98
   languageName: node
   linkType: hard
 
