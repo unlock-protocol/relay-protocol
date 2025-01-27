@@ -5,11 +5,10 @@ import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import {ERC4626} from "@openzeppelin/contracts/token/ERC20/extensions/ERC4626.sol";
 import {ERC20} from "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import {ERC20Permit} from "@openzeppelin/contracts/token/ERC20/extensions/ERC20Permit.sol";
+import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
 import {IWETH} from "./interfaces/IWETH.sol";
 import {ISwapAndDeposit} from "./interfaces/ISwapAndDeposit.sol";
 import {TypeCasts} from "./utils/TypeCasts.sol";
-
-// import "hardhat/console.sol";
 
 struct OriginSettings {
   uint256 maxDebt;
@@ -44,7 +43,7 @@ error ClaimingFailed(
 );
 error NotAWethPool();
 
-contract RelayPool is ERC4626, ERC20Permit {
+contract RelayPool is ERC4626, ERC20Permit, Ownable {
   // The address of the Hyperlane mailbox
   address public immutable HYPERLANE_MAILBOX;
 
@@ -68,6 +67,9 @@ contract RelayPool is ERC4626, ERC20Permit {
   // unswap wrapper contract
   address public swapDepositAddress;
 
+  // The protocol fee in basis points
+  uint8 public bridgeFee;
+
   event LoanEmitted(
     uint256 indexed nonce,
     address indexed recipient,
@@ -90,6 +92,19 @@ contract RelayPool is ERC4626, ERC20Permit {
   event AssetsWithdrawnFromYieldPool(uint256 amount, address yieldPool);
   event SwapDepositChanged(address prevAddress, address newAddress);
 
+  event YieldPoolChanged(address oldPool, address newPool);
+
+  event OriginAdded(OriginParam origin);
+  event OriginRemoved(
+    uint32 chainId,
+    address bridge,
+    uint256 maxDebt,
+    uint256 outstandingDebt,
+    address proxyBridge
+  );
+  event BridgeFeeSet(uint8 previousFee, uint8 newFee);
+
+  // Warning: the owner of the pool should always be a timelock address with a significant delay to reduce the risk of stolen funds
   constructor(
     address hyperlaneMailbox,
     IERC20 asset,
@@ -97,8 +112,10 @@ contract RelayPool is ERC4626, ERC20Permit {
     string memory symbol,
     OriginParam[] memory origins,
     address thirdPartyPool,
-    address wrappedEth
-  ) ERC20(name, symbol) ERC4626(asset) ERC20Permit(name) {
+    address wrappedEth,
+    uint8 feeBasisPoints,
+    address curator
+  ) ERC20(name, symbol) ERC4626(asset) ERC20Permit(name) Ownable(msg.sender) {
     // TODO: can we verify that the asset is an ERC20?
 
     // Set the Hyperlane mailbox
@@ -106,12 +123,7 @@ contract RelayPool is ERC4626, ERC20Permit {
 
     // Set the authorized origins
     for (uint256 i = 0; i < origins.length; i++) {
-      OriginParam memory origin = origins[i];
-      authorizedOrigins[origin.chainId][origin.bridge] = OriginSettings({
-        maxDebt: origin.maxDebt,
-        outstandingDebt: 0,
-        proxyBridge: origin.proxyBridge
-      });
+      addOrigin(origins[i]);
     }
 
     // set the yieldPool
@@ -119,6 +131,50 @@ contract RelayPool is ERC4626, ERC20Permit {
 
     // set weth
     WETH = wrappedEth;
+
+    // set protocol fee
+    bridgeFee = feeBasisPoints;
+
+    // Change the owner to the curator
+    transferOwnership(curator);
+  }
+
+  function updateYieldPool(address newPool) public onlyOwner {
+    address oldPool = yieldPool;
+    uint256 sharesOfOldPool = ERC20(yieldPool).balanceOf(address(this));
+    // Redeem all the shares from the old pool
+    ERC4626(yieldPool).redeem(sharesOfOldPool, address(this), address(this));
+    yieldPool = newPool;
+    // Deposit all assets into the new pool
+    depositAssetsInYieldPool();
+    emit YieldPoolChanged(oldPool, newPool);
+  }
+
+  function addOrigin(OriginParam memory origin) public onlyOwner {
+    authorizedOrigins[origin.chainId][origin.bridge] = OriginSettings({
+      maxDebt: origin.maxDebt,
+      outstandingDebt: 0,
+      proxyBridge: origin.proxyBridge
+    });
+    emit OriginAdded(origin);
+  }
+
+  function removeOrigin(uint32 chainId, address bridge) public onlyOwner {
+    OriginSettings memory origin = authorizedOrigins[chainId][bridge];
+    delete authorizedOrigins[chainId][bridge];
+    emit OriginRemoved(
+      chainId,
+      bridge,
+      origin.maxDebt,
+      origin.outstandingDebt,
+      origin.proxyBridge
+    );
+  }
+
+  function setBridgeFee(uint8 feeBasisPoints) public onlyOwner {
+    uint8 oldFee = bridgeFee;
+    bridgeFee = feeBasisPoints;
+    emit BridgeFeeSet(oldFee, feeBasisPoints);
   }
 
   function increaseOutStandingDebt(uint256 amount) internal {

@@ -6,8 +6,11 @@ import { networks } from '@relay-protocol/networks'
 import OPStackNativeBridgeProxyModule from '../../ignition/modules/OPStackNativeBridgeProxyModule'
 
 import { AbiCoder, Log } from 'ethers'
-const { udt: UDT, op } = networks[1]
-const { udt: UDT_OPTIMISM } = networks[10]
+const {
+  assets: ethereumAssets,
+  bridges: { op },
+} = networks[1]
+const { assets: op1Assets } = networks[10]
 
 describe('OPStackNativeBridgeProxy', function () {
   describe('bridge', function () {
@@ -201,7 +204,7 @@ describe('OPStackNativeBridgeProxy', function () {
     })
 
     it('should work for the base sequence using ERC20', async () => {
-      // We use UDT for example as it has already been bridged to OP
+      // We use ethereumAssets.udt) for example as it has already been bridged to OP
       const [user] = await ethers.getSigners()
 
       const Bridge = await ethers.getContractFactory('OPStackNativeBridgeProxy')
@@ -209,10 +212,10 @@ describe('OPStackNativeBridgeProxy', function () {
       const bridgeAddress = await bridge.getAddress()
 
       const recipient = await user.getAddress()
-      const amount = ethers.parseEther('1') // 1 UDT
-      // Transfer UDT to sender/recipient
+      const amount = ethers.parseEther('1') // 1 ethereumAssets.udt)
+      // Transfer ethereumAssets.udt) to sender/recipient
       await stealERC20(
-        UDT_OPTIMISM,
+        op1Assets.udt,
         '0x99b1348a9129ac49c6de7F11245773dE2f51fB0c',
         recipient,
         amount
@@ -221,7 +224,7 @@ describe('OPStackNativeBridgeProxy', function () {
       // Approve
       const erc20Contract = await ethers.getContractAt(
         ABIs.ERC20,
-        networks[10].udt
+        op1Assets.udt
       )
       await erc20Contract.approve(bridgeAddress, amount)
 
@@ -229,7 +232,7 @@ describe('OPStackNativeBridgeProxy', function () {
         recipient, // recipient
         1, // chain
         recipient, // sender
-        UDT_OPTIMISM,
+        op1Assets.udt,
         amount,
         '0x',
         {
@@ -241,7 +244,7 @@ describe('OPStackNativeBridgeProxy', function () {
       expect(receipt.logs.length).to.equal(9)
       receipt.logs.forEach((log: Log) => {
         expect(log.address).to.be.oneOf([
-          UDT_OPTIMISM,
+          op1Assets.udt,
           '0x4200000000000000000000000000000000000016',
           '0x4200000000000000000000000000000000000007',
           '0x4200000000000000000000000000000000000010',
@@ -323,9 +326,9 @@ describe('OPStackNativeBridgeProxy', function () {
           ])
           if (event.name === 'WithdrawalInitiated') {
             // l1Token
-            expect(event.args[0]).to.equal(UDT)
+            expect(event.args[0]).to.equal(ethereumAssets.udt)
             // l2Token
-            expect(event.args[1]).to.equal(UDT_OPTIMISM)
+            expect(event.args[1]).to.equal(op1Assets.udt)
             // From
             expect(event.args[2]).to.equal(bridgeAddress)
             // To
@@ -336,9 +339,9 @@ describe('OPStackNativeBridgeProxy', function () {
             expect(event.args[5]).to.equal('0x')
           } else if (event.name === 'ERC20BridgeInitiated') {
             // localToken
-            expect(event.args[0]).to.equal(UDT_OPTIMISM)
+            expect(event.args[0]).to.equal(op1Assets.udt)
             // remoteToken
-            expect(event.args[1]).to.equal(UDT)
+            expect(event.args[1]).to.equal(ethereumAssets.udt)
             // from
             expect(event.args[2]).to.equal(bridgeAddress)
             // to

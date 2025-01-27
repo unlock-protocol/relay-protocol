@@ -16,17 +16,17 @@ export const fetchRawBlock = async (
   const rpcURL = rpc || `https://rpc.unlock-protocol.com/${chainId}`
 
   const resp = await fetch(rpcURL, {
-    method: 'POST',
+    body: JSON.stringify({
+      id: 1,
+      jsonrpc: '2.0',
+      method: 'eth_getBlockByHash',
+      params: [blockHash, false],
+    }),
     headers: {
       Accept: 'application/json',
       'Content-Type': 'application/json',
     },
-    body: JSON.stringify({
-      jsonrpc: '2.0',
-      method: 'eth_getBlockByHash',
-      params: [blockHash, false],
-      id: 1,
-    }),
+    method: 'POST',
   })
   const { result } = (await resp.json()) as JsonRpcResult
   return result

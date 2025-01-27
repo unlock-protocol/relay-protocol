@@ -38,6 +38,8 @@ describe('RelayBridge: base yield', () => {
         origins: [],
         thirdPartyPool: thirdPartyPoolAddress,
         weth: ethers.ZeroAddress, // Not used in this test
+        bridgeFee: 0,
+        curator: userAddress,
       },
     }
     ;({ relayPool } = await ignition.deploy(RelayPoolModule, {

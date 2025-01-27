@@ -25,6 +25,8 @@ describe('ERC20 RelayBridge: when receiving a message from the Hyperlane Mailbox
   let myWeth: MyWeth
 
   before(async () => {
+    const [user] = await ethers.getSigners()
+    const userAddress = await user.getAddress()
     myToken = await ethers.deployContract('MyToken', ['My Token', 'TOKEN'])
     expect(await myToken.totalSupply()).to.equal(1000000000000000000000000000n)
 
@@ -37,10 +39,9 @@ describe('ERC20 RelayBridge: when receiving a message from the Hyperlane Mailbox
       'YIELD',
     ])
     // deploy the pool using ignition
-    const [user] = await ethers.getSigners()
     const parameters = {
       RelayPool: {
-        hyperlaneMailbox: await user.getAddress(),
+        hyperlaneMailbox: userAddress, // using the user address as the mailbox so we can send transactions!
         asset: await myToken.getAddress(),
         name: 'ERC20 RELAY POOL',
         symbol: 'ERC20-REL',
@@ -54,6 +55,8 @@ describe('ERC20 RelayBridge: when receiving a message from the Hyperlane Mailbox
         ],
         thirdPartyPool: await thirdPartyPool.getAddress(),
         weth: await myWeth.getAddress(),
+        bridgeFee: 0,
+        curator: userAddress,
       },
     }
     ;({ relayPool } = await ignition.deploy(RelayPoolModule, {
@@ -85,6 +88,7 @@ describe('ERC20 RelayBridge: when receiving a message from the Hyperlane Mailbox
   it('should ensure the origin is authorized', async () => {
     const [user] = await ethers.getSigners()
     const userAddress = await user.getAddress()
+
     await expect(
       relayPool
         .connect(user)
@@ -308,9 +312,10 @@ describe('WETH RelayBridge: when receiving a message from the Hyperlane Mailbox'
     ])
     // deploy the pool using ignition
     const [user] = await ethers.getSigners()
+    const userAddress = await user.getAddress()
     const parameters = {
       RelayPool: {
-        hyperlaneMailbox: await user.getAddress(),
+        hyperlaneMailbox: userAddress, // using the user address as the mailbox so we can send transactions!
         asset: await myWeth.getAddress(),
         name: 'WETH RELAY POOL',
         symbol: 'WETH-REL',
@@ -324,6 +329,8 @@ describe('WETH RelayBridge: when receiving a message from the Hyperlane Mailbox'
         ],
         thirdPartyPool: await thirdPartyPool.getAddress(),
         weth: await myWeth.getAddress(),
+        bridgeFee: 0,
+        curator: userAddress,
       },
     }
     ;({ relayPool } = await ignition.deploy(RelayPoolModule, {

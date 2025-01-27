@@ -5,7 +5,10 @@ import { networks } from '@relay-protocol/networks'
 import { IWETH, RelayPool, RelayPoolNativeGateway } from '../../typechain-types'
 import { getBalance } from '@relay-protocol/helpers'
 import { reverts } from '../utils/errors'
-const { weth: WETH, hyperlaneMailbox } = networks[1]
+const {
+  assets: { weth: WETH },
+  hyperlaneMailbox,
+} = networks[1]
 import RelayPoolModule from '../../ignition/modules/RelayPoolModule'
 
 let weth: IWETH
@@ -20,6 +23,8 @@ describe('RelayPoolNativeGateway', () => {
 
   describe('when using the native token', () => {
     before(async () => {
+      const [user] = await ethers.getSigners()
+      const userAddress = await user.getAddress()
       // deploy 3rd party pool
       const thirdPartyPool = await ethers.deployContract('MyYieldPool', [
         WETH,
@@ -38,6 +43,8 @@ describe('RelayPoolNativeGateway', () => {
           origins: [],
           thirdPartyPool: thirdPartyPoolAddress,
           weth: WETH,
+          bridgeFee: 0,
+          curator: userAddress,
         },
       }
       ;({ relayPool } = await ignition.deploy(RelayPoolModule, {

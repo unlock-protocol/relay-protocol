@@ -115,8 +115,8 @@ export const poolAction = onchainTable('pool_action', (t) => ({
 export const userBalance = onchainTable('user_balance', (t) => ({
   id: t.text().primaryKey(), // Composite ID: wallet-pool
   wallet: t.hex().notNull(),
-  relayPool: t.hex().notNull(), // Reference to relay pool
-  balance: t.bigint().notNull(),
+  relayPool: t.hex().notNull(),
+  shareBalance: t.bigint().notNull(),
   totalDeposited: t.bigint().notNull(),
   totalWithdrawn: t.bigint().notNull(),
   lastUpdated: t.bigint().notNull(),
