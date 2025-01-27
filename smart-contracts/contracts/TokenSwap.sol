@@ -1,5 +1,6 @@
+/* solhint-disable one-contract-per-file */
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.0;
+pragma solidity ^0.8.24;
 
 import {TransferHelper} from "@uniswap/v3-periphery/contracts/libraries/TransferHelper.sol";
 import {IUniversalRouter} from "./interfaces/uniswap/IUniversalRouter.sol";
@@ -34,21 +35,21 @@ contract TokenSwap {
   address public uniswapUniversalRouter;
 
   // specified in https://docs.uniswap.org/contracts/universal-router/technical-reference#v3_swap_exact_in
-  uint256 constant V3_SWAP_EXACT_IN = 0x00;
+  uint256 internal constant V3_SWAP_EXACT_IN = 0x00;
 
   // events
   event TokenSwapped(
     address pool,
     address tokenIn,
-    uint amountIn,
-    uint amountOut
+    uint256 amountIn,
+    uint256 amountOut
   );
 
   // errors
   error TokenSwappedFailed(
     address uniswapUniversalRouter,
     address tokenIn,
-    uint amount
+    uint256 amount
   );
   error UnauthorizedSwap();
 
@@ -64,7 +65,7 @@ contract TokenSwap {
    * Simple helper to retrieve balance in ERC20 or native tokens
    * @param token the address of the token (address(0) for native token)
    */
-  function getBalance(address token) internal view returns (uint) {
+  function getBalance(address token) internal view returns (uint256) {
     return IERC20(token).balanceOf(address(this));
   }
 
@@ -78,15 +79,15 @@ contract TokenSwap {
     address tokenAddress,
     uint24 uniswapWethPoolFeeToken,
     uint24 uniswapWethPoolFeeAsset
-  ) public payable returns (uint amountOut) {
+  ) public payable returns (uint256 amountOut) {
     // get info from pool
     address pool = msg.sender;
     address asset = IRelayPool(pool).asset();
     address wrappedAddress = IRelayPool(pool).WETH();
 
     // get total balance of token to swap
-    uint tokenAmount = getBalance(tokenAddress);
-    uint assetAmountBefore = getBalance(asset);
+    uint256 tokenAmount = getBalance(tokenAddress);
+    uint256 assetAmountBefore = getBalance(asset);
 
     if (tokenAddress == asset) {
       revert UnauthorizedSwap();
