@@ -37,15 +37,15 @@ contract TokenSwap {
   uint256 constant V3_SWAP_EXACT_IN = 0x00;
 
   // events
-  event SwappedDeposit(
+  event TokenSwapped(
     address pool,
     address tokenIn,
     uint amountIn,
-    uint amountDeposited
+    uint amountOut
   );
 
   // errors
-  error SwappedDepositFailed(
+  error TokenSwappedFailed(
     address uniswapUniversalRouter,
     address tokenIn,
     uint amount
@@ -70,6 +70,9 @@ contract TokenSwap {
 
   /**
    * Swap tokens to UDT and burn the tokens
+   *
+   * @notice The default route is token > WETH > asset.
+   * If `uniswapWethPoolFeeAsset` is set to null, then we do a direct swap token > asset
    */
   function swap(
     address tokenAddress,
@@ -107,12 +110,15 @@ contract TokenSwap {
       uint48(block.timestamp + 60) // expires after 1min
     );
 
-    // first part of the path is token > WETH
-    bytes memory wethPath = abi.encodePacked(
-      tokenAddress,
-      uniswapWethPoolFeeToken, // uniswap pool fee
-      wrappedAddress
-    );
+    // parse the path
+    bytes memory path = uniswapWethPoolFeeAsset == 0
+      ? abi.encodePacked(tokenAddress, uniswapWethPoolFeeToken, asset) // if no pool fee for asset, then do direct swap
+      : abi.encodePacked(tokenAddress, uniswapWethPoolFeeToken, wrappedAddress); // else default to token > WETH
+
+    // add WETH > asset to path if needed
+    if (uniswapWethPoolFeeAsset != 0 && asset != wrappedAddress) {
+      path = abi.encodePacked(path, uniswapWethPoolFeeAsset, asset);
+    }
 
     // encode parameters for the swap om UniversalRouter
     bytes memory commands = abi.encodePacked(bytes1(uint8(V3_SWAP_EXACT_IN)));
@@ -121,9 +127,7 @@ contract TokenSwap {
       address(this), // recipient is this contract
       tokenAmount, // amountIn
       0, // amountOutMinimum
-      asset == wrappedAddress
-        ? wethPath // if asset is WETH then path is token > WETH
-        : abi.encodePacked(wethPath, uniswapWethPoolFeeAsset, asset), // else token > WETH > asset
+      path,
       true // funds are not coming from PERMIT2
     );
 
@@ -137,7 +141,7 @@ contract TokenSwap {
     // check if assets have actually been swapped
     amountOut = getBalance(asset) - assetAmountBefore;
     if (amountOut == 0) {
-      revert SwappedDepositFailed(
+      revert TokenSwappedFailed(
         uniswapUniversalRouter,
         tokenAddress,
         tokenAmount
@@ -146,7 +150,7 @@ contract TokenSwap {
 
     // transfer the swapped asset to the pool
     IERC20(asset).transfer(pool, amountOut);
-    emit SwappedDeposit(pool, tokenAddress, tokenAmount, amountOut);
+    emit TokenSwapped(pool, tokenAddress, tokenAmount, amountOut);
   }
 
   // required to withdraw WETH

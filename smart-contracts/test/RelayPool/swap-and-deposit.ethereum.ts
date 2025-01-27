@@ -11,8 +11,8 @@ import {
   TokenSwap,
 } from '../../typechain-types'
 import TokenSwapModule from '../../ignition/modules/TokenSwapModule'
-import { getBalance } from '@relay-protocol/helpers'
-import { ZeroAddress } from 'ethers'
+import { getBalance, getEvent } from '@relay-protocol/helpers'
+import { Signer, ZeroAddress } from 'ethers'
 
 const {
   assets: { weth: WETH, usdc: USDC },
@@ -20,19 +20,67 @@ const {
 } = networks[1]
 
 const DAI = '0x6B175474E89094C44Da98b954EedeAC495271d0F'
-const myTokenAddress = DAI
 const MORPHO = '0x58D97B57BB95320F9a05dC918Aef65434969c2B2'
+
+// pool is priced in DAI
+const myTokenAddress = DAI
+
+const tokenSwapBehavior = async (
+  relayPool: RelayPool,
+  tokenSwap: TokenSwap,
+  token: string,
+  amount: bigint,
+  tokenPoolFee: number,
+  assetPoolFee: number
+) => {
+  const balanceBefore = await getBalance(
+    await relayPool.getAddress(),
+    token,
+    ethers.provider
+  )
+  expect(balanceBefore).to.be.equal(amount)
+
+  // swap that amount
+  const tx = await relayPool.swapAndDeposit(
+    token,
+    amount,
+    tokenPoolFee,
+    assetPoolFee
+  )
+
+  const receipt = await tx.wait()
+  const { event: depositEvent } = await getEvent(
+    receipt!,
+    'AssetsDepositedIntoYieldPool',
+    relayPool.interface
+  )
+  const { event: swapEvent } = await getEvent(
+    receipt!,
+    'TokenSwapped',
+    tokenSwap.interface
+  )
+  expect(swapEvent.args.amount).to.be.equal(depositEvent.args.amountOut)
+
+  // no weth left
+  expect(
+    await getBalance(await relayPool.getAddress(), token, ethers.provider)
+  ).to.be.equal(0)
+}
 
 describe('RelayPool / Swap and Deposit', () => {
   let relayPool: RelayPool
   let myToken: MyToken
   let thirdPartyPool: MyYieldPool
   let tokenSwap: TokenSwap
+  let curator: Signer
   let curatorAddress: string
+  let user: Signer
+  let userAddress: string
 
   before(async () => {
-    const [curator] = await ethers.getSigners()
+    ;[user, curator] = await ethers.getSigners()
     curatorAddress = await curator.getAddress()
+    userAddress = await user.getAddress()
     myToken = await ethers.getContractAt('MyToken', myTokenAddress)
 
     // deploy 3rd party pool
@@ -51,7 +99,7 @@ describe('RelayPool / Swap and Deposit', () => {
         symbol: `${await myToken.symbol()}-REL`,
         origins: [],
         thirdPartyPool: await thirdPartyPool.getAddress(),
-        weth: ethers.ZeroAddress, // Not used in this test
+        weth: WETH,
         bridgeFee: 0,
         curator: curatorAddress,
       },
@@ -79,13 +127,11 @@ describe('RelayPool / Swap and Deposit', () => {
     )
   })
 
-  describe('holding MORPHO', () => {
+  describe('holding MORPHO (swapping using MORPHO > WETH > DAI)', () => {
     const amount = ethers.parseUnits('1', 18)
     let relayPoolAddress: string
 
     before(async () => {
-      const [user] = await ethers.getSigners()
-      const userAddress = await user.getAddress()
       relayPoolAddress = await relayPool.getAddress()
 
       // get some USDC
@@ -101,29 +147,43 @@ describe('RelayPool / Swap and Deposit', () => {
     })
 
     it('should swap to pool asset and transfer it directly into the pool balance', async () => {
-      const balanceBefore = await getBalance(
-        relayPoolAddress,
-        MORPHO,
-        ethers.provider
-      )
-      expect(balanceBefore).to.be.equal(amount)
-
-      // swap that amount
-      await relayPool.swapAndDeposit(
+      await tokenSwapBehavior(
+        relayPool,
+        tokenSwap,
         MORPHO,
         amount,
         3000, // uniswapPoolFee morpho > WETH
-        1000 // uniswapPoolFee WETH > DAI
+        3000 // uniswapPoolFee WETH > DAI
       )
-
-      // no morpho left
-      expect(
-        await getBalance(relayPoolAddress, MORPHO, ethers.provider)
-      ).to.be.equal(0)
     })
   })
 
-  describe('holding USDC', () => {
+  describe('holding WETH (direct swap WETH > DAI )', () => {
+    const amount = ethers.parseEther('3')
+    let relayPoolAddress: string
+
+    before(async () => {
+      relayPoolAddress = await relayPool.getAddress()
+
+      // get some WETH
+      const weth = await ethers.getContractAt('IWETH', WETH)
+      await weth.deposit({ value: amount })
+      await weth.connect(user).transfer(relayPoolAddress, amount)
+    })
+
+    it('should swap to pool asset and transfer it directly into the pool balance', async () => {
+      await tokenSwapBehavior(
+        relayPool,
+        tokenSwap,
+        WETH,
+        amount,
+        3000, // uniswapPoolFee
+        0
+      )
+    })
+  })
+
+  describe('holding USDC (direct SWAP USDC > DAI)', () => {
     const amount = ethers.parseUnits('100', 6)
     let relayPoolAddress: string
 
@@ -141,25 +201,14 @@ describe('RelayPool / Swap and Deposit', () => {
     })
 
     it('should swap to pool asset and transfer it directly into the pool balance', async () => {
-      const balanceBefore = await getBalance(
-        relayPoolAddress,
-        USDC,
-        ethers.provider
-      )
-      expect(balanceBefore).to.be.equal(amount)
-
-      // swap that amount
-      await relayPool.swapAndDeposit(
+      await tokenSwapBehavior(
+        relayPool,
+        tokenSwap,
         USDC,
         amount,
         3000, // uniswapPoolFee
-        500
+        0
       )
-
-      // no usdc left
-      expect(
-        await getBalance(relayPoolAddress, USDC, ethers.provider)
-      ).to.be.equal(0)
     })
   })
 })
