@@ -1797,7 +1797,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@relay-protocol/backend@workspace:backend"
   dependencies:
-    "@types/node": "npm:22.10.7"
+    "@types/node": "npm:22.10.10"
     "@typescript-eslint/eslint-plugin": "npm:8.21.0"
     "@typescript-eslint/parser": "npm:8.21.0"
     eslint: "npm:9.18.0"
@@ -1822,7 +1822,7 @@ __metadata:
     "@relay-protocol/eslint-config": "workspace:^"
     "@relay-protocol/tsconfig": "workspace:./packages/tsconfig"
     "@relay-protocol/types": "workspace:./packages/types"
-    "@types/node": "npm:20.17.16"
+    "@types/node": "npm:22.10.10"
     eslint: "npm:9.18.0"
     graphql: "npm:16.10.0"
     graphql-request: "npm:7.1.2"
@@ -1916,7 +1916,7 @@ __metadata:
     "@types/chai": "npm:4.3.20"
     "@types/fs-extra": "npm:11.0.4"
     "@types/mocha": "npm:10.0.10"
-    "@types/node": "npm:22.10.7"
+    "@types/node": "npm:22.10.10"
     chai: "npm:4.5.0"
     eslint: "npm:9.18.0"
     eslint-config-prettier: "npm:10.0.1"
@@ -2499,7 +2499,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/node@npm:*, @types/node@npm:22.10.7":
+"@types/node@npm:*":
   version: 22.10.7
   resolution: "@types/node@npm:22.10.7"
   dependencies:
@@ -2508,12 +2508,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/node@npm:20.17.16":
-  version: 20.17.16
-  resolution: "@types/node@npm:20.17.16"
+"@types/node@npm:22.10.10":
+  version: 22.10.10
+  resolution: "@types/node@npm:22.10.10"
   dependencies:
-    undici-types: "npm:~6.19.2"
-  checksum: 10/2a6f9f3d6e2640a6de5ae88ea690d8064eb421cca2989c84bc23eb1adf5e9f483c52e273722c05afba451054d3ca902df72bb8b6c33d1684404161bb410922f7
+    undici-types: "npm:~6.20.0"
+  checksum: 10/61559b62bc7e62b947876e097c99472dd01317dd3b5916b538e2c40db8d68a1fc23c8de48149ef04cd2790a97bf2c005ea60cbb067e55ddbefd013d73da7a147
   languageName: node
   linkType: hard
 
