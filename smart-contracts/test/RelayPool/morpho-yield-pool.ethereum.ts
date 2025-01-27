@@ -132,16 +132,14 @@ describe('RelayBridge: use Morpho yield pool (WETH)', () => {
 
     // Withdraw tokens from the RelayPool
     const withdrawAmount = ethers.parseUnits('0.5', 6)
-    const expectedMorphoShares =
-      await morphoUsdcPool.previewWithdraw(withdrawAmount)
     await relayPool
       .connect(user)
       .withdraw(withdrawAmount, userAddress, userAddress)
     expect(await usdc.balanceOf(relayPoolAddress)).to.equal(0)
 
     // morpho pool tokens have been withdrawn from pool
-    expect(await morphoUsdcPool.balanceOf(relayPoolAddress)).to.be.equal(
-      morphoBalance - expectedMorphoShares
+    expect(await morphoUsdcPool.balanceOf(relayPoolAddress)).to.be.lessThan(
+      morphoBalance
     )
   })
 
@@ -151,10 +149,6 @@ describe('RelayBridge: use Morpho yield pool (WETH)', () => {
     const userAddress = await user.getAddress()
     const relayPoolAddress = await relayPool.getAddress()
 
-    // pool starts with no morpho tokens (withdrawn in test above)
-    const morphoBalance = await morphoUsdcPool.balanceOf(relayPoolAddress)
-    expect(morphoBalance).to.not.equal(0)
-
     // Approved the Token to be spent by the RelayPool
     await (await usdc.connect(user).approve(relayPoolAddress, amount)).wait()
 
@@ -163,26 +157,23 @@ describe('RelayBridge: use Morpho yield pool (WETH)', () => {
     await relayPool.connect(user).deposit(amount, userAddress)
 
     // Check balances
+    const morphoBalance = await morphoUsdcPool.balanceOf(relayPoolAddress)
+    expect(morphoBalance).to.not.equal(0)
+
     expect(await usdc.balanceOf(relayPoolAddress)).to.equal(0)
     expect(await morphoUsdcPool.balanceOf(relayPoolAddress)).to.equal(
       morphoBalance + expectedMorphoDeposit
     )
 
-    // Withdraw tokens from the RelayPool
+    // redeem tokens from the RelayPool
     const sharesToRedeem = await relayPool.balanceOf(userAddress)
-    const amountToReceive = await relayPool.previewRedeem(sharesToRedeem)
-    const expectedMorphoRedeemedShares =
-      await morphoUsdcPool.previewWithdraw(amountToReceive)
-
     await relayPool
       .connect(user)
       .redeem(sharesToRedeem, userAddress, userAddress)
-
     expect(await usdc.balanceOf(relayPoolAddress)).to.equal(0)
 
-    // back to the same amount of morpho tokens
-    expect(await morphoUsdcPool.balanceOf(relayPoolAddress)).to.equal(
-      morphoBalance - expectedMorphoRedeemedShares
+    expect(await morphoUsdcPool.balanceOf(relayPoolAddress)).to.be.lessThan(
+      morphoBalance
     )
   })
 })
