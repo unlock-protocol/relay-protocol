@@ -7,8 +7,7 @@ import RelayPoolModule from '../../ignition/modules/RelayPoolModule'
 import { getEvents } from '@relay-protocol/helpers'
 
 const {
-  usdc: { token: USDC },
-  weth,
+  assets: { usdc: USDC, weth },
 } = networks[1]
 
 const USDC_MORPHO_POOL = '0xd63070114470f685b75B74D60EEc7c1113d33a3D'
