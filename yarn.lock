@@ -1801,7 +1801,7 @@ __metadata:
     "@typescript-eslint/eslint-plugin": "npm:8.21.0"
     "@typescript-eslint/parser": "npm:8.21.0"
     eslint: "npm:9.18.0"
-    eslint-config-ponder: "npm:0.8.32"
+    eslint-config-ponder: "npm:0.8.33"
     eslint-config-prettier: "npm:10.0.1"
     eslint-plugin-prettier: "npm:5.2.3"
     hono: "npm:4.6.19"
@@ -4734,14 +4734,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"eslint-config-ponder@npm:0.8.32":
-  version: 0.8.32
-  resolution: "eslint-config-ponder@npm:0.8.32"
+"eslint-config-ponder@npm:0.8.33":
+  version: 0.8.33
+  resolution: "eslint-config-ponder@npm:0.8.33"
   peerDependencies:
     "@typescript-eslint/eslint-plugin": ^6.3.0
     "@typescript-eslint/parser": ^6.3.0
     eslint: ">= 3"
-  checksum: 10/5f771c4a0ef00763c663dd7811324e6a2a73c13ddd360bed7fbd5e3b14fbc0ad3c31edeb53d152ca0f4bf00c06538784d71a417cc68b774f8ec04ba242b81711
+  checksum: 10/cec5476d14b7621349a00a56407ac5c05c230529cef714650706888cf6f7c9d3a30dc63622021b3aab0f155038eb879c39a91554061db159e1161bcefb3223e7
   languageName: node
   linkType: hard
 
