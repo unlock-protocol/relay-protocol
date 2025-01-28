@@ -15,7 +15,7 @@ export default async function ({
 
   // Get Hyperlane dispatch event from the same transaction
   const dispatchEvent = await getEvent(event.transaction, 'Dispatch', Mailbox)
-  const hyperlaneMsgId = dispatchEvent ? dispatchEvent.args[0] : null
+  const hyperlaneMessageId = dispatchEvent ? dispatchEvent.args[0] : null
 
   // Record bridge initiation
   await context.db.insert(bridgeTransaction).values({
@@ -37,7 +37,7 @@ export default async function ({
     amount,
 
     // Hyperlane
-    hyperlaneMsgId,
+    hyperlaneMessageId,
 
     // Bridge status
     nativeBridgeStatus: 'INITIATED',

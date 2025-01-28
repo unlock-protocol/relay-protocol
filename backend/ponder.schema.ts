@@ -169,7 +169,7 @@ export const relayBridge = onchainTable('relay_bridge', (t) => ({
  * - amount: Amount of asset being bridged
  *
  * Hyperlane:
- * - hyperlaneMsgId: ID of the fast Hyperlane message
+ * - hyperlaneMessageId: ID of the fast Hyperlane message
  *
  * Bridge status:
  * - nativeBridgeStatus: INITIATED, PROVEN, FINALIZED
@@ -195,7 +195,7 @@ export const bridgeTransaction = onchainTable(
     destinationRecipient: t.hex().notNull(),
     asset: t.hex().notNull(),
     amount: t.bigint().notNull(),
-    hyperlaneMsgId: t.hex(),
+    hyperlaneMessageId: t.hex(),
     nativeBridgeStatus: t.text().notNull(),
     nativeBridgeProofTxHash: t.hex(),
     nativeBridgeFinalizedTxHash: t.hex(),
