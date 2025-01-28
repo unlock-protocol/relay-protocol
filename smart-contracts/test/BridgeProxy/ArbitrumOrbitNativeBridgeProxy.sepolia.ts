@@ -1,20 +1,20 @@
 import { ethers, ignition } from 'hardhat'
 import { AbiCoder, Interface, type JsonRpcApiProvider } from 'ethers'
 import { expect } from 'chai'
-import { type Signer } from 'ethers'
 
 import { ArbitrumOrbitNativeBridgeProxy } from '../../typechain-types'
 import { networks } from '@relay-protocol/networks'
-import { getEvent, getBalance, decodeLogs } from '@relay-protocol/helpers'
+import { getEvent, getBalance } from '@relay-protocol/helpers'
 import { WETH as WETH_ABI } from '@relay-protocol/helpers/abis'
 import ArbitrumOrbitNativeBridgeProxyModule from '../../ignition/modules/ArbitrumOrbitNativeBridgeProxyModule'
-import RelayPoolModule from '../../ignition/modules/RelayPoolModule'
 
 const ETH_CHAIN_ID = 11155111n
 const ARB_CHAIN_ID = 42161n
 const {
-  arb: { routerGateway, outbox },
-  weth: WETH,
+  bridges: {
+    arb: { routerGateway, outbox },
+  },
+  assets: { weth: WETH },
 } = networks[ETH_CHAIN_ID.toString()]
 
 // WETH bridge tx on Sepolia
@@ -151,7 +151,6 @@ describe('ArbitrumOrbitNativeBridgeProxy', function () {
       const { event: wethTransferEvent } = await getEvent(
         receipt!,
         'Transfer',
-        WETH!,
         new Interface(WETH_ABI)
       )
       expect(wethTransferEvent.args.dst).to.equals(recipientAddress)

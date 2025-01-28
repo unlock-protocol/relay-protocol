@@ -13,6 +13,7 @@ describe('RelayBridge: receive', () => {
 
   it('should handle receiving eth and wrap it instantly if the pool is configured with WETH', async () => {
     const [user] = await ethers.getSigners()
+    const userAddress = await user.getAddress()
 
     // deploy 3rd party pool
     const thirdPartyPool = await ethers.deployContract('MyYieldPool', [
@@ -32,6 +33,8 @@ describe('RelayBridge: receive', () => {
         origins: [],
         thirdPartyPool: thirdPartyPoolAddress,
         weth: await myWeth.getAddress(),
+        bridgeFee: 0,
+        curator: userAddress,
       },
     }
     const { relayPool } = await ignition.deploy(RelayPoolModule, {
@@ -48,6 +51,7 @@ describe('RelayBridge: receive', () => {
 
   it('should fail to receive ETH if the pool was not configured with WETH', async () => {
     const [user] = await ethers.getSigners()
+    const userAddress = await user.getAddress()
 
     const myToken = await ethers.deployContract('MyToken', [
       'My Token',
@@ -72,6 +76,8 @@ describe('RelayBridge: receive', () => {
         origins: [],
         thirdPartyPool: thirdPartyPoolAddress,
         weth: await myWeth.getAddress(),
+        bridgeFee: 0,
+        curator: userAddress,
       },
     }
     const { relayPool } = await ignition.deploy(RelayPoolModule, {

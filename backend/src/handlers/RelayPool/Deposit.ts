@@ -1,5 +1,6 @@
 import { Context, Event } from 'ponder:registry'
-import { poolAction, relayPool, userBalance } from 'ponder:schema'
+import { poolAction, relayPool, userBalance, yieldPool } from 'ponder:schema'
+import { erc4626Abi } from 'viem'
 
 export default async function ({
   event,
@@ -16,23 +17,18 @@ export default async function ({
   // Generate unique ID using transaction hash and log index
   const eventId = `${transactionHash}-${event.log.logIndex}`
 
-  // Record pool action
-  await context.db.insert(poolAction).values({
-    id: eventId,
-    type: 'DEPOSIT',
-    user: sender,
-    receiver: event.log.address,
-    owner: event.log.address,
-    relayPool: event.log.address,
-    assets,
-    shares,
-    timestamp,
-    blockNumber,
-    transactionHash,
+  // Get the relay pool to find its yield pool
+  const pool = await context.db.find(relayPool, {
+    contractAddress: event.log.address,
   })
 
-  // Fetch current totalAssets and totalShares from contract
-  const [totalAssets, totalShares] = await Promise.all([
+  // Fetch current state from both pools
+  const [
+    relayTotalAssets,
+    relayTotalShares,
+    yieldTotalAssets,
+    yieldTotalShares,
+  ] = await Promise.all([
     context.client.readContract({
       abi: context.contracts.RelayPool.abi,
       address: event.log.address,
@@ -43,13 +39,48 @@ export default async function ({
       address: event.log.address,
       functionName: 'totalSupply',
     }),
+    context.client.readContract({
+      abi: erc4626Abi,
+      address: pool.yieldPool,
+      functionName: 'totalAssets',
+    }),
+    context.client.readContract({
+      abi: erc4626Abi,
+      address: pool.yieldPool,
+      functionName: 'totalSupply',
+    }),
   ])
 
-  // Update relay pool with current values from contract
-  await context.db.update(relayPool, { contractAddress: event.log.address }).set({
-    totalAssets,
-    totalShares,
-  })
+  // Update both pools atomically
+  await Promise.all([
+    // Update relay pool
+    context.db.update(relayPool, { contractAddress: event.log.address }).set({
+      totalAssets: relayTotalAssets,
+      totalShares: relayTotalShares,
+    }),
+
+    // Update yield pool
+    context.db.update(yieldPool, { contractAddress: pool.yieldPool }).set({
+      totalAssets: yieldTotalAssets,
+      totalShares: yieldTotalShares,
+      lastUpdated: BigInt(timestamp),
+    }),
+
+    // Record pool action
+    context.db.insert(poolAction).values({
+      id: eventId,
+      type: 'DEPOSIT',
+      user: sender,
+      receiver: event.log.address,
+      owner: event.log.address,
+      relayPool: event.log.address,
+      assets,
+      shares,
+      timestamp,
+      blockNumber,
+      transactionHash,
+    }),
+  ])
 
   // Update user balance - using insert with `onConflictDoUpdate` for atomic operations
   const balanceId = `${sender}-${event.log.address}` // wallet-pool format
@@ -60,13 +91,13 @@ export default async function ({
       id: balanceId,
       wallet: sender,
       relayPool: event.log.address,
-      balance: assets,
+      shareBalance: shares,
       totalDeposited: assets,
       totalWithdrawn: 0n,
       lastUpdated: timestamp,
     })
     .onConflictDoUpdate((row) => ({
-      balance: row.balance + assets,
+      shareBalance: row.shareBalance + shares,
       totalDeposited: row.totalDeposited + assets,
       lastUpdated: timestamp,
     }))

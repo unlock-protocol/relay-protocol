@@ -12,8 +12,10 @@ import CCTPBridgeProxyModule from '../../ignition/modules/CCTPBridgeProxyModule'
 const chainId = 10
 const destinationChainId = 1
 const {
-  udt: UDT,
-  usdc: { token: USDC, messenger, transmitter },
+  bridges: {
+    cctp: { messenger, transmitter },
+  },
+  assets,
 } = networks[chainId]
 
 describe('CCTPBridgeProxy', function () {
@@ -28,14 +30,14 @@ describe('CCTPBridgeProxy', function () {
       CCTPBridgeProxy: {
         messenger,
         transmitter,
-        usdc: USDC,
+        usdc: assets.usdc,
       },
     }
     ;({ bridge } = await ignition.deploy(CCTPBridgeProxyModule, { parameters }))
 
     // const CCTPBridgeProxy = await ethers.getContractFactory('CCTPBridgeProxy')
     // setup all cctp domains
-    // bridge = await CCTPBridgeProxy.deploy(messenger, transmitter, USDC)
+    // bridge = await CCTPBridgeProxy.deploy(messenger, transmitter, assets.usdc)
   })
 
   describe('errors', () => {
@@ -45,7 +47,7 @@ describe('CCTPBridgeProxy', function () {
           await recipient.getAddress(),
           destinationChainId,
           await recipient.getAddress(),
-          UDT,
+          assets.udt,
           parseUnits('100', 6),
           '0x' //empty data
         ),
@@ -60,16 +62,16 @@ describe('CCTPBridgeProxy', function () {
 
     before(async () => {
       // get some usdc
-      await mintUSDC(USDC, await recipient.getAddress(), amount)
+      await mintUSDC(assets.usdc, await recipient.getAddress(), amount)
       balanceBefore = await getBalance(
         await recipient.getAddress(),
-        USDC,
+        assets.usdc,
         ethers.provider
       )
       expect(balanceBefore).to.be.equal(amount)
 
       // approve bridge to manipulate our usdc tokens
-      const usdc = await ethers.getContractAt('IUSDC', USDC)
+      const usdc = await ethers.getContractAt('IUSDC', assets.usdc)
       await usdc.connect(recipient).approve(await bridge.getAddress(), amount)
 
       // send message to the bridge
@@ -77,7 +79,7 @@ describe('CCTPBridgeProxy', function () {
         await recipient.getAddress(),
         destinationChainId,
         await recipient.getAddress(),
-        USDC,
+        assets.usdc,
         amount,
         '0x' //empty data
       )
@@ -86,7 +88,11 @@ describe('CCTPBridgeProxy', function () {
     })
     it('burnt the balance', async () => {
       expect(
-        await getBalance(await recipient.getAddress(), USDC, ethers.provider)
+        await getBalance(
+          await recipient.getAddress(),
+          assets.usdc,
+          ethers.provider
+        )
       ).to.be.equal(balanceBefore - amount)
     })
 
@@ -99,10 +105,10 @@ describe('CCTPBridgeProxy', function () {
       const { event } = await getEvent(receipt!, 'DepositForBurn', iface)
       expect(event).to.not.be.equal(undefined)
       const { args } = event
-      expect(args?.burnToken).to.be.equal(USDC)
+      expect(args?.burnToken).to.be.equal(assets.usdc)
       expect(args?.amount).to.be.equal(amount)
       expect(args?.destinationDomain).to.be.equal(
-        networks[destinationChainId].usdc.domain
+        networks[destinationChainId].bridges.cctp.domain
       )
       // expect(args?.mintRecipient).to.be.equal(await recipient.getAddress())
     })

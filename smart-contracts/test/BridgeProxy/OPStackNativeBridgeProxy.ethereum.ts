@@ -8,7 +8,10 @@ import { buildFinalizeWithdrawal } from '@relay-protocol/helpers'
 import { expect } from 'chai'
 import * as ABIs from '@relay-protocol/helpers/abis'
 
-const { op, weth } = networks[1]
+const {
+  bridges: { op },
+  assets: { weth },
+} = networks[1]
 
 describe('OPStackNativeBridgeProxy', function () {
   describe('claim', function () {

@@ -13,8 +13,10 @@ import CCTPBridgeProxyModule from '../../ignition/modules/CCTPBridgeProxyModule'
 
 const {
   hyperlaneMailbox: HYPERLANE_MAILBOX_ON_OPTIMISM,
-  udt: UDT_OPTIMISM,
-  usdc: { token: USDC, transmitter, messenger },
+  bridges: {
+    cctp: { transmitter, messenger },
+  },
+  assets,
 } = networks[10]
 
 describe('RelayBridge', function () {
@@ -124,7 +126,7 @@ describe('RelayBridge', function () {
     const opProxyBridgeAddress = await opProxyBridge.getAddress()
 
     const bridge = await ethers.deployContract('RelayBridge', [
-      UDT_OPTIMISM,
+      assets.udt,
       opProxyBridgeAddress,
       HYPERLANE_MAILBOX_ON_OPTIMISM,
     ])
@@ -135,14 +137,14 @@ describe('RelayBridge', function () {
 
     // Transfer UDT to sender/recipient
     await stealERC20(
-      UDT_OPTIMISM,
+      assets.udt,
       '0x99b1348a9129ac49c6de7F11245773dE2f51fB0c',
       recipient,
       amount
     )
 
     // Approve
-    const erc20Contract = await ethers.getContractAt(ERC20, UDT_OPTIMISM)
+    const erc20Contract = await ethers.getContractAt(ERC20, assets.udt)
     await erc20Contract.approve(bridgeAddress, amount)
 
     const nonce = await bridge.transferNonce()
@@ -169,7 +171,7 @@ describe('RelayBridge', function () {
         '0x68eE9bec9B4dbB61f69D9D293Ae26a5AACb2e28f', // Merkle Tree Hook https://docs.hyperlane.xyz/docs/reference/contract-addresses#merkle-tree-hook
         '0xD8A76C4D91fCbB7Cc8eA795DFDF870E48368995C', // Interchain Gas Paymaster https://docs.hyperlane.xyz/docs/reference/contract-addresses#interchain-gas-paymaster-hook
         bridgeAddress,
-        UDT_OPTIMISM,
+        assets.udt,
       ])
       if (log.address === HYPERLANE_MAILBOX_ON_OPTIMISM) {
         // L2ToL1MessagePasser
@@ -205,7 +207,7 @@ describe('RelayBridge', function () {
         expect(event.args[0]).to.equal(nonce)
         expect(event.args[1]).to.equal(recipient)
         expect(event.args[2]).to.equal(recipient)
-        expect(event.args[3]).to.equal(UDT_OPTIMISM)
+        expect(event.args[3]).to.equal(assets.udt)
         expect(event.args[4]).to.equal(amount)
         expect(event.args[5]).to.equal(1)
         expect(event.args[6]).to.equal(poolAddress)
@@ -224,7 +226,7 @@ describe('RelayBridge', function () {
         CCTPBridgeProxy: {
           messenger,
           transmitter,
-          usdc: USDC,
+          usdc: assets.usdc,
         },
       }
       const { bridge: cctpProxyBridge } = await ignition.deploy(
@@ -235,7 +237,7 @@ describe('RelayBridge', function () {
       )
       const cctpProxyBridgeAddress = await cctpProxyBridge.getAddress()
       const bridge = await ethers.deployContract('RelayBridge', [
-        USDC,
+        assets.usdc,
         cctpProxyBridgeAddress,
         HYPERLANE_MAILBOX_ON_OPTIMISM,
       ])
@@ -246,10 +248,10 @@ describe('RelayBridge', function () {
       const poolAddress = '0x1Bd1dc30F238541D4CAb3Ba0aB766e9eB57050eb'
 
       // Get some USDC to sender/recipient
-      await mintUSDC(USDC, recipient, amount)
+      await mintUSDC(assets.usdc, recipient, amount)
 
       // Approve
-      const erc20Contract = await ethers.getContractAt(ERC20, USDC)
+      const erc20Contract = await ethers.getContractAt(ERC20, assets.usdc)
       await erc20Contract.approve(bridgeAddress, amount)
 
       const nonce = await bridge.transferNonce()
@@ -276,9 +278,11 @@ describe('RelayBridge', function () {
       const { event } = await getEvent(receipt!, 'DepositForBurn', iface)
       expect(event).to.not.be.equal(undefined)
       const { args } = event
-      expect(args?.burnToken).to.be.equal(USDC)
+      expect(args?.burnToken).to.be.equal(networks[10].assets.usdc)
       expect(args?.amount).to.be.equal(amount)
-      expect(args?.destinationDomain).to.be.equal(networks[1].usdc.domain)
+      expect(args?.destinationDomain).to.be.equal(
+        networks[1].bridges.cctp.domain
+      )
     })
 
     it('fire MessageSent event', async () => {
