@@ -21,6 +21,7 @@ import Deposit from './handlers/RelayPool/Deposit'
 import Withdraw from './handlers/RelayPool/Withdraw'
 import PoolDeployed from './handlers/RelayPoolFactory/PoolDeployed'
 import BridgeDeployed from './handlers/RelayBridgeFactory/BridgeDeployed'
+import BridgeInitiated from './handlers/RelayBridge/BridgeInitiated'
 
 // ============= RelayPool Events =============
 
@@ -40,3 +41,5 @@ ponder.on('RelayPool:Withdraw', Withdraw)
 ponder.on('RelayPoolFactory:PoolDeployed', PoolDeployed)
 
 ponder.on('RelayBridgeFactory:BridgeDeployed', BridgeDeployed)
+
+ponder.on('RelayBridge:BridgeInitiated', BridgeInitiated)
