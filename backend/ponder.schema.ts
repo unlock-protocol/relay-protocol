@@ -147,3 +147,44 @@ export const relayBridge = onchainTable('relay_bridge', (t) => ({
   createdAt: t.bigint().notNull(),
   createdAtBlock: t.bigint().notNull(),
 }))
+
+/**
+ * Track bridge volumes
+ * - id: Unique ID (tx hash + log index)
+ * - chainId: Chain ID where the bridge is deployed
+ * - bridge: Bridge contract address
+ * - sender: User who initiated the bridge
+ * - recipient: Recipient of the bridged funds
+ * - asset: Asset being bridged
+ * - amount: Amount being bridged
+ * - poolChainId: Destination chain ID (usually L1)
+ * - pool: Destination pool address
+ * - nonce: Bridge transfer nonce
+ * - timestamp: Block timestamp
+ * - blockNumber: Block number
+ * - transactionHash: Transaction hash
+ */
+export const bridgeVolume = onchainTable(
+  'bridge_volume',
+  (t) => ({
+    id: t.text().primaryKey(),
+    chainId: t.integer().notNull(),
+    bridge: t.hex().notNull(),
+    sender: t.hex().notNull(),
+    recipient: t.hex().notNull(),
+    asset: t.hex().notNull(),
+    amount: t.bigint().notNull(),
+    poolChainId: t.integer().notNull(),
+    pool: t.hex().notNull(),
+    nonce: t.bigint().notNull(),
+    timestamp: t.bigint().notNull(),
+    blockNumber: t.bigint().notNull(),
+    transactionHash: t.hex().notNull(),
+  }),
+  (table) => ({
+    bridgeIdx: index().on(table.bridge),
+    senderIdx: index().on(table.sender),
+    assetIdx: index().on(table.asset),
+    poolIdx: index().on(table.poolChainId, table.pool),
+  })
+)
