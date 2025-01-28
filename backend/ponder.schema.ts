@@ -167,26 +167,35 @@ export const relayBridge = onchainTable('relay_bridge', (t) => ({
 export const bridgeVolume = onchainTable(
   'bridge_volume',
   (t) => ({
-    bridgeAddress: t.hex().notNull(),
+    originBridge: t.hex().notNull(),
     nonce: t.bigint().notNull(),
     chainId: t.integer().notNull(),
     sender: t.hex().notNull(),
     recipient: t.hex().notNull(),
     asset: t.hex().notNull(),
     amount: t.bigint().notNull(),
-    poolChainId: t.integer().notNull(),
+    originChainId: t.integer().notNull(),
     pool: t.hex().notNull(),
     timestamp: t.bigint().notNull(),
     blockNumber: t.bigint().notNull(),
     transactionHash: t.hex().notNull(),
   }),
   (table) => ({
-    // composite primary key
     pk: primaryKey({
-      columns: [table.bridgeAddress, table.nonce],
+      columns: [table.originBridge, table.nonce],
     }),
-    poolIdx: index().on(table.poolChainId, table.pool),
+    poolIdx: index().on(table.originChainId, table.pool),
     senderIdx: index().on(table.sender),
     assetIdx: index().on(table.asset),
   })
 )
+
+// Add relation between poolOrigin and bridgeVolume
+export const poolOriginBridgeVolumes = relations(poolOrigin, ({ many }) => ({
+  volumes: many(bridgeVolume),
+}))
+
+// Add the reverse relation
+export const bridgeVolumeOrigin = relations(bridgeVolume, ({ one }) => ({
+  origin: one(poolOrigin),
+}))
