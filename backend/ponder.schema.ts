@@ -207,7 +207,10 @@ export const bridgeTransaction = onchainTable(
     pk: primaryKey({
       columns: [table.originChainId, table.originBridgeAddress, table.nonce],
     }),
-    poolIdx: index().on(table.destinationPoolAddress),
+    poolIdx: index().on(
+      table.destinationPoolChainId,
+      table.destinationPoolAddress
+    ),
     senderIdx: index().on(table.originSender),
     assetIdx: index().on(table.asset),
   })
