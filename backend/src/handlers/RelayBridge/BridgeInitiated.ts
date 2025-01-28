@@ -14,21 +14,17 @@ export default async function ({
   const transactionHash = event.transaction.hash
   const timestamp = event.block.timestamp
 
-  // Generate unique ID using transaction hash and log index
-  const eventId = `${transactionHash}-${event.log.logIndex}`
-
-  // Record bridge volume
+  // Record bridge volume using bridge address and nonce as primary key
   await context.db.insert(bridgeVolume).values({
-    id: eventId,
-    chainId: context.network.chainId,
     bridge: event.log.address,
+    nonce,
+    chainId: context.network.chainId,
     sender,
     recipient,
     asset,
     amount,
     poolChainId,
     pool,
-    nonce,
     timestamp,
     blockNumber,
     transactionHash,
