@@ -6,7 +6,8 @@
   "author": "Julien Genestoux <julien.genestoux@gmail.com>",
   "license": "MIT",
   "scripts": {
-    "build": "yarn hardhat export:abis",
+    "build": "yarn hardhat compile",
+    "build:abis": "yarn hardhat export:abis",
     "test": "yarn run test:optimism && yarn run test:hardhat && yarn run test:ethereum && yarn test:sepolia",
     "test:hardhat": "yarn hardhat test test/**/*.hardhat.ts",
     "test:ethereum": "RPC_URL=https://rpc.unlock-protocol.com/1 yarn hardhat test test/**/*.ethereum.ts",
