@@ -10,9 +10,11 @@ const getRpcUrl = (chainId: number): string => {
     1: 'https://rpc.unlock-protocol.com/1',
     10: 'https://rpc.unlock-protocol.com/10',
     8453: 'https://rpc.unlock-protocol.com/8453',
+    84532: 'https://rpc.unlock-protocol.com/84532',
     137: 'https://rpc.unlock-protocol.com/137',
     11155111: 'https://rpc.unlock-protocol.com/11155111',
     11155420: 'https://optimism-sepolia.gateway.tenderly.co',
+    421614: `https://arbitrum-sepolia.gateway.tenderly.co`,
   }
 
   const url = urlMap[chainId]
