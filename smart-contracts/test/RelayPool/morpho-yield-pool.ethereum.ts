@@ -44,6 +44,8 @@ describe('RelayBridge: use Morpho yield pool (WETH)', () => {
         origins: [],
         thirdPartyPool: USDC_MORPHO_POOL,
         weth,
+        bridgeFee: 0,
+        curator: userAddress,
       },
     }
     ;({ relayPool } = await ignition.deploy(RelayPoolModule, {
