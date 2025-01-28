@@ -10,23 +10,41 @@ export default async function ({
 }) {
   const { nonce, sender, recipient, asset, amount, poolChainId, pool } =
     event.args
-  const blockNumber = event.block.number
-  const transactionHash = event.transaction.hash
-  const timestamp = event.block.timestamp
 
-  // Record bridge volume
+  // Record bridge initiation
   await context.db.insert(bridgeTransaction).values({
-    originBridge: event.log.address,
+    // Bridge identification
+    originBridgeAddress: event.log.address,
     nonce,
-    chainId: context.network.chainId,
-    sender,
-    recipient,
+
+    // Chain information
+    originChainId: context.network.chainId,
+    destinationPoolAddress: pool,
+    destinationPoolChainId: poolChainId,
+
+    // Transaction participants
+    originSender: sender,
+    destinationRecipient: recipient,
+
+    // Asset details
     asset,
     amount,
-    originChainId: poolChainId,
-    pool,
-    timestamp,
-    blockNumber,
-    transactionHash,
+
+    // Bridge status tracking
+    hyperlaneMsgId: null as any,
+    hyperlaneMsgTimestamp: null,
+
+    nativeBridgeStatus: 'INITIATED',
+    nativeBridgeProofTimestamp: null,
+    nativeBridgeFinalizedTimestamp: null,
+
+    // Instant loan tracking
+    loanEmittedTimestamp: null,
+    loanEmittedTxHash: null as any,
+
+    // Origin transaction details
+    originBlockNumber: event.block.number,
+    originTimestamp: event.block.timestamp,
+    originTxHash: event.transaction.hash,
   })
 }

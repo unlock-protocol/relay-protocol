@@ -149,47 +149,83 @@ export const relayBridge = onchainTable('relay_bridge', (t) => ({
 }))
 
 /**
- * Track bridge volumes across chains
- * - originBridge: Bridge contract address
- * - nonce: Bridge transfer nonce (used as part of primary key)
- * - chainId: Chain ID where the bridge is deployed
- * - sender: User who initiated the bridge transfer
- * - recipient: Recipient address of the bridged funds
+ * Track bridge transactions across chains
+ *
+ * Bridge identification:
+ * - originBridgeAddress: Bridge contract initiating the transfer
+ * - nonce: Unique nonce from the origin bridge
+ *
+ * Chain information:
+ * - originChainId: Source chain ID
+ * - destinationPoolAddress: Destination pool that will receive funds
+ * - destinationPoolChainId: Chain ID of the destination pool
+ *
+ * Transaction participants:
+ * - originSender: User who initiated the bridge
+ * - destinationRecipient: Address receiving the instant loan
+ *
+ * Asset details:
  * - asset: Asset contract address being bridged
  * - amount: Amount of asset being bridged
- * - originChainId: Chain ID of the source pool
- * - pool: Source pool address
- * - timestamp: Block timestamp when bridge was initiated
- * - blockNumber: Block number when bridge was initiated
- * - transactionHash: Transaction hash of the bridge initiation
+ *
+ * Bridge status tracking:
+ * - hyperlaneMsgId: ID of the fast Hyperlane message
+ * - hyperlaneMsgTimestamp: When Hyperlane message was processed
+ * - nativeBridgeStatus: INITIATED, PROVEN, FINALIZED
+ * - nativeBridgeProofTimestamp: When proof was submitted
+ * - nativeBridgeFinalizedTimestamp: When funds arrived
+ *
+ * Instant loan tracking:
+ * - loanEmittedTimestamp: When instant loan was provided
+ * - loanEmittedTxHash: Transaction hash of loan emission
+ *
+ * Origin transaction details:
+ * - originBlockNumber: Block number when bridge was initiated
+ * - originTimestamp: Block timestamp when bridge was initiated
+ * - originTxHash: Transaction hash of the bridge initiation
  */
 export const bridgeTransaction = onchainTable(
   'bridge_transaction',
   (t) => ({
-    originBridge: t.hex().notNull(),
+    originBridgeAddress: t.hex().notNull(),
     nonce: t.bigint().notNull(),
-    chainId: t.integer().notNull(),
-    sender: t.hex().notNull(),
-    recipient: t.hex().notNull(),
+
+    originChainId: t.integer().notNull(),
+    destinationPoolAddress: t.hex().notNull(),
+    destinationPoolChainId: t.integer().notNull(),
+
+    originSender: t.hex().notNull(),
+    destinationRecipient: t.hex().notNull(),
+
     asset: t.hex().notNull(),
     amount: t.bigint().notNull(),
-    originChainId: t.integer().notNull(),
-    pool: t.hex().notNull(),
-    timestamp: t.bigint().notNull(),
-    blockNumber: t.bigint().notNull(),
-    transactionHash: t.hex().notNull(),
+
+    hyperlaneMsgId: t.hex(),
+    hyperlaneMsgTimestamp: t.bigint(),
+
+    nativeBridgeStatus: t.text().notNull(),
+    nativeBridgeProofTimestamp: t.bigint(),
+    nativeBridgeFinalizedTimestamp: t.bigint(),
+
+    loanEmittedTimestamp: t.bigint(),
+    loanEmittedTxHash: t.hex(),
+
+    originBlockNumber: t.bigint().notNull(),
+    originTimestamp: t.bigint().notNull(),
+    originTxHash: t.hex().notNull(),
   }),
   (table) => ({
     pk: primaryKey({
-      columns: [table.originBridge, table.nonce],
+      columns: [table.originChainId, table.originBridgeAddress, table.nonce],
     }),
-    poolIdx: index().on(table.originChainId, table.pool),
-    senderIdx: index().on(table.sender),
+    poolIdx: index().on(table.destinationPoolAddress),
+    senderIdx: index().on(table.originSender),
     assetIdx: index().on(table.asset),
+    hyperlaneIdx: index().on(table.hyperlaneMsgId),
   })
 )
 
-// Add relation between poolOrigin and bridgeVolume
+// relation between poolOrigin and bridgeTransaction
 export const poolOriginBridgeTransactions = relations(
   poolOrigin,
   ({ many }) => ({
@@ -197,10 +233,23 @@ export const poolOriginBridgeTransactions = relations(
   })
 )
 
-// Add the reverse relation
+// reverse relation between bridgeTransaction and poolOrigin
 export const bridgeTransactionOrigin = relations(
   bridgeTransaction,
   ({ one }) => ({
-    origin: one(poolOrigin),
+    origin: one(poolOrigin, {
+      fields: [
+        bridgeTransaction.destinationPoolChainId,
+        bridgeTransaction.destinationPoolAddress,
+        bridgeTransaction.originChainId,
+        bridgeTransaction.originBridgeAddress,
+      ],
+      references: [
+        poolOrigin.chainId,
+        poolOrigin.pool,
+        poolOrigin.originChainId,
+        poolOrigin.originBridge,
+      ],
+    }),
   })
 )
