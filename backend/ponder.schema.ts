@@ -163,8 +163,8 @@ export const relayBridge = onchainTable('relay_bridge', (t) => ({
  * - blockNumber: Block number when bridge was initiated
  * - transactionHash: Transaction hash of the bridge initiation
  */
-export const bridgeVolume = onchainTable(
-  'bridge_volume',
+export const bridgeTransaction = onchainTable(
+  'bridge_transaction',
   (t) => ({
     originBridge: t.hex().notNull(),
     nonce: t.bigint().notNull(),
@@ -190,11 +190,17 @@ export const bridgeVolume = onchainTable(
 )
 
 // Add relation between poolOrigin and bridgeVolume
-export const poolOriginBridgeVolumes = relations(poolOrigin, ({ many }) => ({
-  volumes: many(bridgeVolume),
-}))
+export const poolOriginBridgeTransactions = relations(
+  poolOrigin,
+  ({ many }) => ({
+    transactions: many(bridgeTransaction),
+  })
+)
 
 // Add the reverse relation
-export const bridgeVolumeOrigin = relations(bridgeVolume, ({ one }) => ({
-  origin: one(poolOrigin),
-}))
+export const bridgeTransactionOrigin = relations(
+  bridgeTransaction,
+  ({ one }) => ({
+    origin: one(poolOrigin),
+  })
+)

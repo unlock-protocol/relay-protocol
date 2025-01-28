@@ -1,5 +1,5 @@
 import { Context, Event } from 'ponder:registry'
-import { bridgeVolume } from 'ponder:schema'
+import { bridgeTransaction } from 'ponder:schema'
 
 export default async function ({
   event,
@@ -15,7 +15,7 @@ export default async function ({
   const timestamp = event.block.timestamp
 
   // Record bridge volume
-  await context.db.insert(bridgeVolume).values({
+  await context.db.insert(bridgeTransaction).values({
     originBridge: event.log.address,
     nonce,
     chainId: context.network.chainId,
