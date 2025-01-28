@@ -18,7 +18,7 @@
   ],
   "scripts": {
     "release": "npm publish",
-    "clean": "rm -rf src/abis dist",
+    "clean": "rm -rf src dist",
     "build": "tsup src/index.ts --dts --format esm,cjs"
   },
   "devDependencies": {
