@@ -16,7 +16,7 @@ export default async function ({
 
   // Record bridge volume using bridge address and nonce as primary key
   await context.db.insert(bridgeVolume).values({
-    bridge: event.log.address,
+    bridgeAddress: event.log.address,
     nonce,
     chainId: context.network.chainId,
     sender,

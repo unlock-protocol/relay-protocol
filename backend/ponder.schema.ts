@@ -167,7 +167,7 @@ export const relayBridge = onchainTable('relay_bridge', (t) => ({
 export const bridgeVolume = onchainTable(
   'bridge_volume',
   (t) => ({
-    bridge: t.hex().notNull(),
+    bridgeAddress: t.hex().notNull(),
     nonce: t.bigint().notNull(),
     chainId: t.integer().notNull(),
     sender: t.hex().notNull(),
@@ -183,7 +183,7 @@ export const bridgeVolume = onchainTable(
   (table) => ({
     // composite primary key
     pk: primaryKey({
-      columns: [table.bridge, table.nonce],
+      columns: [table.bridgeAddress, table.nonce],
     }),
     poolIdx: index().on(table.poolChainId, table.pool),
     senderIdx: index().on(table.sender),
