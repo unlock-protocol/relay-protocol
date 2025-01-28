@@ -14,7 +14,7 @@ export default async function ({
   const transactionHash = event.transaction.hash
   const timestamp = event.block.timestamp
 
-  // Record bridge volume using bridge address and nonce as primary key
+  // Record bridge volume
   await context.db.insert(bridgeVolume).values({
     originBridge: event.log.address,
     nonce,
