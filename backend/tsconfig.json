@@ -1,17 +1,9 @@
 {
   "extends": "@relay-protocol/tsconfig",
   "compilerOptions": {
-    "noUncheckedIndexedAccess": true,
-    "verbatimModuleSyntax": false,
-    "isolatedModules": true,
-    "allowSyntheticDefaultImports": true,
     "moduleResolution": "bundler",
     "module": "ESNext",
     "noEmit": true,
-    "declaration": false,
-    "lib": ["ES2022"],
-    "target": "ES2022"
-  },
-  "include": ["./**/*.ts"],
-  "exclude": ["node_modules"]
+    "declaration": false
+  }
 }
