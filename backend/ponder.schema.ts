@@ -149,20 +149,19 @@ export const relayBridge = onchainTable('relay_bridge', (t) => ({
 }))
 
 /**
- * Track bridge volumes
- * - id: Unique ID (tx hash + log index)
+ * Track bridge volumes across chains
+ * - originBridge: Bridge contract address
+ * - nonce: Bridge transfer nonce (used as part of primary key)
  * - chainId: Chain ID where the bridge is deployed
- * - bridge: Bridge contract address
- * - sender: User who initiated the bridge
- * - recipient: Recipient of the bridged funds
- * - asset: Asset being bridged
- * - amount: Amount being bridged
- * - poolChainId: Destination chain ID (usually L1)
- * - pool: Destination pool address
- * - nonce: Bridge transfer nonce
- * - timestamp: Block timestamp
- * - blockNumber: Block number
- * - transactionHash: Transaction hash
+ * - sender: User who initiated the bridge transfer
+ * - recipient: Recipient address of the bridged funds
+ * - asset: Asset contract address being bridged
+ * - amount: Amount of asset being bridged
+ * - originChainId: Chain ID of the source pool
+ * - pool: Source pool address
+ * - timestamp: Block timestamp when bridge was initiated
+ * - blockNumber: Block number when bridge was initiated
+ * - transactionHash: Transaction hash of the bridge initiation
  */
 export const bridgeVolume = onchainTable(
   'bridge_volume',
