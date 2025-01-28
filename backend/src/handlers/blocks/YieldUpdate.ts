@@ -19,15 +19,15 @@ ponder.on('YieldUpdate:block', async ({ event, context }) => {
   const { db } = context
 
   // Get all yield pools from the database
-  const pools = await db.sql.select().from(yieldPool).execute()
+  const yieldPools = await db.sql.select().from(yieldPool).execute()
 
-  if (!pools || pools.length === 0) {
+  if (!yieldPools || yieldPools.length === 0) {
     return
   }
 
   // Prepare batch updates
   const updates = await Promise.all(
-    pools.map(async (pool) => {
+    yieldPools.map(async (pool) => {
       try {
         // Read current state from chain
         const [totalAssets, totalShares, name] = await Promise.all([
