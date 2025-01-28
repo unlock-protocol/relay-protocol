@@ -1,12 +1,10 @@
 import { task } from 'hardhat/config'
-
+import { checkAllowance } from '@relay-protocol/helpers'
 task('pool:deposit', 'Deposit ERC20 tokens in a relay pool')
   // .addParam('asset', 'The ERC20 asset to deposit')
   .addParam('pool', 'The relay pool address')
   .addParam('amount', 'the amount of tokens to deposit')
   .setAction(async ({ pool: poolAddress, amount }, { ethers }) => {
-    const { checkAllowance } = await import('../lib/utils')
-
     const pool = await ethers.getContractAt('RelayPool', poolAddress)
     const [user] = await ethers.getSigners()
     const userAddress = await user.getAddress()

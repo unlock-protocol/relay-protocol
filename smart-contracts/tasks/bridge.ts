@@ -1,3 +1,6 @@
+import { getBalance, checkAllowance, getEvent } from '@relay-protocol/helpers'
+import { Mailbox } from '@relay-protocol/helpers/abis'
+
 import { task } from 'hardhat/config'
 
 task('bridge:send', 'Send tokens to a pool across a relay bridge')
@@ -21,8 +24,7 @@ task('bridge:send', 'Send tokens to a pool across a relay bridge')
       },
       { ethers }
     ) => {
-      const { getBalance, checkAllowance } = await import('../lib/utils')
-
+      // Find the bridge
       const bridge = await ethers.getContractAt('RelayBridge', bridgeAddress)
       const assetAddress = await bridge.asset()
       const [user] = await ethers.getSigners()
@@ -31,8 +33,14 @@ task('bridge:send', 'Send tokens to a pool across a relay bridge')
       // parse default values
       if (!recipient) recipient = userAddress
 
+      // TODO: check balance on pool as well!
+
       // check balance
-      const balance = await getBalance(userAddress, assetAddress)
+      const balance = await getBalance(
+        userAddress,
+        assetAddress,
+        ethers.provider
+      )
       if (balance < amount) {
         throw Error(
           `Insufficient balance (actual: ${balance}, expected: ${amount})`
@@ -42,11 +50,11 @@ task('bridge:send', 'Send tokens to a pool across a relay bridge')
       // check allowance
       if (assetAddress != ethers.ZeroAddress) {
         const asset = await ethers.getContractAt('MyToken', assetAddress)
-        await checkAllowance(asset, bridgeAddress, amount)
+        await checkAllowance(asset, bridgeAddress, amount, userAddress)
       }
 
       // TODO: estimate fee correctly
-      const hyperlaneFee = ethers.parseEther('0.003')
+      const hyperlaneFee = ethers.parseEther('0.01')
       const value =
         assetAddress === ethers.ZeroAddress
           ? BigInt(amount) + hyperlaneFee
@@ -66,7 +74,17 @@ task('bridge:send', 'Send tokens to a pool across a relay bridge')
       // TODO: parse tx results
       const receipt = await tx.wait()
       // console.log(receipt?.logs)
-      console.log(`tx sent. ${tx.hash}`)
+
+      const event = await getEvent(
+        receipt!,
+        'DispatchId',
+        new ethers.Interface(Mailbox)
+      )
+      const dispatchId = event.args[0].substring(2)
+
+      console.log(
+        `Tx. ${tx.hash}. \nHyperlane message: https://explorer.hyperlane.xyz/message/${dispatchId} `
+      )
     }
   )
 
@@ -91,8 +109,6 @@ task('bridge:send-proxy', 'Send tokens across a proxy bridge (test purposes)')
       },
       { ethers }
     ) => {
-      const { getBalance, checkAllowance } = await import('../lib/utils')
-
       const bridge = await ethers.getContractAt('BridgeProxy', bridgeAddress)
       const [user] = await ethers.getSigners()
       const userAddress = await user.getAddress()
@@ -117,7 +133,7 @@ task('bridge:send-proxy', 'Send tokens across a proxy bridge (test purposes)')
       // check allowance
       if (assetAddress != ethers.ZeroAddress) {
         const asset = await ethers.getContractAt('MyToken', assetAddress)
-        await checkAllowance(asset, bridgeAddress, amount)
+        await checkAllowance(asset, bridgeAddress, amount, userAddress)
       }
 
       // send tx
