@@ -1,0 +1,28 @@
+{
+  "name": "@relay-protocol/abis",
+  "version": "0.0.2",
+  "license": "MIT",
+  "type": "module",
+  "main": "dist/index.js",
+  "module": "dist/index.mjs",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.js"
+    }
+  },
+  "files": [
+    "abis",
+    "index.js"
+  ],
+  "scripts": {
+    "release": "npm publish",
+    "clean": "rm -rf src/abis dist",
+    "build": "tsup src/index.ts --dts --format esm,cjs"
+  },
+  "devDependencies": {
+    "tsup": "8.3.6",
+    "typescript": "5.7.3"
+  }
+}
