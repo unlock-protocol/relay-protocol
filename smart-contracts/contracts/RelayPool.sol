@@ -9,6 +9,8 @@ import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
 import {IWETH} from "./interfaces/IWETH.sol";
 import {TypeCasts} from "./utils/TypeCasts.sol";
 
+import "hardhat/console.sol";
+
 struct OriginSettings {
   uint256 maxDebt;
   uint256 outstandingDebt;
@@ -62,8 +64,14 @@ contract RelayPool is ERC4626, ERC20Permit, Ownable {
   // The address of the yield pool where funds are deposited
   address public yieldPool;
 
-  // The protocol fee in basis points
+  // The protocol fee in basis points: 1bps = 0.01%
   uint8 public bridgeFee;
+
+  // Keeping track of the total fees collected
+  uint256 public totalCollectedFees = 0;
+  uint256 public streamedFees = 0; // Full streamed fees
+  uint256 public lastFeeCollectedAt = 0; // timestamp to account for streaming fees
+  uint256 public constant STREAMING_PERIOD = 7 days;
 
   event LoanEmitted(
     uint256 indexed nonce,
@@ -226,19 +234,18 @@ contract RelayPool is ERC4626, ERC20Permit, Ownable {
 
   // This function returns the total assets "controlled" by the pool
   // This is the sum of
-  // - the assets actually owned by the pool
-  // - the assets that would be resulting from withdrawing all the shares held by this pool into
-  //   the yield pool
+  // - the assets that would be resulting from withdrawing all the shares
+  //   held by this pool into the yield pool
   // - the assets "in transit" to the pool (i.e. the outstanding debt)
+  // - the collected fees
   function totalAssets() public view override returns (uint256) {
-    uint256 poolBalance = ERC20(ERC4626.asset()).balanceOf(address(this));
     uint256 balanceOfYieldPoolTokens = ERC20(yieldPool).balanceOf(
       address(this)
     );
     uint256 yieldPoolBalance = ERC4626(yieldPool).previewRedeem(
       balanceOfYieldPoolTokens
     );
-    return poolBalance + yieldPoolBalance + outstandingDebt;
+    return yieldPoolBalance + outstandingDebt + streamingFees();
   }
 
   // Helper function
@@ -364,35 +371,65 @@ contract RelayPool is ERC4626, ERC20Permit, Ownable {
     // Mark as processed if not
     messages[chainId][bridge][nonce] = message;
 
+    // Pull funds from the yield pool, and send them to the recipient
+    uint256 debtAmount = collectFees(amount);
+
     // Check if origin settings are respected
-    if (origin.outstandingDebt + amount > origin.maxDebt) {
+    if (origin.outstandingDebt + debtAmount > origin.maxDebt) {
       revert TooMuchDebtFromOrigin(
         chainId,
         bridge,
         origin.maxDebt,
         nonce,
         recipient,
-        amount
+        debtAmount
       );
     }
 
-    origin.outstandingDebt += amount;
-    increaseOutStandingDebt(amount);
+    origin.outstandingDebt += debtAmount;
+    increaseOutStandingDebt(debtAmount);
 
-    // Pull funds from the yield pool, and send them to the recipient
-    sendFunds(amount, recipient);
+    sendFunds(debtAmount, recipient);
 
-    // TODO: handle fees!
     // TODO: handle insufficient funds?
 
     emit LoanEmitted(
       nonce,
       recipient,
       ERC4626.asset(),
-      amount,
+      debtAmount,
       chainId,
       bridge
     );
+  }
+
+  function collectFees(uint amount) internal returns (uint256) {
+    uint feeAmount = (amount * bridgeFee) / 10000;
+    // Updated the streamed fees
+    if (block.timestamp - lastFeeCollectedAt > STREAMING_PERIOD) {
+      streamedFees = totalCollectedFees;
+    } else {
+      streamedFees +=
+        ((totalCollectedFees - streamedFees) *
+          (block.timestamp - lastFeeCollectedAt)) /
+        STREAMING_PERIOD;
+    }
+    // And now update fees
+    totalCollectedFees += feeAmount;
+    lastFeeCollectedAt = block.timestamp;
+    return amount - feeAmount;
+  }
+
+  function streamingFees() internal view returns (uint256) {
+    if (block.timestamp - lastFeeCollectedAt > STREAMING_PERIOD) {
+      return totalCollectedFees;
+    } else {
+      return
+        streamedFees +
+        ((totalCollectedFees - streamedFees) *
+          (block.timestamp - lastFeeCollectedAt)) /
+        STREAMING_PERIOD;
+    }
   }
 
   // This function is called externally to claim funds from a bridge.

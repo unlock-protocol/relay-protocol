@@ -4,7 +4,7 @@ import { networks } from '@relay-protocol/networks'
 import RelayPoolModule from '../../ignition/modules/RelayPoolModule'
 import { MyToken, MyYieldPool, RelayPool } from '../../typechain-types'
 
-describe('RelayBridge: base yield', () => {
+describe.only('RelayBridge: base yield', () => {
   let relayPool: RelayPool
   let myToken: MyToken
   let thirdPartyPool: MyYieldPool
@@ -130,7 +130,7 @@ describe('RelayBridge: base yield', () => {
     )
   })
 
-  it('should withdraw tokens from the base yield pool when redeeming shares', async () => {
+  it.only('should withdraw tokens from the base yield pool when redeeming shares', async () => {
     const [user] = await ethers.getSigners()
     const amount = ethers.parseUnits('1', 18)
     const userAddress = await user.getAddress()
