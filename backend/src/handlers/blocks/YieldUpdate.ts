@@ -11,60 +11,79 @@
  * and provides up-to-date information for the frontend.
  */
 
-import { Context } from 'ponder:registry'
+import { ponder } from 'ponder:registry'
 import { erc20Abi, erc4626Abi } from 'viem'
+import { yieldPool } from 'ponder:schema'
 
-export default async function ({
-  block,
-  context,
-}: {
-  block: any
-  context: Context
-}) {
+ponder.on('YieldUpdate:block', async ({ event, context }) => {
   const { db } = context
 
-  // Get all yield pools that need updating
-  const yieldPools = await db.yieldPool.findMany()
+  // Get all yield pools from the database
+  const pools = await db.sql.select().from(yieldPool).execute()
 
-  // Update each yield pool
-  await Promise.all(
-    yieldPools.map(async (yieldPool) => {
+  if (!pools || pools.length === 0) {
+    return
+  }
+
+  // Prepare batch updates
+  const updates = await Promise.all(
+    pools.map(async (pool) => {
       try {
         // Read current state from chain
         const [totalAssets, totalShares, name] = await Promise.all([
           context.client.readContract({
             abi: erc4626Abi,
-            address: yieldPool.contractAddress,
+            address: pool.contractAddress,
             functionName: 'totalAssets',
+            blockNumber: event.block.number,
           }),
           context.client.readContract({
             abi: erc4626Abi,
-            address: yieldPool.contractAddress,
+            address: pool.contractAddress,
             functionName: 'totalSupply',
+            blockNumber: event.block.number,
           }),
           context.client.readContract({
             abi: erc20Abi,
-            address: yieldPool.contractAddress,
+            address: pool.contractAddress,
             functionName: 'name',
+            blockNumber: event.block.number,
           }),
         ])
 
-        // Update yield pool data
-        await db.yieldPool.update({
-          where: { contractAddress: yieldPool.contractAddress },
-          data: {
-            totalAssets,
-            totalShares,
-            name,
-            lastUpdated: BigInt(block.timestamp),
-          },
-        })
+        return {
+          contractAddress: pool.contractAddress,
+          asset: pool.asset,
+          name,
+          totalAssets,
+          totalShares,
+          lastUpdated: BigInt(event.block.timestamp),
+        }
       } catch (error) {
         console.error(
-          `Failed to update yield pool ${yieldPool.contractAddress}:`,
+          `Failed to update yield pool ${pool.contractAddress}:`,
           error
         )
+        return null
       }
     })
   )
-}
+
+  // Filter out failed updates and update the database
+  const validUpdates = updates.filter(
+    (update): update is NonNullable<typeof update> => update !== null
+  )
+
+  if (validUpdates.length > 0) {
+    await Promise.all(
+      validUpdates.map((update) =>
+        db.update(yieldPool, { contractAddress: update.contractAddress }).set({
+          name: update.name,
+          totalAssets: update.totalAssets,
+          totalShares: update.totalShares,
+          lastUpdated: update.lastUpdated,
+        })
+      )
+    )
+  }
+})
