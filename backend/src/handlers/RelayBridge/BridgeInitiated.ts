@@ -1,5 +1,7 @@
 import { Context, Event } from 'ponder:registry'
 import { bridgeTransaction } from 'ponder:schema'
+import { getEvent } from '@relay-protocol/helpers'
+import { Mailbox } from '@relay-protocol/helpers/abis'
 
 export default async function ({
   event,
@@ -10,6 +12,10 @@ export default async function ({
 }) {
   const { nonce, sender, recipient, asset, amount, poolChainId, pool } =
     event.args
+
+  // Get Hyperlane dispatch event from the same transaction
+  const dispatchEvent = await getEvent(event.transaction, 'Dispatch', Mailbox)
+  const hyperlaneMsgId = dispatchEvent ? dispatchEvent.args[0] : null
 
   // Record bridge initiation
   await context.db.insert(bridgeTransaction).values({
@@ -30,20 +36,18 @@ export default async function ({
     asset,
     amount,
 
-    // Bridge status tracking
-    hyperlaneMsgId: null as any,
-    hyperlaneMsgTimestamp: null,
+    // Hyperlane
+    hyperlaneMsgId,
 
+    // Bridge status
     nativeBridgeStatus: 'INITIATED',
-    nativeBridgeProofTimestamp: null,
-    nativeBridgeFinalizedTimestamp: null,
+    nativeBridgeProofTxHash: null as any,
+    nativeBridgeFinalizedTxHash: null as any,
 
     // Instant loan tracking
-    loanEmittedTimestamp: null,
     loanEmittedTxHash: null as any,
 
     // Origin transaction details
-    originBlockNumber: event.block.number,
     originTimestamp: event.block.timestamp,
     originTxHash: event.transaction.hash,
   })

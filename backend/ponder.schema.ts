@@ -154,9 +154,9 @@ export const relayBridge = onchainTable('relay_bridge', (t) => ({
  * Bridge identification:
  * - originBridgeAddress: Bridge contract initiating the transfer
  * - nonce: Unique nonce from the origin bridge
- *
- * Chain information:
  * - originChainId: Source chain ID
+ *
+ * Chain/Pool info:
  * - destinationPoolAddress: Destination pool that will receive funds
  * - destinationPoolChainId: Chain ID of the destination pool
  *
@@ -168,19 +168,18 @@ export const relayBridge = onchainTable('relay_bridge', (t) => ({
  * - asset: Asset contract address being bridged
  * - amount: Amount of asset being bridged
  *
- * Bridge status tracking:
+ * Hyperlane:
  * - hyperlaneMsgId: ID of the fast Hyperlane message
- * - hyperlaneMsgTimestamp: When Hyperlane message was processed
- * - nativeBridgeStatus: INITIATED, PROVEN, FINALIZED
- * - nativeBridgeProofTimestamp: When proof was submitted
- * - nativeBridgeFinalizedTimestamp: When funds arrived
  *
- * Instant loan tracking:
- * - loanEmittedTimestamp: When instant loan was provided
+ * Bridge status:
+ * - nativeBridgeStatus: INITIATED, PROVEN, FINALIZED
+ * - nativeBridgeProofTxHash: Transaction hash of proof submission
+ * - nativeBridgeFinalizedTxHash: Transaction hash of finalization
+ *
+ * Loan tracking:
  * - loanEmittedTxHash: Transaction hash of loan emission
  *
- * Origin transaction details:
- * - originBlockNumber: Block number when bridge was initiated
+ * Origin transaction:
  * - originTimestamp: Block timestamp when bridge was initiated
  * - originTxHash: Transaction hash of the bridge initiation
  */
@@ -189,28 +188,18 @@ export const bridgeTransaction = onchainTable(
   (t) => ({
     originBridgeAddress: t.hex().notNull(),
     nonce: t.bigint().notNull(),
-
     originChainId: t.integer().notNull(),
     destinationPoolAddress: t.hex().notNull(),
     destinationPoolChainId: t.integer().notNull(),
-
     originSender: t.hex().notNull(),
     destinationRecipient: t.hex().notNull(),
-
     asset: t.hex().notNull(),
     amount: t.bigint().notNull(),
-
     hyperlaneMsgId: t.hex(),
-    hyperlaneMsgTimestamp: t.bigint(),
-
     nativeBridgeStatus: t.text().notNull(),
-    nativeBridgeProofTimestamp: t.bigint(),
-    nativeBridgeFinalizedTimestamp: t.bigint(),
-
-    loanEmittedTimestamp: t.bigint(),
+    nativeBridgeProofTxHash: t.hex(),
+    nativeBridgeFinalizedTxHash: t.hex(),
     loanEmittedTxHash: t.hex(),
-
-    originBlockNumber: t.bigint().notNull(),
     originTimestamp: t.bigint().notNull(),
     originTxHash: t.hex().notNull(),
   }),
@@ -221,7 +210,6 @@ export const bridgeTransaction = onchainTable(
     poolIdx: index().on(table.destinationPoolAddress),
     senderIdx: index().on(table.originSender),
     assetIdx: index().on(table.asset),
-    hyperlaneIdx: index().on(table.hyperlaneMsgId),
   })
 )
 
