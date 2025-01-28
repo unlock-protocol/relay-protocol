@@ -24,9 +24,9 @@
     "build": "yarn build:export-abis && yarn build:ts"
   },
   "devDependencies": {
-    "tsup": "8.3.6",
-    "typescript": "5.7.3",
+    "@relay-protocol/helpers": "^workspace:*",
     "@relay-protocol/networks": "^workspace:*",
-    "@relay-protocol/helpers": "^workspace:*"
+    "tsup": "8.3.6",
+    "typescript": "5.7.3"
   }
 }

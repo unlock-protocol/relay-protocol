@@ -1797,6 +1797,8 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@relay-protocol/abis@workspace:packages/abis"
   dependencies:
+    "@relay-protocol/helpers": "^workspace:*"
+    "@relay-protocol/networks": "^workspace:*"
     tsup: "npm:8.3.6"
     typescript: "npm:5.7.3"
   languageName: unknown
@@ -1854,7 +1856,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@relay-protocol/helpers@workspace:*, @relay-protocol/helpers@workspace:packages/helpers":
+"@relay-protocol/helpers@^workspace:*, @relay-protocol/helpers@workspace:*, @relay-protocol/helpers@workspace:packages/helpers":
   version: 0.0.0-use.local
   resolution: "@relay-protocol/helpers@workspace:packages/helpers"
   dependencies:
@@ -1889,7 +1891,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@relay-protocol/networks@workspace:^, @relay-protocol/networks@workspace:packages/networks":
+"@relay-protocol/networks@^workspace:*, @relay-protocol/networks@workspace:^, @relay-protocol/networks@workspace:packages/networks":
   version: 0.0.0-use.local
   resolution: "@relay-protocol/networks@workspace:packages/networks"
   dependencies:
