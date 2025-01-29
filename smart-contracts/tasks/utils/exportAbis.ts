@@ -44,18 +44,17 @@ task('export:abis', 'Export ABIs to a node package')
           'src',
           'abis',
           sourceName.replace('contracts/', ''),
-          `${contractName}.ts`
+          `${contractName}.json`
         )
 
-        // export the abi as a constant (needed for ponder)
-        const abiContent = `export default ${JSON.stringify(toExport.abi, null, 2)} as const`
-        await fs.outputFile(abiFileName, abiContent)
+        await fs.outputJSON(abiFileName, toExport.abi, { spaces: 2 })
       })
     )
 
     // create repo files
     await createIndexFile(
       path.resolve(packageFolder, 'src', 'abis'),
-      path.resolve(packageFolder, 'src')
+      path.resolve(packageFolder, 'src'),
+      path.resolve(packageFolder, 'src', 'abis')
     )
   })
