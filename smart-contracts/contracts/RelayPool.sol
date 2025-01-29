@@ -226,10 +226,6 @@ contract RelayPool is ERC4626, Ownable {
   //          depositing tokens into the pool and then use these tokens as collateral.
   //          See https://mudit.blog/cream-hack-analysis/
   function totalAssets() public view override returns (uint256) {
-<<<<<<< HEAD
-=======
-    uint256 poolBalance = ERC20(asset).balanceOf(address(this));
->>>>>>> hooks
     uint256 balanceOfYieldPoolTokens = ERC20(yieldPool).balanceOf(
       address(this)
     );
@@ -243,18 +239,11 @@ contract RelayPool is ERC4626, Ownable {
   // We deposit all the assets we own to the yield pool.
   // This function can also be called by anyone if the pool owns
   // tokens that are not in the yield pool.
-<<<<<<< HEAD
+
   function depositAssetsInYieldPool(uint amount) internal {
-    ERC20(ERC4626.asset()).approve(yieldPool, amount);
+    ERC20(asset).approve(yieldPool, amount);
     ERC4626(yieldPool).deposit(amount, address(this));
     emit AssetsDepositedIntoYieldPool(amount, yieldPool);
-=======
-  function depositAssetsInYieldPool() public {
-    uint256 poolBalance = ERC20(asset).balanceOf(address(this));
-    ERC20(asset).approve(yieldPool, poolBalance);
-    ERC4626(yieldPool).deposit(poolBalance, address(this));
-    emit AssetsDepositedIntoYieldPool(poolBalance, yieldPool);
->>>>>>> hooks
   }
 
   // Helper function
@@ -374,14 +363,20 @@ contract RelayPool is ERC4626, Ownable {
     }
   }
 
-  function beforeWithdraw(uint256 assets, uint256 shares) internal override {
+  function beforeWithdraw(
+    uint256 assets,
+    uint256 /* shares */
+  ) internal override {
     // We need to withdraw the assets from the yield pool
     withdrawAssetsFromYieldPool(assets, address(this));
   }
 
-  function afterDeposit(uint256 assets, uint256 shares) internal override {
+  function afterDeposit(
+    uint256 assets,
+    uint256 /* shares */
+  ) internal override {
     // We need to deposit the assets into the yield pool
-    depositAssetsInYieldPool();
+    depositAssetsInYieldPool(assets);
   }
 
   receive() external payable {
