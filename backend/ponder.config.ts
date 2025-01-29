@@ -1,10 +1,12 @@
 import { createConfig, factory } from 'ponder'
 
 // ABIs
-import { relayPoolAbi } from './abis/relayPool'
-import { relayBridgeAbi } from './abis/relayBridge'
-import { relayPoolFactoryAbi } from './abis/relayPoolFactory'
-import { relayBridgeFactoryAbi } from './abis/relayBridgeFactory'
+import {
+  RelayPool,
+  RelayBridge,
+  RelayPoolFactory,
+  RelayBridgeFactory,
+} from '@relay-protocol/abis'
 import { createNetworkConfig } from './src/utils/rpc'
 
 const poolDeployedEvent = {
@@ -97,7 +99,7 @@ export default createConfig({
   },
   contracts: {
     RelayPoolFactory: {
-      abi: relayPoolFactoryAbi,
+      abi: RelayPoolFactory,
       network: {
         sepolia: {
           address: '0xF06fB9fBC957e99D4B527B0a73a894A483EA1c46',
@@ -105,7 +107,7 @@ export default createConfig({
       },
     },
     RelayPool: {
-      abi: relayPoolAbi,
+      abi: RelayPool,
       network: 'sepolia',
       address: factory({
         address: '0xF06fB9fBC957e99D4B527B0a73a894A483EA1c46',
@@ -116,7 +118,7 @@ export default createConfig({
       startBlock: 7499300,
     },
     RelayBridgeFactory: {
-      abi: relayBridgeFactoryAbi,
+      abi: RelayBridgeFactory,
       network: {
         opSepolia: {
           address: [
@@ -133,7 +135,7 @@ export default createConfig({
       },
     },
     RelayBridge: {
-      abi: relayBridgeAbi,
+      abi: RelayBridge,
       network: {
         opSepolia: {
           address: factory({
