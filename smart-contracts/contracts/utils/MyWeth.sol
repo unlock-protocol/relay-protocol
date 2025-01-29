@@ -28,8 +28,9 @@ contract MyWeth {
   function withdraw(uint256 wad) public {
     require(balanceOf[msg.sender] >= wad);
     balanceOf[msg.sender] -= wad;
-    payable(msg.sender).transfer(wad);
     emit Withdrawal(msg.sender, wad);
+    (bool s, ) = msg.sender.call{value: wad}("");
+    require(s, "MyWeth: withdraw failed");
   }
 
   function totalSupply() public view returns (uint256) {
