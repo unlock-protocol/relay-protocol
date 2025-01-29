@@ -6,9 +6,11 @@ import ethers from 'ethers'
 import { type JsonRpcResult } from 'ethers'
 import hre, { zkUpgrades } from 'hardhat'
 import { getProvider } from '@relay-protocol/helpers'
+import networks from '@relay-protocol/networks'
 
-export async function getBridgeContracts(chainId: bigint) {
-  const { rpc } = networks[chainId.toString()]
+export async function getZkSyncBridgeContracts() {
+  const { chainId } = hre.network.config
+  const { rpc } = networks[chainId!.toString()]
   const rpcURL = rpc || `https://rpc.unlock-protocol.com/${chainId}`
   const resp = await fetch(rpcURL, {
     body: JSON.stringify({
@@ -80,12 +82,14 @@ export async function deployUpgradeableContract(
 async function zkSyncSetupDeployer() {
   // set provider and accounts
   const { chainId } = hre.network.config
+  console.log({ chainId })
   const provider = (await getProvider(chainId!)) as Provider
+  console.log(provider)
   let wallet
   if (process.env.DEPLOYER_PRIVATE_KEY) {
     wallet = new Wallet(process.env.DEPLOYER_PRIVATE_KEY, provider)
   } else {
-    throw 'missing deployer key, cant deployon zksync. Export DEPLOYER_PRIVATE_KEY'
+    throw 'missing deployer key, cant deploy on zksync. Export DEPLOYER_PRIVATE_KEY'
   }
 
   // set deployer
