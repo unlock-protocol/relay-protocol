@@ -65,6 +65,9 @@
   "dependencies": {
     "@bgd-labs/aave-address-book": "4.8.1",
     "@eth-optimism/contracts-bedrock": "0.17.3",
+    "@matterlabs/hardhat-zksync-solc": "1.2.5",
+    "@matterlabs/hardhat-zksync-upgradable": "1.8.2",
+    "@matterlabs/hardhat-zksync-verify": "1.7.1",
     "@openzeppelin/contracts": "5.2.0"
   }
 }
