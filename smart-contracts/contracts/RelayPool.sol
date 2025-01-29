@@ -251,71 +251,6 @@ contract RelayPool is ERC4626, Ownable {
     emit AssetsWithdrawnFromYieldPool(amount, yieldPool);
   }
 
-  function previewDeposit(
-    uint256 assets
-  ) public view override returns (uint256 shares) {
-    return ERC4626.previewDeposit(assets);
-  }
-
-  function deposit(
-    uint256 assets,
-    address receiver
-  ) public override returns (uint256 shares) {
-    uint256 mintedShares = ERC4626.deposit(assets, receiver);
-    depositAssetsInYieldPool();
-    return mintedShares;
-  }
-
-  function previewMint(
-    uint256 shares
-  ) public view override returns (uint256 assets) {
-    return ERC4626.previewMint(shares);
-  }
-
-  function mint(
-    uint256 shares,
-    address receiver
-  ) public override returns (uint256 assets) {
-    uint256 depositedAssets = ERC4626.mint(shares, receiver);
-    depositAssetsInYieldPool();
-    return depositedAssets;
-  }
-
-  function previewWithdraw(
-    uint256 assets
-  ) public view override returns (uint256 shares) {
-    return ERC4626.previewWithdraw(assets);
-  }
-
-  function withdraw(
-    uint256 assets,
-    address receiver,
-    address owner
-  ) public override returns (uint256 shares) {
-    withdrawAssetsFromYieldPool(assets, address(this));
-    return ERC4626.withdraw(assets, receiver, owner);
-  }
-
-  function previewRedeem(
-    uint256 shares
-  ) public view override returns (uint256 assets) {
-    return ERC4626.previewRedeem(shares);
-  }
-
-  function redeem(
-    uint256 shares,
-    address receiver,
-    address owner
-  ) public override returns (uint256 assets) {
-    // Compute the assets to withdraw from the yield pool
-    uint256 assetsToWithdraw = ERC4626.previewRedeem(shares);
-
-    // withdraw the required assets from the yield pool
-    withdrawAssetsFromYieldPool(assetsToWithdraw, address(this));
-
-    return ERC4626.redeem(shares, receiver, owner);
-  }
-
   // Function called by Hyperlane
   // We need to instantly send funds to the user
   // BUT we need to make sure we do not change the underlying balance of assets,
@@ -420,6 +355,16 @@ contract RelayPool is ERC4626, Ownable {
     } else {
       withdrawAssetsFromYieldPool(amount, recipient);
     }
+  }
+
+  function beforeWithdraw(uint256 assets, uint256 shares) internal override {
+    // We need to withdraw the assets from the yield pool
+    withdrawAssetsFromYieldPool(assets, address(this));
+  }
+
+  function afterDeposit(uint256 assets, uint256 shares) internal override {
+    // We need to deposit the assets into the yield pool
+    depositAssetsInYieldPool();
   }
 
   receive() external payable {
