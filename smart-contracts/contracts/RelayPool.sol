@@ -195,7 +195,7 @@ contract RelayPool is ERC4626, Ownable {
     return convertToAssets(this.balanceOf(owner));
   }
 
-  // We cap the maxMint of any receiver the number of our shares corresponding to the
+  // We cap the maxMint of any receiver to the number of our shares corresponding to the
   // maxDeposit of the yield pool for us
   function maxMint(
     address receiver
