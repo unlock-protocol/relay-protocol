@@ -219,7 +219,7 @@ contract RelayPool is ERC4626, Ownable {
   //   the yield pool
   // - the assets "in transit" to the pool (i.e. the outstanding debt)
   function totalAssets() public view override returns (uint256) {
-    uint256 poolBalance = ERC20(this.asset()).balanceOf(address(this));
+    uint256 poolBalance = ERC20(asset).balanceOf(address(this));
     uint256 balanceOfYieldPoolTokens = ERC20(yieldPool).balanceOf(
       address(this)
     );
@@ -234,8 +234,8 @@ contract RelayPool is ERC4626, Ownable {
   // This function can also be called by anyone if the pool owns
   // tokens that are not in the yield pool.
   function depositAssetsInYieldPool() public {
-    uint256 poolBalance = ERC20(this.asset()).balanceOf(address(this));
-    ERC20(this.asset()).approve(yieldPool, poolBalance);
+    uint256 poolBalance = ERC20(asset).balanceOf(address(this));
+    ERC20(asset).approve(yieldPool, poolBalance);
     ERC4626(yieldPool).deposit(poolBalance, address(this));
     emit AssetsDepositedIntoYieldPool(poolBalance, yieldPool);
   }
@@ -389,7 +389,7 @@ contract RelayPool is ERC4626, Ownable {
     }
 
     (bool success, bytes memory result) = origin.proxyBridge.delegatecall(
-      abi.encodeWithSignature("claim(address,bytes)", this.asset(), claimParams)
+      abi.encodeWithSignature("claim(address,bytes)", asset, claimParams)
     );
 
     if (!success) {
@@ -413,7 +413,7 @@ contract RelayPool is ERC4626, Ownable {
   // Internal function to send funds to a recipient,
   // based on whether this is an ERC20 or native ETH.
   function sendFunds(uint256 amount, address recipient) internal {
-    if (address(this.asset()) == WETH) {
+    if (address(asset) == WETH) {
       withdrawAssetsFromYieldPool(amount, address(this));
       IWETH(WETH).withdraw(amount);
       payable(recipient).transfer(amount);
@@ -423,7 +423,7 @@ contract RelayPool is ERC4626, Ownable {
   }
 
   receive() external payable {
-    if (address(this.asset()) != WETH) {
+    if (address(asset) != WETH) {
       revert NotAWethPool();
     }
     if (msg.sender != WETH) {
