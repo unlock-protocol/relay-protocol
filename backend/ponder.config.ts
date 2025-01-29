@@ -8,9 +8,9 @@ import {
   RelayBridgeFactory,
 } from '@relay-protocol/abis'
 import { createNetworkConfig } from './src/utils/rpc'
-import { Abi } from 'viem'
+import { Abi, AbiEvent } from 'viem'
 
-const poolDeployedEvent = {
+const poolDeployedEvent: AbiEvent = {
   anonymous: false,
   inputs: [
     {
@@ -61,7 +61,7 @@ const poolDeployedEvent = {
   type: 'event',
 }
 
-const bridgeDeployedEvent = {
+const bridgeDeployedEvent: AbiEvent = {
   anonymous: false,
   inputs: [
     {
@@ -112,7 +112,6 @@ export default createConfig({
       network: 'sepolia',
       address: factory({
         address: '0xF06fB9fBC957e99D4B527B0a73a894A483EA1c46',
-        // @ts-expect-error The expected type comes from property 'event' which is declared here on type 'Factory<AbiEvent>'
         event: poolDeployedEvent,
         parameter: 'pool',
       }),

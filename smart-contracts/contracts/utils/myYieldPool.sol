@@ -1,22 +1,25 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.28;
 
-import {ERC20} from "@openzeppelin/contracts/token/ERC20/ERC20.sol";
-import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import {ERC4626} from "@openzeppelin/contracts/token/ERC20/extensions/ERC4626.sol";
+import {ERC20} from "solmate/src/tokens/ERC20.sol";
+import {ERC4626} from "solmate/src/tokens/ERC4626.sol";
 
 contract MyYieldPool is ERC4626 {
   uint256 public maxPoolDeposit = type(uint256).max;
   uint256 public maxPoolWithdraw = type(uint256).max;
 
   constructor(
-    IERC20 asset,
+    ERC20 asset,
     string memory name,
     string memory symbol
-  ) ERC20(name, symbol) ERC4626(asset) {}
+  ) ERC4626(asset, name, symbol) {}
+
+  function totalAssets() public view override returns (uint256) {
+    return ERC20(this.asset()).balanceOf(address(this));
+  }
 
   function setMaxDeposit(uint256 newMaxDeposit) public {
-    uint256 assetBalance = ERC20(ERC4626.asset()).balanceOf(address(this));
+    uint256 assetBalance = ERC20(this.asset()).balanceOf(address(this));
     if (assetBalance > type(uint256).max - newMaxDeposit) {
       maxPoolDeposit = newMaxDeposit - assetBalance;
     } else {
@@ -25,7 +28,7 @@ contract MyYieldPool is ERC4626 {
   }
 
   function maxDeposit(address) public view override returns (uint256) {
-    uint256 assetBalance = ERC20(ERC4626.asset()).balanceOf(address(this));
+    uint256 assetBalance = ERC20(this.asset()).balanceOf(address(this));
     if (maxPoolDeposit < assetBalance) {
       return 0;
     }
@@ -37,7 +40,7 @@ contract MyYieldPool is ERC4626 {
   }
 
   function maxWithdraw(address) public view override returns (uint256) {
-    uint256 userAssets = convertToAssets(balanceOf(msg.sender));
+    uint256 userAssets = convertToAssets(this.balanceOf(msg.sender));
     if (maxPoolWithdraw > userAssets) {
       return maxPoolWithdraw - userAssets;
     }
