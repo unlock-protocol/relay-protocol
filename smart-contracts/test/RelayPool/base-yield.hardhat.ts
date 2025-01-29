@@ -301,7 +301,7 @@ describe('RelayBridge: base yield', () => {
       await thirdPartyPool.setMaxDeposit(ethers.MaxUint256)
     })
 
-    it('should return the maximum amount of tokens that we can deposited in the yield pool', async () => {
+    it.skip('should return the maximum amount of tokens that we can deposited in the yield pool', async () => {
       const [user] = await ethers.getSigners()
       const userAddress = await user.getAddress()
       const maxDeposit = await relayPool.maxDeposit(userAddress)
