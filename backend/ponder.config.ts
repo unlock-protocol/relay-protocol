@@ -8,6 +8,7 @@ import {
   RelayBridgeFactory,
 } from '@relay-protocol/abis'
 import { createNetworkConfig } from './src/utils/rpc'
+import { Abi } from 'viem'
 
 const poolDeployedEvent = {
   anonymous: false,
@@ -99,7 +100,7 @@ export default createConfig({
   },
   contracts: {
     RelayPoolFactory: {
-      abi: RelayPoolFactory,
+      abi: RelayPoolFactory as Abi,
       network: {
         sepolia: {
           address: '0xF06fB9fBC957e99D4B527B0a73a894A483EA1c46',
@@ -107,7 +108,7 @@ export default createConfig({
       },
     },
     RelayPool: {
-      abi: RelayPool,
+      abi: RelayPool as Abi,
       network: 'sepolia',
       address: factory({
         address: '0xF06fB9fBC957e99D4B527B0a73a894A483EA1c46',
@@ -118,7 +119,7 @@ export default createConfig({
       startBlock: 7499300,
     },
     RelayBridgeFactory: {
-      abi: RelayBridgeFactory,
+      abi: RelayBridgeFactory as Abi,
       network: {
         opSepolia: {
           address: [
@@ -135,7 +136,7 @@ export default createConfig({
       },
     },
     RelayBridge: {
-      abi: RelayBridge,
+      abi: RelayBridge as Abi,
       network: {
         opSepolia: {
           address: factory({
