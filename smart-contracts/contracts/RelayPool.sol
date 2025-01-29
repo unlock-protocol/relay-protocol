@@ -239,7 +239,6 @@ contract RelayPool is ERC4626, Ownable {
   // We deposit all the assets we own to the yield pool.
   // This function can also be called by anyone if the pool owns
   // tokens that are not in the yield pool.
-
   function depositAssetsInYieldPool(uint amount) internal {
     ERC20(asset).approve(yieldPool, amount);
     ERC4626(yieldPool).deposit(amount, address(this));
