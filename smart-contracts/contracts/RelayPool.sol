@@ -135,10 +135,14 @@ contract RelayPool is ERC4626, Ownable {
     address oldPool = yieldPool;
     uint256 sharesOfOldPool = ERC20(yieldPool).balanceOf(address(this));
     // Redeem all the shares from the old pool
-    ERC4626(yieldPool).redeem(sharesOfOldPool, address(this), address(this));
+    uint withdrawnAssets = ERC4626(yieldPool).redeem(
+      sharesOfOldPool,
+      address(this),
+      address(this)
+    );
     yieldPool = newPool;
     // Deposit all assets into the new pool
-    depositAssetsInYieldPool();
+    depositAssetsInYieldPool(withdrawnAssets);
     emit YieldPoolChanged(oldPool, newPool);
   }
 
@@ -214,30 +218,33 @@ contract RelayPool is ERC4626, Ownable {
 
   // This function returns the total assets "controlled" by the pool
   // This is the sum of
-  // - the assets actually owned by the pool
   // - the assets that would be resulting from withdrawing all the shares held by this pool into
   //   the yield pool
   // - the assets "in transit" to the pool (i.e. the outstanding debt)
+  // WARNING: a previous version of this function took the token balance into account.
+  //          This creates a vulnerability where a 3rd party can inflate the share price by
+  //          depositing tokens into the pool and then use these tokens as collateral.
+  //          See https://mudit.blog/cream-hack-analysis/
   function totalAssets() public view override returns (uint256) {
-    uint256 poolBalance = ERC20(asset).balanceOf(address(this));
     uint256 balanceOfYieldPoolTokens = ERC20(yieldPool).balanceOf(
       address(this)
     );
     uint256 yieldPoolBalance = ERC4626(yieldPool).previewRedeem(
       balanceOfYieldPoolTokens
     );
-    return poolBalance + yieldPoolBalance + outstandingDebt;
+    return yieldPoolBalance + outstandingDebt;
   }
 
   // Helper function
-  // We deposit all the assets we own to the yield pool.
-  // This function can also be called by anyone if the pool owns
-  // tokens that are not in the yield pool.
-  function depositAssetsInYieldPool() public {
-    uint256 poolBalance = ERC20(asset).balanceOf(address(this));
-    ERC20(asset).approve(yieldPool, poolBalance);
-    ERC4626(yieldPool).deposit(poolBalance, address(this));
-    emit AssetsDepositedIntoYieldPool(poolBalance, yieldPool);
+  // We deposit assets to the yield pool.
+  // This function is internal
+  // Note: a previous version used the full balance of assets.
+  //       This creates a vulnerability where a 3rd party can inflate
+  //       the share price and use that to capture the value created.
+  function depositAssetsInYieldPool(uint amount) internal {
+    ERC20(asset).approve(yieldPool, amount);
+    ERC4626(yieldPool).deposit(amount, address(this));
+    emit AssetsDepositedIntoYieldPool(amount, yieldPool);
   }
 
   // Helper function
@@ -339,7 +346,7 @@ contract RelayPool is ERC4626, Ownable {
     origin.outstandingDebt -= amount;
     decreaseOutStandingDebt(amount);
     // and we should deposit these funds into the yield pool
-    depositAssetsInYieldPool();
+    depositAssetsInYieldPool(amount);
 
     // TODO: include more details about the origin of the funds
     emit BridgeCompleted(chainId, bridge, amount, claimParams);
@@ -357,14 +364,20 @@ contract RelayPool is ERC4626, Ownable {
     }
   }
 
-  function beforeWithdraw(uint256 assets, uint256 shares) internal override {
+  function beforeWithdraw(
+    uint256 assets,
+    uint256 /* shares */
+  ) internal override {
     // We need to withdraw the assets from the yield pool
     withdrawAssetsFromYieldPool(assets, address(this));
   }
 
-  function afterDeposit(uint256 assets, uint256 shares) internal override {
+  function afterDeposit(
+    uint256 assets,
+    uint256 /* shares */
+  ) internal override {
     // We need to deposit the assets into the yield pool
-    depositAssetsInYieldPool();
+    depositAssetsInYieldPool(assets);
   }
 
   receive() external payable {
