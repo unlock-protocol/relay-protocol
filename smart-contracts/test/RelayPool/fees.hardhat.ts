@@ -1,7 +1,6 @@
 import { expect } from 'chai'
 import { AbiCoder } from 'ethers'
 import { ethers, ignition } from 'hardhat'
-import { getBalance, getEvent } from '@relay-protocol/helpers'
 import RelayPoolModule from '../../ignition/modules/RelayPoolModule'
 import { MyToken, MyWeth, MyYieldPool, RelayPool } from '../../typechain-types'
 
@@ -98,7 +97,7 @@ describe('Fees', () => {
     let streamingPeriod: bigint
     before(async () => {
       // Advance enough to make sure no fee is streaming anymore
-      streamingPeriod = await relayPool.FEE_STREAMING_PERIOD()
+      streamingPeriod = await relayPool.streamingPeriod()
       await ethers.provider.send('evm_increaseTime', [
         Number(streamingPeriod + 1n),
       ])

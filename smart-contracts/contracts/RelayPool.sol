@@ -67,7 +67,7 @@ contract RelayPool is ERC4626, Ownable {
   uint256 public totalCollectedBridgeFees = 0;
   uint256 public streamedFees = 0; // Full streamed fees
   uint256 public lastFeeCollectedAt = 0; // timestamp to account for streaming fees
-  uint256 public constant FEE_STREAMING_PERIOD = 7 days;
+  uint256 public streamingPeriod = 7 days;
 
   event LoanEmitted(
     uint256 indexed nonce,
@@ -91,6 +91,7 @@ contract RelayPool is ERC4626, Ownable {
   event AssetsWithdrawnFromYieldPool(uint256 amount, address yieldPool);
 
   event YieldPoolChanged(address oldPool, address newPool);
+  event StreamingPeriodChanged(uint256 oldPeriod, uint256 newPeriod);
 
   event OriginAdded(OriginParam origin);
   event OriginRemoved(
@@ -137,11 +138,18 @@ contract RelayPool is ERC4626, Ownable {
     transferOwnership(curator);
   }
 
+  function updateStreamingPeriod(uint256 newPeriod) public onlyOwner {
+    updateStreamedFees();
+    uint256 oldPeriod = streamingPeriod;
+    streamingPeriod = newPeriod;
+    emit StreamingPeriodChanged(oldPeriod, newPeriod);
+  }
+
   function updateYieldPool(address newPool) public onlyOwner {
     address oldPool = yieldPool;
     uint256 sharesOfOldPool = ERC20(yieldPool).balanceOf(address(this));
     // Redeem all the shares from the old pool
-    uint withdrawnAssets = ERC4626(yieldPool).redeem(
+    uint256 withdrawnAssets = ERC4626(yieldPool).redeem(
       sharesOfOldPool,
       address(this),
       address(this)
@@ -249,7 +257,7 @@ contract RelayPool is ERC4626, Ownable {
   // Note: a previous version used the full balance of assets.
   //       This creates a vulnerability where a 3rd party can inflate
   //       the share price and use that to capture the value created.
-  function depositAssetsInYieldPool(uint amount) internal {
+  function depositAssetsInYieldPool(uint256 amount) internal {
     ERC20(asset).approve(yieldPool, amount);
     ERC4626(yieldPool).deposit(amount, address(this));
     emit AssetsDepositedIntoYieldPool(amount, yieldPool);
@@ -332,14 +340,14 @@ contract RelayPool is ERC4626, Ownable {
   // Otherwise, we return the amount streamed so far to which we add the time-based
   // pro-rata of the remaining fees to be streamed.
   function streamingFees() internal view returns (uint256) {
-    if (block.timestamp - lastFeeCollectedAt > FEE_STREAMING_PERIOD) {
+    if (block.timestamp - lastFeeCollectedAt > streamingPeriod) {
       return totalCollectedBridgeFees;
     } else {
       return
         streamedFees +
         ((totalCollectedBridgeFees - streamedFees) *
           (block.timestamp - lastFeeCollectedAt)) /
-        FEE_STREAMING_PERIOD;
+        streamingPeriod;
     }
   }
 
@@ -351,8 +359,8 @@ contract RelayPool is ERC4626, Ownable {
   }
 
   // Collect the bridge fees and returns the remainder.
-  function collectBridgeFees(uint bridgedAmount) internal returns (uint256) {
-    uint feeAmount = (bridgedAmount * bridgeFee) / 10000;
+  function collectBridgeFees(uint256 bridgedAmount) internal returns (uint256) {
+    uint256 feeAmount = (bridgedAmount * bridgeFee) / 10000;
     updateStreamedFees();
     totalCollectedBridgeFees += feeAmount;
     return bridgedAmount - feeAmount;
