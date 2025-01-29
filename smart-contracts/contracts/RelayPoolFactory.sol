@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.28;
 
-import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import {ERC20} from "solmate/src/tokens/ERC20.sol";
 import {RelayPool, OriginParam} from "./RelayPool.sol";
 
 contract RelayPoolFactory {
@@ -25,7 +25,7 @@ contract RelayPoolFactory {
   }
 
   function deployPool(
-    IERC20 asset,
+    ERC20 asset,
     string memory name,
     string memory symbol,
     OriginParam[] memory origins,
