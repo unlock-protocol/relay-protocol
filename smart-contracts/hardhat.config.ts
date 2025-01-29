@@ -20,6 +20,7 @@ import './tasks/deploy/relay-bridge-factory'
 // Helpers/tests
 import './tasks/deploy/native-wrapper'
 import './tasks/deploy/dummy-yield-pool'
+import './tasks/utils/exportAbis'
 
 // get pk from shell
 const { DEPLOYER_PRIVATE_KEY } = process.env
