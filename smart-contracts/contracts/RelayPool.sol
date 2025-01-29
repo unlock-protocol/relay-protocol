@@ -1,10 +1,8 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.28;
 
-import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import {ERC4626} from "@openzeppelin/contracts/token/ERC20/extensions/ERC4626.sol";
-import {ERC20} from "@openzeppelin/contracts/token/ERC20/ERC20.sol";
-import {ERC20Permit} from "@openzeppelin/contracts/token/ERC20/extensions/ERC20Permit.sol";
+import {ERC4626} from "solmate/src/tokens/ERC4626.sol";
+import {ERC20} from "solmate/src/tokens/ERC20.sol";
 import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
 import {IWETH} from "./interfaces/IWETH.sol";
 import {TypeCasts} from "./utils/TypeCasts.sol";
@@ -41,7 +39,7 @@ error ClaimingFailed(
 );
 error NotAWethPool();
 
-contract RelayPool is ERC4626, ERC20Permit, Ownable {
+contract RelayPool is ERC4626, Ownable {
   // The address of the Hyperlane mailbox
   address public immutable HYPERLANE_MAILBOX;
 
@@ -68,7 +66,7 @@ contract RelayPool is ERC4626, ERC20Permit, Ownable {
   event LoanEmitted(
     uint256 indexed nonce,
     address indexed recipient,
-    address asset,
+    ERC20 asset,
     uint256 amount,
     uint32 bridgeChainId,
     address indexed bridge
@@ -101,7 +99,7 @@ contract RelayPool is ERC4626, ERC20Permit, Ownable {
   // Warning: the owner of the pool should always be a timelock address with a significant delay to reduce the risk of stolen funds
   constructor(
     address hyperlaneMailbox,
-    IERC20 asset,
+    ERC20 asset,
     string memory name,
     string memory symbol,
     OriginParam[] memory origins,
@@ -109,7 +107,7 @@ contract RelayPool is ERC4626, ERC20Permit, Ownable {
     address wrappedEth,
     uint8 feeBasisPoints,
     address curator
-  ) ERC20(name, symbol) ERC4626(asset) ERC20Permit(name) Ownable(msg.sender) {
+  ) ERC4626(asset, name, symbol) Ownable(msg.sender) {
     // TODO: can we verify that the asset is an ERC20?
 
     // Set the Hyperlane mailbox
@@ -183,16 +181,6 @@ contract RelayPool is ERC4626, ERC20Permit, Ownable {
     emit OutstandingDebtChanged(currentOutstandingDebt, outstandingDebt);
   }
 
-  function decimals()
-    public
-    view
-    virtual
-    override(ERC20, ERC4626)
-    returns (uint8)
-  {
-    return ERC4626.decimals(); // or return the decimals of the underlying asset
-  }
-
   // We cap the maxDeposit of any receiver to the maxDeposit of the yield pool for us
   function maxDeposit(
     address /* receiver */
@@ -204,10 +192,10 @@ contract RelayPool is ERC4626, ERC20Permit, Ownable {
   function maxWithdraw(
     address owner
   ) public view override returns (uint256 maxAssets) {
-    return convertToAssets(balanceOf(owner));
+    return convertToAssets(this.balanceOf(owner));
   }
 
-  // We cap the maxMint of any receiver the number of our shares corresponding to the
+  // We cap the maxMint of any receiver to the number of our shares corresponding to the
   // maxDeposit of the yield pool for us
   function maxMint(
     address receiver
@@ -231,7 +219,7 @@ contract RelayPool is ERC4626, ERC20Permit, Ownable {
   //   the yield pool
   // - the assets "in transit" to the pool (i.e. the outstanding debt)
   function totalAssets() public view override returns (uint256) {
-    uint256 poolBalance = ERC20(ERC4626.asset()).balanceOf(address(this));
+    uint256 poolBalance = ERC20(this.asset()).balanceOf(address(this));
     uint256 balanceOfYieldPoolTokens = ERC20(yieldPool).balanceOf(
       address(this)
     );
@@ -246,8 +234,8 @@ contract RelayPool is ERC4626, ERC20Permit, Ownable {
   // This function can also be called by anyone if the pool owns
   // tokens that are not in the yield pool.
   function depositAssetsInYieldPool() public {
-    uint256 poolBalance = ERC20(ERC4626.asset()).balanceOf(address(this));
-    ERC20(ERC4626.asset()).approve(yieldPool, poolBalance);
+    uint256 poolBalance = ERC20(this.asset()).balanceOf(address(this));
+    ERC20(this.asset()).approve(yieldPool, poolBalance);
     ERC4626(yieldPool).deposit(poolBalance, address(this));
     emit AssetsDepositedIntoYieldPool(poolBalance, yieldPool);
   }
@@ -385,14 +373,7 @@ contract RelayPool is ERC4626, ERC20Permit, Ownable {
     // TODO: handle fees!
     // TODO: handle insufficient funds?
 
-    emit LoanEmitted(
-      nonce,
-      recipient,
-      ERC4626.asset(),
-      amount,
-      chainId,
-      bridge
-    );
+    emit LoanEmitted(nonce, recipient, asset, amount, chainId, bridge);
   }
 
   // This function is called externally to claim funds from a bridge.
@@ -408,11 +389,7 @@ contract RelayPool is ERC4626, ERC20Permit, Ownable {
     }
 
     (bool success, bytes memory result) = origin.proxyBridge.delegatecall(
-      abi.encodeWithSignature(
-        "claim(address,bytes)",
-        ERC4626.asset(),
-        claimParams
-      )
+      abi.encodeWithSignature("claim(address,bytes)", this.asset(), claimParams)
     );
 
     if (!success) {
@@ -436,7 +413,7 @@ contract RelayPool is ERC4626, ERC20Permit, Ownable {
   // Internal function to send funds to a recipient,
   // based on whether this is an ERC20 or native ETH.
   function sendFunds(uint256 amount, address recipient) internal {
-    if (ERC4626.asset() == WETH) {
+    if (address(this.asset()) == WETH) {
       withdrawAssetsFromYieldPool(amount, address(this));
       IWETH(WETH).withdraw(amount);
       payable(recipient).transfer(amount);
@@ -446,7 +423,7 @@ contract RelayPool is ERC4626, ERC20Permit, Ownable {
   }
 
   receive() external payable {
-    if (ERC4626.asset() != WETH) {
+    if (address(this.asset()) != WETH) {
       revert NotAWethPool();
     }
     if (msg.sender != WETH) {

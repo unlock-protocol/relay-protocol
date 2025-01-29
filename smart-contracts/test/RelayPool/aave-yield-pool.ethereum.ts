@@ -28,7 +28,7 @@ describe('RelayBridge: use Aave yield pool (USDC)', () => {
     // get Aave pool static wrapper
     const staticAaveUsdcAddress = await getStataToken(USDC, 1n)
     staticAaveUsdc = await ethers.getContractAt(
-      'ERC4626',
+      'solmate/src/tokens/ERC4626.sol:ERC4626',
       staticAaveUsdcAddress
     )
 
