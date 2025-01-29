@@ -1,9 +1,4 @@
 {
   "extends": "@relay-protocol/tsconfig",
-  "compilerOptions": {
-    "moduleResolution": "bundler", // ensures compatibility with modern bundlers like Vite/esbuild
-    "module": "ESNext", // targets the latest ECMAScript module syntax for optimal tree-shaking
-    "noEmit": true, // skips emitting files as Ponder handles the compilation and bundling
-    "declaration": false // avoids generating .d.ts declaration files as this is a backend service and not a package
-  }
+  "exclude": ["dist"]
 }
