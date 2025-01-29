@@ -64,10 +64,10 @@ contract RelayPool is ERC4626, Ownable {
   uint8 public bridgeFee;
 
   // Keeping track of the total fees collected
-  uint256 public totalCollectedFees = 0;
+  uint256 public totalCollectedBridgeFees = 0;
   uint256 public streamedFees = 0; // Full streamed fees
   uint256 public lastFeeCollectedAt = 0; // timestamp to account for streaming fees
-  uint256 public constant STREAMING_PERIOD = 7 days;
+  uint256 public constant FEE_STREAMING_PERIOD = 7 days;
 
   event LoanEmitted(
     uint256 indexed nonce,
@@ -227,6 +227,7 @@ contract RelayPool is ERC4626, Ownable {
   // - the assets that would be resulting from withdrawing all the shares held by this pool into
   //   the yield pool
   // - the assets "in transit" to the pool (i.e. the outstanding debt)
+  // - the bridging fees that have accrued so far (streaming)
   // WARNING: a previous version of this function took the token balance into account.
   //          This creates a vulnerability where a 3rd party can inflate the share price by
   //          depositing tokens into the pool and then use these tokens as collateral.
@@ -301,58 +302,60 @@ contract RelayPool is ERC4626, Ownable {
     // Mark as processed if not
     messages[chainId][bridge][nonce] = message;
 
-    // Pull funds from the yield pool, and send them to the recipient
-    uint256 debtAmount = collectFees(amount);
+    // Pull funds from the yield pool to get the amount to be loaned
+    uint256 loanAmount = collectBridgeFees(amount);
 
     // Check if origin settings are respected
-    if (origin.outstandingDebt + debtAmount > origin.maxDebt) {
+    if (origin.outstandingDebt + loanAmount > origin.maxDebt) {
       revert TooMuchDebtFromOrigin(
         chainId,
         bridge,
         origin.maxDebt,
         nonce,
         recipient,
-        debtAmount
+        loanAmount
       );
     }
 
-    origin.outstandingDebt += debtAmount;
-    increaseOutStandingDebt(debtAmount);
+    origin.outstandingDebt += loanAmount;
+    increaseOutStandingDebt(loanAmount);
 
-    sendFunds(debtAmount, recipient);
+    sendFunds(loanAmount, recipient);
 
     // TODO: handle insufficient funds?
 
-    emit LoanEmitted(nonce, recipient, asset, amount, chainId, bridge);
+    emit LoanEmitted(nonce, recipient, asset, loanAmount, chainId, bridge);
   }
 
-  function collectFees(uint amount) internal returns (uint256) {
-    uint feeAmount = (amount * bridgeFee) / 10000;
-    // Updated the streamed fees
-    if (block.timestamp - lastFeeCollectedAt > STREAMING_PERIOD) {
-      streamedFees = totalCollectedFees;
-    } else {
-      streamedFees +=
-        ((totalCollectedFees - streamedFees) *
-          (block.timestamp - lastFeeCollectedAt)) /
-        STREAMING_PERIOD;
-    }
-    // And now update fees
-    totalCollectedFees += feeAmount;
-    lastFeeCollectedAt = block.timestamp;
-    return amount - feeAmount;
-  }
-
+  // Compute the streaming fees
+  // If the last fee collection was more than 7 days ago, we return the full amount
+  // Otherwise, we return the amount streamed so far to which we add the time-based
+  // pro-rata of the remaining fees to be streamed.
   function streamingFees() internal view returns (uint256) {
-    if (block.timestamp - lastFeeCollectedAt > STREAMING_PERIOD) {
-      return totalCollectedFees;
+    if (block.timestamp - lastFeeCollectedAt > FEE_STREAMING_PERIOD) {
+      return totalCollectedBridgeFees;
     } else {
       return
         streamedFees +
-        ((totalCollectedFees - streamedFees) *
+        ((totalCollectedBridgeFees - streamedFees) *
           (block.timestamp - lastFeeCollectedAt)) /
-        STREAMING_PERIOD;
+        FEE_STREAMING_PERIOD;
     }
+  }
+
+  // Updates the streamed fees and returns the new value
+  function updateStreamedFees() internal returns (uint256) {
+    streamedFees = streamingFees();
+    lastFeeCollectedAt = block.timestamp;
+    return streamedFees;
+  }
+
+  // Collect the bridge fees and returns the remainder.
+  function collectBridgeFees(uint bridgedAmount) internal returns (uint256) {
+    uint feeAmount = (bridgedAmount * bridgeFee) / 10000;
+    updateStreamedFees();
+    totalCollectedBridgeFees += feeAmount;
+    return bridgedAmount - feeAmount;
   }
 
   // This function is called externally to claim funds from a bridge.
