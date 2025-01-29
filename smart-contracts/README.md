@@ -126,3 +126,9 @@ Then you can use the `bridge` function on the Relay Bridge contract! Make sure y
 ```
 yarn hardhat bridge:send --network op-sepolia --bridge 0xd0b14797b9D08493392865647384974470202A78 --dest-chain 11155111 --pool 0xFf7c09b2aeC469E0D11Be84B84Ef30E2f3147B52 --amount 10000
 ```
+
+## Use with ZkSync
+
+```
+yarn hardhat compile --network zksync
+```

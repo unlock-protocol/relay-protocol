@@ -1823,7 +1823,29 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@matterlabs/hardhat-zksync-solc@npm:1.2.5, @matterlabs/hardhat-zksync-solc@npm:^1.2.4, @matterlabs/hardhat-zksync-solc@npm:^1.2.5":
+"@matterlabs/hardhat-zksync-node@npm:^1.2.0":
+  version: 1.2.1
+  resolution: "@matterlabs/hardhat-zksync-node@npm:1.2.1"
+  dependencies:
+    "@matterlabs/hardhat-zksync-solc": "npm:^1.2.5"
+    axios: "npm:^1.7.2"
+    chai: "npm:^4.3.4"
+    chalk: "npm:^4.1.2"
+    debug: "npm:^4.3.5"
+    fs-extra: "npm:^11.2.0"
+    proxyquire: "npm:^2.1.3"
+    semver: "npm:^7.6.2"
+    sinon: "npm:^18.0.0"
+    sinon-chai: "npm:^3.7.0"
+    source-map-support: "npm:^0.5.21"
+    undici: "npm:^6.18.2"
+  peerDependencies:
+    hardhat: ^2.22.5
+  checksum: 10/a022879984a7ad75da41ce678934ad7270a242c43960ce64380db2c8591b3ab95ff79d8f13dea8274867c24a6cc390a68562d8e4a2be4b0c730f7f2fe56839ed
+  languageName: node
+  linkType: hard
+
+"@matterlabs/hardhat-zksync-solc@npm:^1.2.4, @matterlabs/hardhat-zksync-solc@npm:^1.2.5":
   version: 1.2.5
   resolution: "@matterlabs/hardhat-zksync-solc@npm:1.2.5"
   dependencies:
@@ -1844,7 +1866,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@matterlabs/hardhat-zksync-upgradable@npm:1.8.2":
+"@matterlabs/hardhat-zksync-upgradable@npm:^1.7.0":
   version: 1.8.2
   resolution: "@matterlabs/hardhat-zksync-upgradable@npm:1.8.2"
   dependencies:
@@ -1871,7 +1893,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@matterlabs/hardhat-zksync-verify@npm:1.7.1":
+"@matterlabs/hardhat-zksync-verify@npm:^1.6.0":
   version: 1.7.1
   resolution: "@matterlabs/hardhat-zksync-verify@npm:1.7.1"
   dependencies:
@@ -1891,6 +1913,35 @@ __metadata:
     "@nomicfoundation/hardhat-verify": ^2.0.8
     hardhat: ^2.22.5
   checksum: 10/a86f3bbe2499cf4269b4cd8c48106e61548a7d4d1427026cbec6eb6d138e6999504ce4442bb06d1b520544816fec691dae850cd210caa89d5e15fff8d8e49ef5
+  languageName: node
+  linkType: hard
+
+"@matterlabs/hardhat-zksync@npm:1.3.0":
+  version: 1.3.0
+  resolution: "@matterlabs/hardhat-zksync@npm:1.3.0"
+  dependencies:
+    "@matterlabs/hardhat-zksync-deploy": "npm:^1.6.0"
+    "@matterlabs/hardhat-zksync-ethers": "npm:^1.2.1"
+    "@matterlabs/hardhat-zksync-node": "npm:^1.2.0"
+    "@matterlabs/hardhat-zksync-solc": "npm:^1.2.5"
+    "@matterlabs/hardhat-zksync-upgradable": "npm:^1.7.0"
+    "@matterlabs/hardhat-zksync-verify": "npm:^1.6.0"
+    "@nomicfoundation/hardhat-verify": "npm:^2.0.0"
+    "@openzeppelin/upgrades-core": "npm:^1.37.0"
+    chai: "npm:^4.3.4"
+    ethers: "npm:^6.12.2"
+    hardhat: "npm:^2.22.5"
+    sinon: "npm:^18.0.0"
+    sinon-chai: "npm:^3.7.0"
+    zksync-ethers: "npm:^6.11.2"
+  peerDependencies:
+    "@matterlabs/hardhat-zksync-deploy": ^1.6.0
+    "@matterlabs/hardhat-zksync-ethers": ^1.2.1
+    "@matterlabs/hardhat-zksync-node": ^1.2.0
+    "@matterlabs/hardhat-zksync-solc": ^1.2.5
+    "@matterlabs/hardhat-zksync-upgradable": ^1.7.0
+    "@matterlabs/hardhat-zksync-verify": ^1.6.0
+  checksum: 10/afbdafcb62a4f38bc78e7b77133f039b992869da0b6e6a1254e47c5de78f1ec5fe0d8c00347eb7002a3692d32802505c26d486d45404ed1f5b79bfefd8b0ec64
   languageName: node
   linkType: hard
 
@@ -2215,7 +2266,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@nomicfoundation/hardhat-verify@npm:2.0.12, @nomicfoundation/hardhat-verify@npm:^2.0.8":
+"@nomicfoundation/hardhat-verify@npm:2.0.12, @nomicfoundation/hardhat-verify@npm:^2.0.0, @nomicfoundation/hardhat-verify@npm:^2.0.8":
   version: 2.0.12
   resolution: "@nomicfoundation/hardhat-verify@npm:2.0.12"
   dependencies:
@@ -2778,9 +2829,7 @@ __metadata:
     "@bgd-labs/aave-address-book": "npm:4.8.1"
     "@eslint/js": "npm:9.19.0"
     "@eth-optimism/contracts-bedrock": "npm:0.17.3"
-    "@matterlabs/hardhat-zksync-solc": "npm:1.2.5"
-    "@matterlabs/hardhat-zksync-upgradable": "npm:1.8.2"
-    "@matterlabs/hardhat-zksync-verify": "npm:1.7.1"
+    "@matterlabs/hardhat-zksync": "npm:1.3.0"
     "@nomicfoundation/hardhat-chai-matchers": "npm:2.0.8"
     "@nomicfoundation/hardhat-ethers": "npm:3.0.8"
     "@nomicfoundation/hardhat-ignition": "npm:0.15.9"
@@ -7087,6 +7136,16 @@ __metadata:
   languageName: node
   linkType: hard
 
+"fill-keys@npm:^1.0.2":
+  version: 1.0.2
+  resolution: "fill-keys@npm:1.0.2"
+  dependencies:
+    is-object: "npm:~1.0.1"
+    merge-descriptors: "npm:~1.0.0"
+  checksum: 10/6e78e314dc6852060086a8edc754d6a5b8efea5389ba8ec48367c1d0fa14272f9fad2f5c1ced1dcbd73306ffbfa3aa8cc64add884150ccf729f2a45ebc22d2eb
+  languageName: node
+  linkType: hard
+
 "fill-range@npm:^7.1.1":
   version: 7.1.1
   resolution: "fill-range@npm:7.1.1"
@@ -8296,6 +8355,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"is-object@npm:~1.0.1":
+  version: 1.0.2
+  resolution: "is-object@npm:1.0.2"
+  checksum: 10/db53971751c50277f0ed31d065d93038d23cb9785090ab5c8070a903cf5bab16cdb18f05b8855599ad87ec19eb4c85afa05980bcda77dd4a8482120b6348c73c
+  languageName: node
+  linkType: hard
+
 "is-plain-obj@npm:^2.1.0":
   version: 2.1.0
   resolution: "is-plain-obj@npm:2.1.0"
@@ -9041,6 +9107,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"merge-descriptors@npm:~1.0.0":
+  version: 1.0.3
+  resolution: "merge-descriptors@npm:1.0.3"
+  checksum: 10/52117adbe0313d5defa771c9993fe081e2d2df9b840597e966aadafde04ae8d0e3da46bac7ca4efc37d4d2b839436582659cd49c6a43eacb3fe3050896a105d1
+  languageName: node
+  linkType: hard
+
 "merge-stream@npm:^2.0.0":
   version: 2.0.0
   resolution: "merge-stream@npm:2.0.0"
@@ -9321,6 +9394,13 @@ __metadata:
     _mocha: bin/_mocha
     mocha: bin/mocha.js
   checksum: 10/903bbffcb195ef9d36b27db54e3462c5486de1397289e0953735b3530397a139336c452bcf5188c663496c660d2285bbb6c7213290d36d536ad647b6145cb917
+  languageName: node
+  linkType: hard
+
+"module-not-found-error@npm:^1.0.1":
+  version: 1.0.1
+  resolution: "module-not-found-error@npm:1.0.1"
+  checksum: 10/ebd65339d4d5980dd55cd32dbf112ec02b8e33f30866312b94caeee4783322259f18cf2270e9d2e600df3bd1876c35612b87f5c2525c21885fb1f83e85a9b9b0
   languageName: node
   linkType: hard
 
@@ -10349,6 +10429,17 @@ __metadata:
   languageName: node
   linkType: hard
 
+"proxyquire@npm:^2.1.3":
+  version: 2.1.3
+  resolution: "proxyquire@npm:2.1.3"
+  dependencies:
+    fill-keys: "npm:^1.0.2"
+    module-not-found-error: "npm:^1.0.1"
+    resolve: "npm:^1.11.1"
+  checksum: 10/c124bdb6f732d680c59c2d4cf0ff66ebae7b3c76af0c1bb05d5c9b982ba05db22c1df6ad4cb486d1d8a5f6b1fe0534cbea864917e82dacaf947cfa84c4c30463
+  languageName: node
+  linkType: hard
+
 "pump@npm:^1.0.0":
   version: 1.0.3
   resolution: "pump@npm:1.0.3"
@@ -10649,7 +10740,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"resolve@npm:^1.1.6":
+"resolve@npm:^1.1.6, resolve@npm:^1.11.1":
   version: 1.22.10
   resolution: "resolve@npm:1.22.10"
   dependencies:
@@ -10678,7 +10769,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"resolve@patch:resolve@npm%3A^1.1.6#optional!builtin<compat/resolve>":
+"resolve@patch:resolve@npm%3A^1.1.6#optional!builtin<compat/resolve>, resolve@patch:resolve@npm%3A^1.11.1#optional!builtin<compat/resolve>":
   version: 1.22.10
   resolution: "resolve@patch:resolve@npm%3A1.22.10#optional!builtin<compat/resolve>::version=1.22.10&hash=c3c19d"
   dependencies:
@@ -11323,7 +11414,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"source-map-support@npm:^0.5.13":
+"source-map-support@npm:^0.5.13, source-map-support@npm:^0.5.21":
   version: 0.5.21
   resolution: "source-map-support@npm:0.5.21"
   dependencies:
@@ -13025,7 +13116,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"zksync-ethers@npm:^6.15.0":
+"zksync-ethers@npm:^6.11.2, zksync-ethers@npm:^6.15.0":
   version: 6.15.4
   resolution: "zksync-ethers@npm:6.15.4"
   peerDependencies:

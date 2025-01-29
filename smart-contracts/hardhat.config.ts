@@ -2,13 +2,7 @@ import { HardhatUserConfig } from 'hardhat/config'
 import '@nomicfoundation/hardhat-toolbox'
 import '@nomicfoundation/hardhat-ignition-ethers'
 import { networks as nets } from '@relay-protocol/networks'
-
-// zksync
-if (process.env.ZK_SYNC) {
-  require('@matterlabs/hardhat-zksync-solc')
-  require('@matterlabs/hardhat-zksync-verify')
-  require('@matterlabs/hardhat-zksync-upgradable')
-}
+import '@matterlabs/hardhat-zksync'
 
 // Interracting
 import './tasks/pool'
