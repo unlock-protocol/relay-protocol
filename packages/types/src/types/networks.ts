@@ -3,7 +3,7 @@ export interface NetworkConfig {
   l1ChainId?: number | bigint
   name: string
   slug: string
-  bridges?: {
+  bridges: {
     cctp?: {
       domain: bigint
       messenger: string
