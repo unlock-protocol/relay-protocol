@@ -201,9 +201,6 @@ describe.only('RelayBridge: base yield', () => {
   })
 
   describe('maxDeposit', () => {
-    after(async () => {
-      await thirdPartyPool.setMaxDeposit(ethers.MaxUint256)
-    })
     it('should return the maximum amount of tokens that we can deposited in the yield pool', async () => {
       const [user] = await ethers.getSigners()
       const userAddress = await user.getAddress()
@@ -230,6 +227,7 @@ describe.only('RelayBridge: base yield', () => {
       // Add amount to the current deposits to set the new max!
       const maxDeposit = currentDeposits + amount
       // Set a max deposit on 3rd party pool
+      const maxDepositBefore = await thirdPartyPool.maxPoolDeposit()
       await thirdPartyPool.setMaxDeposit(maxDeposit)
 
       // The user does not have tokens so they should be able to deposit.
@@ -246,14 +244,13 @@ describe.only('RelayBridge: base yield', () => {
       const user3Address = await user3.getAddress()
       expect(await relayPool.balanceOf(user3Address)).to.be.equal(0)
       expect(await relayPool.maxDeposit(user3Address)).to.be.equal(0)
+
+      // Cleanup!
+      await thirdPartyPool.setMaxDeposit(maxDepositBefore)
     })
   })
 
   describe('maxWithdraw', () => {
-    after(async () => {
-      await thirdPartyPool.setMaxWithdraw(ethers.MaxUint256)
-    })
-
     it("should return the user's balance of assets at most if the yieldPool has no limit", async () => {
       const [user] = await ethers.getSigners()
       const userAddress = await user.getAddress()
@@ -269,44 +266,24 @@ describe.only('RelayBridge: base yield', () => {
         maxWithdrawBefore + amount
       )
     })
-
-    // This test is skipped because we changed the behavior of the maxWithdraw function
-    // Indeed, this function should _not_ take into account the underlying pool's balance,
-    // because it would then break the redeem flow since redeeming shares as we may end up in a
-    // situation where the assets pulled from the underlying pool are MORE than the assets about to be
-    // redeemed, even though they have already been accounted for.
-    it.skip("should return at most the relay pool's balance from the yieldPool", async () => {
-      const [user] = await ethers.getSigners()
-      const userAddress = await user.getAddress()
-      const amount = ethers.parseUnits('1', 18)
-      const relayPoolAddress = await relayPool.getAddress()
-
-      const maxWithdrawBefore = await relayPool.maxWithdraw(userAddress)
-      await myToken.connect(user).mint(amount)
-      await myToken.connect(user).approve(relayPoolAddress, amount)
-      await relayPool.connect(user).deposit(amount, userAddress)
-
-      expect(await relayPool.maxWithdraw(userAddress)).to.be.equal(
-        maxWithdrawBefore + amount
-      )
-      // Set a max withdraw on 3rd party pool
-      const maxWithdraw = ethers.parseUnits('0.1', 18)
-      await thirdPartyPool.setMaxWithdraw(maxWithdraw)
-      expect(await relayPool.maxWithdraw(userAddress)).to.be.equal(maxWithdraw)
-    })
   })
 
   describe('maxMint', () => {
-    after(async () => {
-      await thirdPartyPool.setMaxDeposit(ethers.MaxUint256)
-    })
-
     it('should return the maximum amount of tokens that we can deposited in the yield pool', async () => {
       const [user] = await ethers.getSigners()
       const userAddress = await user.getAddress()
+
+      const currentDeposits = await myToken.balanceOf(
+        await thirdPartyPool.getAddress()
+      )
+      const maxDepositBefore = await thirdPartyPool.maxPoolDeposit()
+      await thirdPartyPool.setMaxDeposit(currentDeposits * 2n)
+
       const maxDeposit = await relayPool.maxDeposit(userAddress)
       const maxMint = await relayPool.maxMint(userAddress)
       expect(maxMint).to.be.equal(await relayPool.convertToShares(maxDeposit))
+      // Cleanup!
+      await thirdPartyPool.setMaxDeposit(maxDepositBefore)
     })
   })
 
@@ -324,7 +301,7 @@ describe.only('RelayBridge: base yield', () => {
       const maxWithdraw = await relayPool.maxWithdraw(userAddress)
       const maxRedeem = await relayPool.maxRedeem(userAddress)
       expect(maxRedeem).to.be.equal(
-        await relayPool.convertToShares(maxWithdraw + 1n) // for some reason we need to round!
+        await relayPool.convertToShares(maxWithdraw)
       )
     })
   })
