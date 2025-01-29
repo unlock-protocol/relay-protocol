@@ -7,8 +7,6 @@ import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
 import {IWETH} from "./interfaces/IWETH.sol";
 import {TypeCasts} from "./utils/TypeCasts.sol";
 
-import "hardhat/console.sol";
-
 struct OriginSettings {
   uint256 maxDebt;
   uint256 outstandingDebt;
@@ -245,9 +243,11 @@ contract RelayPool is ERC4626, Ownable {
   }
 
   // Helper function
-  // We deposit all the assets we own to the yield pool.
-  // This function can also be called by anyone if the pool owns
-  // tokens that are not in the yield pool.
+  // We deposit assets to the yield pool.
+  // This function is internal
+  // Note: a previous version used the full balance of assets.
+  //       This creates a vulnerability where a 3rd party can inflate
+  //       the share price and use that to capture the value created.
   function depositAssetsInYieldPool(uint amount) internal {
     ERC20(asset).approve(yieldPool, amount);
     ERC4626(yieldPool).deposit(amount, address(this));

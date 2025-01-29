@@ -1,7 +1,14 @@
+import { Context, Event } from 'ponder:registry'
 import { poolOrigin, relayPool, yieldPool } from 'ponder:schema'
 import { erc4626Abi, erc20Abi } from 'viem'
 
-export default async function ({ event, context }) {
+export default async function ({
+  event,
+  context,
+}: {
+  event: Event<'RelayPoolFactory:PoolDeployed'>
+  context: Context<'RelayPoolFactory:PoolDeployed'>
+}) {
   const { pool, asset, creator, thirdPartyPool, origins } = event.args
 
   // First create or update the yield pool entry
@@ -35,12 +42,9 @@ export default async function ({ event, context }) {
       lastUpdated: BigInt(event.block.timestamp),
     })
     .onConflictDoUpdate({
-      target: yieldPool.contractAddress,
-      set: {
-        totalAssets,
-        totalShares,
-        lastUpdated: BigInt(event.block.timestamp),
-      },
+      totalAssets,
+      totalShares,
+      lastUpdated: BigInt(event.block.timestamp),
     })
 
   // Create a pool for each of these!
@@ -49,9 +53,9 @@ export default async function ({ event, context }) {
     asset: asset as `0x${string}`,
     creator: creator as `0x${string}`,
     yieldPool: thirdPartyPool as `0x${string}`,
-    outstandingDebt: 0n,
-    totalAssets: 0n,
-    totalShares: 0n,
+    outstandingDebt: BigInt(0),
+    totalAssets: BigInt(0),
+    totalShares: BigInt(0),
     chainId: context.network.chainId,
     createdAt: BigInt(new Date().getTime()),
     createdAtBlock: event.block.number,
