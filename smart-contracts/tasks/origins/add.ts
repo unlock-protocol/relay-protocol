@@ -1,7 +1,7 @@
 import { task } from 'hardhat/config'
 
 import { networks } from '@relay-protocol/networks'
-import RelayVaultService from '@relay-protocol/client'
+import { RelayVaultService } from '@relay-protocol/client'
 
 task('pool:add-origin', 'Add origin for a pool').setAction(
   async ({}, { ethers }) => {
@@ -9,7 +9,7 @@ task('pool:add-origin', 'Add origin for a pool').setAction(
     const { chainId } = await ethers.provider.getNetwork()
     const network = networks[chainId.toString()]
     const vaultService = new RelayVaultService(
-      'https://api.example.com/graphql'
+      'https://relay-pools-backend-production.up.railway.app/' // TODO: add to config?
     )
     const { data } = await vaultService.query(GET_ALL_POOLS)
 
