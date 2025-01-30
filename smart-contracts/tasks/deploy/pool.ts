@@ -168,7 +168,7 @@ task('deploy:pool', 'Deploy a relay pool')
       while (!verified) {
         attempts += 1
         await tx.wait(attempts)
-        await run(`verify:verify`, {
+        await run('verify:verify', {
           address: poolAddress,
           constructorArguments: [
             await factoryContract.hyperlaneMailbox(),
