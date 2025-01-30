@@ -80,3 +80,29 @@ export const GET_USER_BALANCE_IN_POOL = gql`
     }
   }
 `
+
+export const GET_POOLS_BY_CURATOR = gql`
+  query GetPoolsByCurator($curatorAddress: String!) {
+    relayPools(where: { curator: $curatorAddress }) {
+      items {
+        contractAddress
+        asset
+        chainId
+        name
+        symbol
+        outstandingDebt
+        totalAssets
+        totalShares
+        curator
+        origins(limit: 10) {
+          totalCount
+          items {
+            proxyBridge
+            originChainId
+            originBridge
+          }
+        }
+      }
+    }
+  }
+`
