@@ -56,14 +56,16 @@ contract ZkSyncBridgeProxy is BridgeProxy {
       params := bridgeParams.offset
     }
 
+    // TODO: decode value/amount from message
+
     // finalize withdrawal on L1
     L1_SHARED_BRIDGE.finalizeWithdrawal(
-      bridgeParams.chainId,
-      bridgeParams.l2BatchNumber,
-      bridgeParams.l2MessageIndex,
-      bridgeParams.l2TxNumberInBatch,
-      bridgeParams.message,
-      bridgeParams.merkleProof
+      params.chainId,
+      params.l2BatchNumber,
+      params.l2MessageIndex,
+      params.l2TxNumberInBatch,
+      params.message,
+      params.merkleProof
     );
   }
 }

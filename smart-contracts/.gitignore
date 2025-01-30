@@ -24,3 +24,4 @@ journal.jsonl
 # zksync
 artifacts-zk
 cache-zk
+deployments-zk

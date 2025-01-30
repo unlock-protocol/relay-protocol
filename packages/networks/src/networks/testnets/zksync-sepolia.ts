@@ -7,6 +7,9 @@ export const zkSyncSepolia: NetworkConfig = {
   name: 'ZKsync Sepolia Testnet',
   slug: 'zksync-sepolia',
   rpc: 'https://sepolia.era.zksync.dev',
+  bridges: {
+    zksync: true,
+  },
   assets: {
     usdc: '0xAe045DE5638162fa134807Cb558E15A3F5A7F853',
   },

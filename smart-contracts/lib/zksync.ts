@@ -2,14 +2,12 @@
 // https://github.com/NomicFoundation/hardhat-ignition/issues/825
 import { Wallet, Provider } from 'zksync-ethers'
 import { Deployer } from '@matterlabs/hardhat-zksync-deploy/dist/deployer'
-import ethers from 'ethers'
 import { type JsonRpcResult } from 'ethers'
-import hre, { zkUpgrades } from 'hardhat'
 import { getProvider } from '@relay-protocol/helpers'
 import networks from '@relay-protocol/networks'
+import { HardhatRuntimeEnvironment } from 'hardhat/types'
 
-export async function getZkSyncBridgeContracts() {
-  const { chainId } = hre.network.config
+export async function getZkSyncBridgeContracts(chainId: bigint) {
   const { rpc } = networks[chainId!.toString()]
   const rpcURL = rpc || `https://rpc.unlock-protocol.com/${chainId}`
   const resp = await fetch(rpcURL, {
@@ -30,14 +28,15 @@ export async function getZkSyncBridgeContracts() {
 }
 
 export async function deployContract(
+  hre: HardhatRuntimeEnvironment,
   contractNameOrFullyQualifiedName: string,
   deployArgs = []
 ) {
-  const { deployer } = await zkSyncSetupDeployer()
+  const { deployer } = await zkSyncSetupDeployer(hre)
   const artifact = await deployer.loadArtifact(contractNameOrFullyQualifiedName)
 
   const deploymentFee = await deployer.estimateDeployFee(artifact, deployArgs)
-  const parsedFee = ethers.formatEther(deploymentFee.toString())
+  const parsedFee = hre.ethers.formatEther(deploymentFee.toString())
   console.log(`Deployment is estimated to cost ${parsedFee} ETH`)
 
   const contract = await deployer.deploy(artifact, deployArgs)
@@ -53,52 +52,9 @@ export async function deployContract(
   }
 }
 
-export async function deployUpgradeableContract(
-  contractNameOrFullyQualifiedName: string,
-  deployArgs = [],
-  deployOptions = {}
-) {
-  const { deployer } = await zkSyncSetupDeployer()
-  const artifact = await deployer.loadArtifact(contractNameOrFullyQualifiedName)
-
-  const contract = await zkUpgrades.deployProxy(
-    deployer.zkWallet,
-    artifact,
-    deployArgs,
-    deployOptions
-  )
-
-  await contract.waitForDeployment()
-  const contractAddress = await contract.getAddress()
-  const { hash } = contract.deployTransaction
-
-  return {
-    contract,
-    hash,
-    address: contractAddress,
-  }
-}
-
-async function zkSyncSetupDeployer() {
-  // set provider and accounts
-  const { chainId } = hre.network.config
-  console.log({ chainId })
-  const provider = (await getProvider(chainId!)) as Provider
-  console.log(provider)
-  let wallet
-  if (process.env.DEPLOYER_PRIVATE_KEY) {
-    wallet = new Wallet(process.env.DEPLOYER_PRIVATE_KEY, provider)
-  } else {
-    throw 'missing deployer key, cant deploy on zksync. Export DEPLOYER_PRIVATE_KEY'
-  }
-
+async function zkSyncSetupDeployer(hre: HardhatRuntimeEnvironment) {
   // set deployer
+  const wallet = await hre.zksyncEthers.getWallet(0)
   const deployer = new Deployer(hre, wallet)
-
-  return { provider, wallet, deployer }
-}
-
-export default {
-  deployContract,
-  deployUpgradeableContract,
+  return { wallet, deployer }
 }

@@ -6,9 +6,11 @@ import { AutoComplete } from 'enquirer'
 import CCTPBridgeProxyModule from '../../ignition/modules/CCTPBridgeProxyModule'
 import OPStackNativeBridgeProxyModule from '../../ignition/modules/OPStackNativeBridgeProxyModule'
 import ArbitrumOrbitNativeBridgeProxyModule from '../../ignition/modules/ArbitrumOrbitNativeBridgeProxyModule'
+import { getZkSyncBridgeContracts, deployContract } from '../../lib/zksync'
 
 task('deploy:bridge-proxy', 'Deploy a bridge proxy').setAction(
-  async (_, { ethers, ignition }) => {
+  async (_, hre) => {
+    const { ethers, ignition, network } = hre
     const { chainId } = await ethers.provider.getNetwork()
 
     const { bridges } = networks[chainId.toString()]
@@ -80,6 +82,25 @@ task('deploy:bridge-proxy', 'Deploy a bridge proxy').setAction(
       ))
       console.log(
         `ArbOrbit bridge deployed at: ${await proxyBridge.getAddress()}`
+      )
+    } else if (type === 'zksync') {
+      const chainId = BigInt(network.config.chainId!)
+
+      // TODO: pass L1 chainId when deplopying for pools
+      // get addresses from zksync RPC
+      const { l2SharedDefaultBridge, l1SharedDefaultBridge } =
+        await getZkSyncBridgeContracts(chainId)
+
+      // deploy using `deployContract` helper
+      const deployArgs = [l2SharedDefaultBridge, l1SharedDefaultBridge]
+      console.log(deployArgs)
+      const { hash, address } = await deployContract(
+        hre,
+        'ZkSyncBridgeProxy',
+        deployArgs as any
+      )
+      console.log(
+        `Zksync BridgeProxy contract deployed at :${address} (tx: ${hash})`
       )
     }
   }

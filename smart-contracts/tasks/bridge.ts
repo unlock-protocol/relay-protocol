@@ -1,5 +1,5 @@
 import { task } from 'hardhat/config'
-import { setTimeout } from 'timers/promises'
+import { getBalance, checkAllowance } from '@relay-protocol/helpers'
 
 task('bridge:send', 'Send tokens to a pool across a relay bridge')
   .addParam('bridge', 'The Relay Bridge contract address')
@@ -22,8 +22,6 @@ task('bridge:send', 'Send tokens to a pool across a relay bridge')
       },
       { ethers }
     ) => {
-      const { getBalance, checkAllowance } = await import('../lib/utils')
-
       const bridge = await ethers.getContractAt('RelayBridge', bridgeAddress)
       const assetAddress = await bridge.asset()
       const [user] = await ethers.getSigners()
@@ -33,7 +31,11 @@ task('bridge:send', 'Send tokens to a pool across a relay bridge')
       if (!recipient) recipient = userAddress
 
       // check balance
-      const balance = await getBalance(userAddress, assetAddress)
+      const balance = await getBalance(
+        userAddress,
+        assetAddress,
+        ethers.provider
+      )
       if (balance < amount) {
         throw Error(
           `Insufficient balance (actual: ${balance}, expected: ${amount})`
@@ -43,7 +45,7 @@ task('bridge:send', 'Send tokens to a pool across a relay bridge')
       // check allowance
       if (assetAddress != ethers.ZeroAddress) {
         const asset = await ethers.getContractAt('MyToken', assetAddress)
-        await checkAllowance(asset, bridgeAddress, amount)
+        await checkAllowance(asset, bridgeAddress, amount, userAddress)
       }
 
       // TODO: estimate fee correctly
@@ -92,8 +94,6 @@ task('bridge:send-proxy', 'Send tokens across a proxy bridge (test purposes)')
       },
       { ethers }
     ) => {
-      const { getBalance, checkAllowance } = await import('../lib/utils')
-
       const bridge = await ethers.getContractAt('BridgeProxy', bridgeAddress)
       const [user] = await ethers.getSigners()
       const userAddress = await user.getAddress()
@@ -118,7 +118,7 @@ task('bridge:send-proxy', 'Send tokens across a proxy bridge (test purposes)')
       // check allowance
       if (assetAddress != ethers.ZeroAddress) {
         const asset = await ethers.getContractAt('MyToken', assetAddress)
-        await checkAllowance(asset, bridgeAddress, amount)
+        await checkAllowance(asset, bridgeAddress, amount, userAddress)
       }
 
       // send tx
