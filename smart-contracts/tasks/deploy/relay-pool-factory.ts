@@ -31,7 +31,6 @@ task('deploy:pool-factory', 'Deploy a relay pool factory').setAction(
 
     const poolFactoryAddress = await relayPoolFactory.getAddress()
 
-    console.log([hyperlaneMailbox, weth])
     console.log(`relayPoolFactory deployed to: ${poolFactoryAddress}`)
     await run('verify:verify', {
       address: poolFactoryAddress,
