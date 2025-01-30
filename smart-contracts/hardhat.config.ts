@@ -10,6 +10,7 @@ import './tasks/bridge'
 import './tasks/claim/cctp'
 import './tasks/claim/arb'
 import './tasks/claim/native'
+import './tasks/claim/zksync'
 
 // Actual contracts
 import './tasks/deploy/pool'
