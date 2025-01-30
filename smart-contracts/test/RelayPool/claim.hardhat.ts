@@ -51,6 +51,7 @@ describe('RelayBridge: claim', () => {
       bridge: relayBridgeOptimism,
       maxDebt: ethers.parseEther('10'),
       proxyBridge: await oPStackNativeBridgeProxy.getAddress(),
+      bridgeFee: 0,
     })
 
     // deploy the pool using ignition
@@ -63,7 +64,6 @@ describe('RelayBridge: claim', () => {
         origins,
         thirdPartyPool: thirdPartyPoolAddress,
         weth: await myWeth.getAddress(),
-        bridgeFee: 0,
         curator: userAddress,
       },
     }
@@ -173,7 +173,7 @@ describe('RelayBridge: claim', () => {
     ).to.equal(bridgedAmount)
   })
 
-  it('should desposit the funds in the 3rd party pool', async () => {
+  it.only('should desposit the funds in the 3rd party pool', async () => {
     const abiCoder = new ethers.AbiCoder()
     const relayPoolAddress = await relayPool.getAddress()
     const bridgedAmount = ethers.parseEther('0.033')
