@@ -15,8 +15,7 @@ contract RelayPoolFactory {
     string name,
     string symbol,
     OriginParam[] origins,
-    address thirdPartyPool,
-    uint8 bridgeFee
+    address thirdPartyPool
   );
 
   constructor(address hMailbox, address weth) {
@@ -29,8 +28,7 @@ contract RelayPoolFactory {
     string memory name,
     string memory symbol,
     OriginParam[] memory origins,
-    address thirdPartyPool,
-    uint8 bridgeFee
+    address thirdPartyPool
   ) public returns (address) {
     RelayPool pool = new RelayPool(
       hyperlaneMailbox,
@@ -40,7 +38,6 @@ contract RelayPoolFactory {
       origins,
       thirdPartyPool,
       wrappedEth,
-      bridgeFee,
       msg.sender
     );
 
@@ -51,8 +48,7 @@ contract RelayPoolFactory {
       name,
       symbol,
       origins,
-      thirdPartyPool,
-      bridgeFee
+      thirdPartyPool
     );
 
     return address(pool);

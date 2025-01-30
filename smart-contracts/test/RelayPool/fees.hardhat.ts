@@ -50,11 +50,11 @@ describe('Fees', () => {
             bridge: relayBridgeOptimism,
             maxDebt: ethers.parseEther('10'),
             proxyBridge: oPStackNativeBridgeProxy,
+            bridgeFee: 5, // (0.05%)
           },
         ],
         thirdPartyPool: await thirdPartyPool.getAddress(),
         weth: await myWeth.getAddress(),
-        bridgeFee: 5, // (0.05%)
         curator: userAddress,
       },
     }
@@ -72,7 +72,11 @@ describe('Fees', () => {
     const recipientAddress = ethers.Wallet.createRandom().address
 
     const amount = ethers.parseUnits('1')
-    const fees = (amount * (await relayPool.bridgeFee())) / 10000n
+    const [, , , bridgeFee] = await relayPool.authorizedOrigins(
+      10,
+      relayBridgeOptimism
+    )
+    const fees = (amount * bridgeFee) / 10000n
     const recipientBalanceBefore = await myToken.balanceOf(recipientAddress) // Probably 0
     const outstandingDebtBefore = await relayPool.outstandingDebt() // Probably 0
     const collectedFeesBefore = await relayPool.totalCollectedBridgeFees() // Probably 0
