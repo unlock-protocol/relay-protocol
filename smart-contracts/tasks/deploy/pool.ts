@@ -19,6 +19,8 @@ task('deploy:pool', 'Deploy a relay pool')
       { name, symbol, factory, asset, yieldPool, origins = '[]' },
       { ethers, run }
     ) => {
+      const [user] = await ethers.getSigners()
+
       // get args value
       const { chainId } = await ethers.provider.getNetwork()
       const { name: networkName, assets } = networks[chainId.toString()]
@@ -166,7 +168,34 @@ task('deploy:pool', 'Deploy a relay pool')
         factoryContract.interface
       )
 
-      console.log(`relayPool deployed to: ${await event.args.pool}`)
-      await run(`hardhat:verify ${event.args.pool}`)
+      const poolAddress = event.args.pool
+      console.log(`relayPool deployed to: ${poolAddress}`)
+      let verified = false
+      let attempts = 0
+      while (!verified) {
+        attempts += 1
+        await tx.wait(attempts)
+        await run(`verify:verify`, {
+          address: poolAddress,
+          constructorArguments: [
+            await factoryContract.hyperlaneMailbox(),
+            asset,
+            name,
+            symbol,
+            authorizedOrigins,
+            yieldPool,
+            await factoryContract.wrappedEth(),
+            await user.getAddress(),
+          ],
+        })
+          .then(() => {
+            verified = true
+          })
+          .catch((e) => {
+            if (attempts >= 10) {
+              throw e
+            }
+          })
+      }
     }
   )
