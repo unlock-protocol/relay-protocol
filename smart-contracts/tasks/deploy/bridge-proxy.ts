@@ -7,6 +7,7 @@ import CCTPBridgeProxyModule from '../../ignition/modules/CCTPBridgeProxyModule'
 import OPStackNativeBridgeProxyModule from '../../ignition/modules/OPStackNativeBridgeProxyModule'
 import ArbitrumOrbitNativeBridgeProxyModule from '../../ignition/modules/ArbitrumOrbitNativeBridgeProxyModule'
 import { getZkSyncBridgeContracts, deployContract } from '../../lib/zksync'
+import ZkSyncBridgeProxyModule from '../../ignition/modules/ZkSyncBridgeProxyModule'
 
 task('deploy:bridge-proxy', 'Deploy a bridge proxy').setAction(
   async (_, hre) => {
@@ -84,19 +85,37 @@ task('deploy:bridge-proxy', 'Deploy a bridge proxy').setAction(
         `ArbOrbit bridge deployed at: ${await proxyBridge.getAddress()}`
       )
     } else if (type === 'zksync') {
-      // deploy using `deployContract` helper
-      const deployArgs = [
-        bridges.zksync!.l2SharedDefaultBridge!,
-        bridges.zksync!.l1SharedDefaultBridge!,
-      ]
-      console.log(deployArgs)
-      const { hash, address } = await deployContract(
-        hre,
-        'ZkSyncBridgeProxy',
-        deployArgs as any
-      )
+      let zkSyncBridgeAddress: string
+      const l2SharedDefaultBridge = bridges.zksync!.l2SharedDefaultBridge!
+      const l1SharedDefaultBridge = bridges.zksync!.l1SharedDefaultBridge!
+      if (network.zksync) {
+        // deploy using `deployContract` helper
+        const deployArgs = [l2SharedDefaultBridge, l1SharedDefaultBridge]
+
+        ;({ address: zkSyncBridgeAddress } = await deployContract(
+          hre,
+          'ZkSyncBridgeProxy',
+          deployArgs as any
+        ))
+      } else {
+        // deploy ARB bridge
+        const parameters = {
+          ZkSyncBridgeProxy: {
+            l2SharedDefaultBridge,
+            l1SharedDefaultBridge,
+          },
+        }
+        ;({ bridge: proxyBridge } = await ignition.deploy(
+          ZkSyncBridgeProxyModule,
+          {
+            parameters,
+            deploymentId: `BridgeProxy-ZkSync-${chainId.toString()}`,
+          }
+        ))
+        zkSyncBridgeAddress = await proxyBridge.getAddress()
+      }
       console.log(
-        `Zksync BridgeProxy contract deployed at :${address} (tx: ${hash})`
+        `Zksync BridgeProxy contract deployed at ${zkSyncBridgeAddress}`
       )
     }
   }
