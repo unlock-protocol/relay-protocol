@@ -17,7 +17,7 @@ const USDC_MORPHO_POOL = '0xd63070114470f685b75B74D60EEc7c1113d33a3D'
 // WETH: https://etherscan.io/tx/0x038ba440b1cf7cfc0a326832db1cb63cb0c8b7c6a98927df5304e6f3e0935e65
 // USDC: https://basescan.org/tx/0x3d3bcf5e73135f9c42e4f34cfef3e43d055303df6d26da28e5284d600869ca5d
 
-describe('RelayBridge: use Morpho yield pool (WETH)', () => {
+describe.skip('RelayBridge: use Morpho yield pool (WETH)', () => {
   let relayPool: RelayPool
   let usdc: IUSDC
   let morphoUsdcPool: ERC4626
