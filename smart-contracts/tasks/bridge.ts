@@ -92,8 +92,9 @@ task('bridge:send-proxy', 'Send tokens across a proxy bridge (test purposes)')
         asset: assetAddress,
         recipient,
       },
-      { ethers }
+      { ethers: rawEthers, zksyncEthers, network }
     ) => {
+      const ethers = network.zksync ? zksyncEthers : rawEthers
       const bridge = await ethers.getContractAt('BridgeProxy', bridgeAddress)
       const [user] = await ethers.getSigners()
       const userAddress = await user.getAddress()

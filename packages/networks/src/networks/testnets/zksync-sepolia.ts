@@ -12,5 +12,6 @@ export const zkSyncSepolia: NetworkConfig = {
   },
   assets: {
     usdc: '0xAe045DE5638162fa134807Cb558E15A3F5A7F853',
+    weth: '0x2D6Db36B3117802E996f13073A08A685D3FeF7eD',
   },
 }
