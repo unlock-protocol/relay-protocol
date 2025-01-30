@@ -30,7 +30,6 @@ describe('RelayPool: initialization of ERC20 pool', () => {
         origins: [],
         thirdPartyPool: await thirdPartyPool.getAddress(),
         weth: ethers.ZeroAddress,
-        bridgeFee: 0,
         curator: userAddress,
       },
     }

@@ -43,7 +43,6 @@ describe('RelayPoolNativeGateway', () => {
           origins: [],
           thirdPartyPool: thirdPartyPoolAddress,
           weth: WETH,
-          bridgeFee: 0,
           curator: userAddress,
         },
       }

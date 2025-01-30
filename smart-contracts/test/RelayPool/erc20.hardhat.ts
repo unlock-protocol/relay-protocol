@@ -32,7 +32,6 @@ describe('RelayBridge: when using an ERC20', () => {
         origins: [],
         thirdPartyPool: await thirdPartyPool.getAddress(),
         weth: ethers.ZeroAddress, // Not used in this test
-        bridgeFee: 0,
         curator: userAddress,
       },
     }

@@ -1,5 +1,4 @@
 import { task } from 'hardhat/config'
-import { setTimeout } from 'timers/promises'
 
 task('bridge:send', 'Send tokens to a pool across a relay bridge')
   .addParam('bridge', 'The Relay Bridge contract address')
