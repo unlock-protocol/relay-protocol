@@ -18,7 +18,10 @@ export interface NetworkConfig {
       portalProxy?: string
       disputeGame?: string
     }
-    zksync?: boolean
+    zksync?: {
+      l1SharedDefaultBridge: string
+      l2SharedDefaultBridge: string
+    }
   }
   rpc?: string
   hyperlaneMailbox: string

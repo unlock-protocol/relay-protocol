@@ -8,7 +8,10 @@ export const zkSyncSepolia: NetworkConfig = {
   slug: 'zksync-sepolia',
   rpc: 'https://sepolia.era.zksync.dev',
   bridges: {
-    zksync: true,
+    zksync: {
+      l1SharedDefaultBridge: '0x3E8b2fe58675126ed30d0d12dea2A9bda72D18Ae',
+      l2SharedDefaultBridge: '0x681A1AFdC2e06776816386500D2D461a6C96cB45',
+    },
   },
   assets: {
     usdc: '0xAe045DE5638162fa134807Cb558E15A3F5A7F853',

@@ -84,15 +84,11 @@ task('deploy:bridge-proxy', 'Deploy a bridge proxy').setAction(
         `ArbOrbit bridge deployed at: ${await proxyBridge.getAddress()}`
       )
     } else if (type === 'zksync') {
-      const chainId = BigInt(network.config.chainId!)
-
-      // TODO: pass L1 chainId when deplopying for pools
-      // get addresses from zksync RPC
-      const { l2SharedDefaultBridge, l1SharedDefaultBridge } =
-        await getZkSyncBridgeContracts(chainId)
-
       // deploy using `deployContract` helper
-      const deployArgs = [l2SharedDefaultBridge, l1SharedDefaultBridge]
+      const deployArgs = [
+        bridges.zksync!.l2SharedDefaultBridge!,
+        bridges.zksync!.l1SharedDefaultBridge!,
+      ]
       console.log(deployArgs)
       const { hash, address } = await deployContract(
         hre,
