@@ -22,6 +22,10 @@ export default async function ({
     contractAddress: event.log.address,
   })
 
+  if (!pool) {
+    throw new Error(`Relay pool ${event.log.address} not found`)
+  }
+
   // Fetch current state from both pools
   const [
     relayTotalAssets,
