@@ -11,6 +11,7 @@ struct OriginSettings {
   uint256 maxDebt;
   uint256 outstandingDebt;
   address proxyBridge;
+  uint8 bridgeFee; // basis points
 }
 
 struct OriginParam {
@@ -18,6 +19,7 @@ struct OriginParam {
   address bridge;
   address proxyBridge;
   uint256 maxDebt;
+  uint8 bridgeFee; // basis points
 }
 
 error UnauthorizedCaller(address sender);
@@ -60,9 +62,6 @@ contract RelayPool is ERC4626, Ownable {
   // The address of the yield pool where funds are deposited
   address public yieldPool;
 
-  // The protocol fee in basis points: 1bps = 0.01%
-  uint8 public bridgeFee;
-
   // Keeping track of the total fees collected
   uint256 public totalCollectedBridgeFees = 0;
   uint256 public streamedFees = 0; // Full streamed fees
@@ -101,7 +100,6 @@ contract RelayPool is ERC4626, Ownable {
     uint256 outstandingDebt,
     address proxyBridge
   );
-  event BridgeFeeSet(uint8 previousFee, uint8 newFee);
 
   // Warning: the owner of the pool should always be a timelock address with a significant delay to reduce the risk of stolen funds
   constructor(
@@ -112,7 +110,6 @@ contract RelayPool is ERC4626, Ownable {
     OriginParam[] memory origins,
     address thirdPartyPool,
     address wrappedEth,
-    uint8 feeBasisPoints,
     address curator
   ) ERC4626(asset, name, symbol) Ownable(msg.sender) {
     // TODO: can we verify that the asset is an ERC20?
@@ -130,9 +127,6 @@ contract RelayPool is ERC4626, Ownable {
 
     // set weth
     WETH = wrappedEth;
-
-    // set protocol fee
-    bridgeFee = feeBasisPoints;
 
     // Change the owner to the curator
     transferOwnership(curator);
@@ -164,7 +158,8 @@ contract RelayPool is ERC4626, Ownable {
     authorizedOrigins[origin.chainId][origin.bridge] = OriginSettings({
       maxDebt: origin.maxDebt,
       outstandingDebt: 0,
-      proxyBridge: origin.proxyBridge
+      proxyBridge: origin.proxyBridge,
+      bridgeFee: origin.bridgeFee
     });
     emit OriginAdded(origin);
   }
@@ -179,12 +174,6 @@ contract RelayPool is ERC4626, Ownable {
       origin.outstandingDebt,
       origin.proxyBridge
     );
-  }
-
-  function setBridgeFee(uint8 feeBasisPoints) public onlyOwner {
-    uint8 oldFee = bridgeFee;
-    bridgeFee = feeBasisPoints;
-    emit BridgeFeeSet(oldFee, feeBasisPoints);
   }
 
   function increaseOutStandingDebt(uint256 amount) internal {
@@ -311,7 +300,7 @@ contract RelayPool is ERC4626, Ownable {
     messages[chainId][bridge][nonce] = message;
 
     // Pull funds from the yield pool to get the amount to be loaned
-    uint256 loanAmount = collectBridgeFees(amount);
+    uint256 loanAmount = collectBridgeFees(origin.bridgeFee, amount);
 
     // Check if origin settings are respected
     if (origin.outstandingDebt + loanAmount > origin.maxDebt) {
@@ -359,7 +348,10 @@ contract RelayPool is ERC4626, Ownable {
   }
 
   // Collect the bridge fees and returns the remainder.
-  function collectBridgeFees(uint256 bridgedAmount) internal returns (uint256) {
+  function collectBridgeFees(
+    uint8 bridgeFee,
+    uint256 bridgedAmount
+  ) internal returns (uint256) {
     uint256 feeAmount = (bridgedAmount * bridgeFee) / 10000;
     updateStreamedFees();
     totalCollectedBridgeFees += feeAmount;

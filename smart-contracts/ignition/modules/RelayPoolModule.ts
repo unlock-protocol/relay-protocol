@@ -10,7 +10,6 @@ export default buildModule('RelayPool', (m) => {
   const origins = m.getParameter('origins')
   const thirdPartyPool = m.getParameter('thirdPartyPool')
   const weth = m.getParameter('weth')
-  const bridgeFee = m.getParameter('bridgeFee')
   const curator = m.getParameter('curator')
 
   const relayPool = m.contract('RelayPool', [
@@ -21,7 +20,6 @@ export default buildModule('RelayPool', (m) => {
     origins,
     thirdPartyPool,
     weth,
-    bridgeFee,
     curator,
   ])
   return { relayPool }

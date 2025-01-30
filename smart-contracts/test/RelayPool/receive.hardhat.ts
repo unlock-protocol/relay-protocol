@@ -33,7 +33,6 @@ describe('RelayBridge: receive', () => {
         origins: [],
         thirdPartyPool: thirdPartyPoolAddress,
         weth: await myWeth.getAddress(),
-        bridgeFee: 0,
         curator: userAddress,
       },
     }
@@ -76,7 +75,6 @@ describe('RelayBridge: receive', () => {
         origins: [],
         thirdPartyPool: thirdPartyPoolAddress,
         weth: await myWeth.getAddress(),
-        bridgeFee: 0,
         curator: userAddress,
       },
     }
