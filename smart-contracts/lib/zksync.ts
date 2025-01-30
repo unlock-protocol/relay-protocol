@@ -27,6 +27,44 @@ export async function getZkSyncBridgeContracts(chainId: bigint) {
   return result
 }
 
+export const verifyContract = async ({
+  hre,
+  address,
+  deployArgs,
+  contract,
+}: {
+  hre: HardhatRuntimeEnvironment
+  address: string
+  deployArgs?: any
+  contract: string
+}) => {
+  const { run } = hre
+  let tries = 0
+  while (tries < 5) {
+    try {
+      await run('verify:verify', {
+        address,
+        contract,
+        constructorArguments: deployArgs,
+      })
+      tries++
+    } catch (error) {
+      if (tries >= 5) {
+        console.log(
+          `FAIL: Verification failed for contract at ${address} with args : ${deployArgs.toString()} after 5 tries.`
+        )
+        console.log(error)
+        return
+      } else {
+        console.log(
+          `FAIL: Verification failed for contract at ${address} with args : ${deployArgs.toString()}. Retrying in 10 seconds`
+        )
+        await new Promise((resolve) => setTimeout(resolve, 10000))
+      }
+    }
+  }
+}
+
 export async function deployContract(
   hre: HardhatRuntimeEnvironment,
   contractNameOrFullyQualifiedName: string,
@@ -45,6 +83,13 @@ export async function deployContract(
   const address = await contract.getAddress()
   const { hash } = await contract.deploymentTransaction()
 
+  // verify
+  await verifyContract({
+    hre,
+    address,
+    contract: contractNameOrFullyQualifiedName,
+    deployArgs,
+  })
   return {
     contract,
     hash,
