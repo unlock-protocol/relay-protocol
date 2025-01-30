@@ -4,13 +4,13 @@ import { networks } from '@relay-protocol/networks'
 import RelayPoolFactoryModule from '../../ignition/modules/RelayPoolFactoryModule'
 
 task('deploy:pool-factory', 'Deploy a relay pool factory').setAction(
-  async (_params, { ethers, ignition }) => {
+  async (_params, { ethers, ignition, run, ...rest }) => {
     // get args value
     const { chainId } = await ethers.provider.getNetwork()
     const {
       hyperlaneMailbox,
       name: networkName,
-      weth,
+      assets: { weth },
     } = networks[chainId.toString()]
     console.log(`deploying on ${networkName} (${chainId})...`)
 
@@ -19,14 +19,22 @@ task('deploy:pool-factory', 'Deploy a relay pool factory').setAction(
       RelayPoolFactory: {
         hyperlaneMailbox,
         weth,
+        verify: true,
       },
     }
+
+    const deploymentId = `RelayPoolFactory-${chainId.toString()}`
     const { relayPoolFactory } = await ignition.deploy(RelayPoolFactoryModule, {
       parameters,
-      deploymentId: `RelayPoolFactory-${chainId.toString()}`,
+      deploymentId,
     })
-    console.log(
-      `relayPoolFactory deployed to: ${await relayPoolFactory.getAddress()}`
-    )
+
+    const poolFactoryAddress = await relayPoolFactory.getAddress()
+
+    console.log(`relayPoolFactory deployed to: ${poolFactoryAddress}`)
+    await run('verify:verify', {
+      address: poolFactoryAddress,
+      constructorArguments: [hyperlaneMailbox, weth],
+    })
   }
 )
