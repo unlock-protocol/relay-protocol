@@ -24,3 +24,10 @@ yarn workspace @relay-protocol/smart-contracts build
 # build the abis package
 yarn build:ts
 ```
+
+Make sure you update the version in `package.json` and then publish:
+
+```
+npm login
+npm publish --access public
+```
