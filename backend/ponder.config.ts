@@ -129,7 +129,7 @@ export default createConfig({
       abi: RelayPoolFactory as Abi,
       network: {
         sepolia: {
-          address: '0xF06fB9fBC957e99D4B527B0a73a894A483EA1c46',
+          address: '0xa6A1E3FE900282372a8c7d2a758aBAa1ba3EC7D5',
         },
       },
     },
@@ -137,7 +137,7 @@ export default createConfig({
       abi: RelayPool as Abi,
       network: 'sepolia',
       address: factory({
-        address: '0xF06fB9fBC957e99D4B527B0a73a894A483EA1c46',
+        address: '0xa6A1E3FE900282372a8c7d2a758aBAa1ba3EC7D5',
         event: poolDeployedEvent,
         parameter: 'pool',
       }),
