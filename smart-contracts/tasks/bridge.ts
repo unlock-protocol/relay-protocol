@@ -20,8 +20,9 @@ task('bridge:send', 'Send tokens to a pool across a relay bridge')
         destChain = 11155111,
         // asset: assetAddress,
       },
-      { ethers }
+      { ethers: rawEthers, zksyncEthers, network }
     ) => {
+      const ethers = network.zksync ? zksyncEthers : rawEthers
       const bridge = await ethers.getContractAt('RelayBridge', bridgeAddress)
       const assetAddress = await bridge.asset()
       const [user] = await ethers.getSigners()
@@ -49,7 +50,7 @@ task('bridge:send', 'Send tokens to a pool across a relay bridge')
       }
 
       // TODO: estimate fee correctly
-      const hyperlaneFee = ethers.parseEther('0.003')
+      const hyperlaneFee = ethers.parseEther('0.005')
       const value =
         assetAddress === ethers.ZeroAddress
           ? BigInt(amount) + hyperlaneFee
