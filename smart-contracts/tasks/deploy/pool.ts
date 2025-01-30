@@ -146,13 +146,6 @@ task('deploy:pool', 'Deploy a relay pool')
         }
       }
 
-      // ERC20 asset,
-      // string memory name,
-      // string memory symbol,
-      // OriginParam[] memory origins,
-      // address thirdPartyPool,
-      // uint8 bridgeFee
-
       // deploy the pool
       const tx = await factoryContract.deployPool(
         asset,
