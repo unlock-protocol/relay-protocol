@@ -1,6 +1,5 @@
 import { createConfig, factory } from 'ponder'
 
-// ABIs
 import {
   RelayPool,
   RelayBridge,
@@ -14,24 +13,29 @@ const poolDeployedEvent: AbiEvent = {
   anonymous: false,
   inputs: [
     {
-      indexed: false,
+      indexed: true,
       internalType: 'address',
       name: 'pool',
       type: 'address',
     },
     {
-      indexed: false,
+      indexed: true,
       internalType: 'address',
       name: 'creator',
       type: 'address',
     },
     {
-      indexed: false,
+      indexed: true,
       internalType: 'address',
       name: 'asset',
       type: 'address',
     },
-    { indexed: false, internalType: 'string', name: 'name', type: 'string' },
+    {
+      indexed: false,
+      internalType: 'string',
+      name: 'name',
+      type: 'string',
+    },
     {
       indexed: false,
       internalType: 'string',
@@ -40,10 +44,26 @@ const poolDeployedEvent: AbiEvent = {
     },
     {
       components: [
-        { internalType: 'uint32', name: 'chainId', type: 'uint32' },
-        { internalType: 'address', name: 'bridge', type: 'address' },
-        { internalType: 'address', name: 'proxyBridge', type: 'address' },
-        { internalType: 'uint256', name: 'maxDebt', type: 'uint256' },
+        {
+          internalType: 'uint32',
+          name: 'chainId',
+          type: 'uint32',
+        },
+        {
+          internalType: 'address',
+          name: 'bridge',
+          type: 'address',
+        },
+        {
+          internalType: 'address',
+          name: 'proxyBridge',
+          type: 'address',
+        },
+        {
+          internalType: 'uint256',
+          name: 'maxDebt',
+          type: 'uint256',
+        },
       ],
       indexed: false,
       internalType: 'struct OriginParam[]',
@@ -55,6 +75,12 @@ const poolDeployedEvent: AbiEvent = {
       internalType: 'address',
       name: 'thirdPartyPool',
       type: 'address',
+    },
+    {
+      indexed: false,
+      internalType: 'uint8',
+      name: 'bridgeFee',
+      type: 'uint8',
     },
   ],
   name: 'PoolDeployed',
