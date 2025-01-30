@@ -155,6 +155,7 @@ describe('RelayPool: curator', () => {
       bridge: string
       maxDebt: bigint
       proxyBridge: string
+      bridgeFee: number
     }
     before(async () => {
       originToRemove = {
@@ -162,6 +163,7 @@ describe('RelayPool: curator', () => {
         bridge: ethers.Wallet.createRandom().address,
         maxDebt: ethers.parseEther('10'),
         proxyBridge: ethers.Wallet.createRandom().address,
+        bridgeFee: 0,
       }
 
       // Let's first add it!

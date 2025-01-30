@@ -173,7 +173,7 @@ describe('RelayBridge: claim', () => {
     ).to.equal(bridgedAmount)
   })
 
-  it.only('should desposit the funds in the 3rd party pool', async () => {
+  it('should desposit the funds in the 3rd party pool', async () => {
     const abiCoder = new ethers.AbiCoder()
     const relayPoolAddress = await relayPool.getAddress()
     const bridgedAmount = ethers.parseEther('0.033')
