@@ -18,7 +18,7 @@ const {
 } = networks[ETH_CHAIN_ID.toString()]
 
 // USDC bridge tx on Sepolia
-// https://sepolia.arbiscan.io/tx/0x075f42ae6e150209c543959ca8b0f1e3bedcf146c86fb19a073f783b38ed15f3
+// https://sepolia-era.zksync.network/tx/0x94372eed4202154a87527eed4f24ec1cabd77630db7b7172ea82a52fe1608274
 const recipientAddress = '0x246A13358Fb27523642D86367a51C2aEB137Ac6C'
 const amount = 1000n
 
@@ -102,7 +102,6 @@ describe('ZkSyncBridgeProxy', function () {
       )
 
       const receipt = await tx.wait()
-      console.log(receipt)
 
       // weth transfer happened
       const { event: erc20TransferEvent } = await getEvent(
@@ -111,16 +110,7 @@ describe('ZkSyncBridgeProxy', function () {
         new Interface(ERC20_ABI)
       )
       expect(erc20TransferEvent.args.to).to.equals(recipientAddress)
-      expect(erc20TransferEvent.args.amount).to.equals(amount.toString())
-
-      // // outbox recorded
-      // const { event: outboxEvent } = await getEvent(
-      //   receipt!,
-      //   'OutBoxTransactionExecuted'
-      // )
-      // expect(outboxEvent.args.to).to.equals(returnedProof.destination)
-      // expect(outboxEvent.args.l2Sender).to.equals(returnedProof.caller)
-      // expect(balanceAfter).to.equals(balanceBefore + amount)
+      expect(erc20TransferEvent.args.value).to.equals(amount.toString())
     })
   })
 })
