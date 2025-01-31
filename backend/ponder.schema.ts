@@ -147,3 +147,100 @@ export const relayBridge = onchainTable('relay_bridge', (t) => ({
   createdAt: t.bigint().notNull(),
   createdAtBlock: t.bigint().notNull(),
 }))
+
+/**
+ * Track bridge transactions across chains
+ *
+ * Bridge identification:
+ * - originBridgeAddress: Bridge contract initiating the transfer
+ * - nonce: Unique nonce from the origin bridge
+ * - originChainId: Source chain ID
+ *
+ * Chain/Pool info:
+ * - destinationPoolAddress: Destination pool that will receive funds
+ * - destinationPoolChainId: Chain ID of the destination pool
+ *
+ * Transaction participants:
+ * - originSender: User who initiated the bridge
+ * - destinationRecipient: Address receiving the instant loan
+ *
+ * Asset details:
+ * - asset: Asset contract address being bridged
+ * - amount: Amount of asset being bridged
+ *
+ * Hyperlane:
+ * - hyperlaneMessageId: ID of the fast Hyperlane message
+ *
+ * Bridge status:
+ * - nativeBridgeStatus: INITIATED, PROVEN, FINALIZED
+ * - nativeBridgeProofTxHash: Transaction hash of proof submission
+ * - nativeBridgeFinalizedTxHash: Transaction hash of finalization
+ *
+ * Loan tracking:
+ * - loanEmittedTxHash: Transaction hash of loan emission
+ *
+ * Origin transaction:
+ * - originTimestamp: Block timestamp when bridge was initiated
+ * - originTxHash: Transaction hash of the bridge initiation
+ */
+export const bridgeTransaction = onchainTable(
+  'bridge_transaction',
+  (t) => ({
+    originBridgeAddress: t.hex().notNull(),
+    nonce: t.bigint().notNull(),
+    originChainId: t.integer().notNull(),
+    destinationPoolAddress: t.hex().notNull(),
+    destinationPoolChainId: t.integer().notNull(),
+    originSender: t.hex().notNull(),
+    destinationRecipient: t.hex().notNull(),
+    asset: t.hex().notNull(),
+    amount: t.bigint().notNull(),
+    hyperlaneMessageId: t.hex(),
+    nativeBridgeStatus: t.text().notNull(),
+    nativeBridgeProofTxHash: t.hex(),
+    nativeBridgeFinalizedTxHash: t.hex(),
+    loanEmittedTxHash: t.hex(),
+    originTimestamp: t.bigint().notNull(),
+    originTxHash: t.hex().notNull(),
+  }),
+  (table) => ({
+    pk: primaryKey({
+      columns: [table.originChainId, table.originBridgeAddress, table.nonce],
+    }),
+    poolIdx: index().on(
+      table.destinationPoolChainId,
+      table.destinationPoolAddress
+    ),
+    senderIdx: index().on(table.originSender),
+    assetIdx: index().on(table.asset),
+  })
+)
+
+// relation between poolOrigin and bridgeTransaction
+export const poolOriginBridgeTransactions = relations(
+  poolOrigin,
+  ({ many }) => ({
+    transactions: many(bridgeTransaction),
+  })
+)
+
+// reverse relation between bridgeTransaction and poolOrigin
+export const bridgeTransactionOrigin = relations(
+  bridgeTransaction,
+  ({ one }) => ({
+    origin: one(poolOrigin, {
+      fields: [
+        bridgeTransaction.destinationPoolChainId,
+        bridgeTransaction.destinationPoolAddress,
+        bridgeTransaction.originChainId,
+        bridgeTransaction.originBridgeAddress,
+      ],
+      references: [
+        poolOrigin.chainId,
+        poolOrigin.pool,
+        poolOrigin.originChainId,
+        poolOrigin.originBridge,
+      ],
+    }),
+  })
+)

@@ -11,8 +11,9 @@ const walk = async (dirPath: string) =>
     )
   )
 
-export const parseExports = async (folderName: string) => {
+export const parseExports = async (folderName: string, destFolder: string) => {
   const files = await walk(path.resolve('src', folderName))
+
   const exportsList = files!
     .flat()
     .filter((f: string) => f.includes('.json'))
@@ -21,9 +22,8 @@ export const parseExports = async (folderName: string) => {
       fs.pathExistsSync(path.resolve(f))
       // get contractName
       const contractName = path.parse(f).name
-      const exportPath = `./${path
-        .relative(process.cwd(), f)
-        .replace('src/abis/', '')}`
+
+      const exportPath = `./${path.relative(destFolder, f)}`
       return {
         contractName,
         exportPath,
@@ -40,12 +40,11 @@ export const createIndexFile = async (
   fileContent.push("// This file is generated, please don't edit directly")
   fileContent.push("// Refer to 'yarn build:index' for more\n")
 
-  const abiFiles = await parseExports(srcFolder)
+  const abiFiles = await parseExports(srcFolder, destFolder)
 
   abiFiles.forEach(({ contractName, exportPath }) =>
     fileContent.push(`import ${contractName} from '${exportPath}'`)
   )
-
   fileContent.push('\n// exports')
 
   abiFiles.forEach(({ contractName }) =>
@@ -53,7 +52,7 @@ export const createIndexFile = async (
   )
 
   await fs.outputFile(
-    path.resolve(destFolder, srcFolder, 'index.ts'),
+    path.resolve(destFolder, 'index.ts'),
     fileContent.join('\n')
   )
 }

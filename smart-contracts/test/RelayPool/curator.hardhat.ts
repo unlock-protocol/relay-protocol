@@ -37,7 +37,6 @@ describe('RelayPool: curator', () => {
         origins: [],
         thirdPartyPool: await thirdPartyPool.getAddress(),
         weth: ethers.ZeroAddress,
-        bridgeFee: 0,
         curator: userAddress,
       },
     }
@@ -110,6 +109,7 @@ describe('RelayPool: curator', () => {
       bridge: ethers.Wallet.createRandom().address,
       maxDebt: ethers.parseEther('10'),
       proxyBridge: ethers.Wallet.createRandom().address,
+      bridgeFee: 5,
     }
 
     it('should only be callable by the curator', async () => {
@@ -155,6 +155,7 @@ describe('RelayPool: curator', () => {
       bridge: string
       maxDebt: bigint
       proxyBridge: string
+      bridgeFee: number
     }
     before(async () => {
       originToRemove = {
@@ -162,6 +163,7 @@ describe('RelayPool: curator', () => {
         bridge: ethers.Wallet.createRandom().address,
         maxDebt: ethers.parseEther('10'),
         proxyBridge: ethers.Wallet.createRandom().address,
+        bridgeFee: 0,
       }
 
       // Let's first add it!
@@ -213,29 +215,6 @@ describe('RelayPool: curator', () => {
     })
   })
 
-  describe('setBridgeFee', () => {
-    it('should only be callable by the curator', async () => {
-      const [, another] = await ethers.getSigners()
-      await expect(relayPool.connect(another).setBridgeFee(100))
-        .to.be.revertedWithCustomError(relayPool, 'OwnableUnauthorizedAccount')
-        .withArgs(await another.getAddress())
-    })
-    it('should set the new protocol fee and emit and event', async () => {
-      const bridgeFeeBefore = await relayPool.bridgeFee()
-      const newBridgeFee = bridgeFeeBefore + 100n
-      const receipt = await (await relayPool.setBridgeFee(100)).wait()
-      const bridgeFeeAfter = await relayPool.bridgeFee()
-      expect(bridgeFeeAfter).to.equal(newBridgeFee)
-      const { event } = await getEvent(
-        receipt!,
-        'BridgeFeeSet',
-        relayPool.interface
-      )
-      expect(event.args.previousFee).to.equal(bridgeFeeBefore)
-      expect(event.args.newFee).to.equal(bridgeFeeAfter)
-    })
-  })
-
   describe('timelock', () => {
     const delay = 60 * 60 * 24 * 10 // 10 days
     let timelock: Timelock
@@ -254,12 +233,12 @@ describe('RelayPool: curator', () => {
     it('should work when the curator is a timelock', async () => {
       expect(await relayPool.owner()).to.equal(await timelock.getAddress())
 
-      const bridgeFeeBefore = await relayPool.bridgeFee()
-      const newBridgeFee = bridgeFeeBefore + 100n
+      const streamingPeriodBefore = await relayPool.streamingPeriod()
+      const newStreamingPeriod = streamingPeriodBefore * 2n
 
       const calldata = await relayPool.interface.encodeFunctionData(
-        'setBridgeFee',
-        [newBridgeFee]
+        'updateStreamingPeriod',
+        [newStreamingPeriod]
       )
       const predecessor = ethers.encodeBytes32String('')
       const salt = ethers.keccak256(ethers.toUtf8Bytes('mysalt'))
@@ -328,8 +307,8 @@ describe('RelayPool: curator', () => {
       expect(await timelock.isOperationPending(operationId)).to.equal(false)
       expect(await timelock.isOperationReady(operationId)).to.equal(false)
       expect(await timelock.isOperationDone(operationId)).to.equal(true)
-      const bridgeFeeAfter = await relayPool.bridgeFee()
-      expect(bridgeFeeAfter).to.equal(newBridgeFee)
+      const streamingPeriodAfter = await relayPool.streamingPeriod()
+      expect(streamingPeriodAfter).to.equal(newStreamingPeriod)
     })
   })
 })

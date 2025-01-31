@@ -1,0 +1,35 @@
+name: Main Branch
+
+on:
+  push:
+    branches: main
+
+jobs:
+  run-tests:
+    name: 'Run the tests'
+    runs-on: ubuntu-24.04
+    strategy:
+      matrix:
+        folders: ['smart-contracts', 'backend']
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - run: yarn
+        shell: bash
+
+      - run: 'yarn build'
+        shell: bash
+
+      - name: 'run lint'
+        run: yarn workspace @relay-protocol/${{matrix.folders}} lint
+        shell: bash
+
+      - name: 'run tests'
+        run: yarn workspace @relay-protocol/${{matrix.folders}} run test
+        shell: bash
