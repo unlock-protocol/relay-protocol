@@ -6,8 +6,6 @@ import {IL1SharedBridge} from "../interfaces/zksync/IL1SharedBridge.sol";
 import {IL2SharedBridge} from "../interfaces/zksync/IL2SharedBridge.sol";
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
-import "hardhat/console.sol";
-
 /**
  * from https://github.com/matter-labs/era-contracts/blob/3288adb0aee6c1c3022f6c817f95234764e0d611/l1-contracts/contracts/common/libraries/UnsafeBytes.sol
  * @author Matter Labs
@@ -122,7 +120,6 @@ contract ZkSyncBridgeProxy is BridgeProxy {
 
     // decode value/amount from L2 > L1 message
     amount = _parseL2WithdrawalMessage(params.message);
-    console.log(amount);
 
     // finalize withdrawal on L1
     L1_SHARED_BRIDGE.finalizeWithdrawal(
