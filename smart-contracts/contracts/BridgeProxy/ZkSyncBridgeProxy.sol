@@ -97,11 +97,6 @@ contract ZkSyncBridgeProxy is BridgeProxy {
     bytes32[] merkleProof;
   }
 
-  struct L2Message {
-    address sender;
-    bytes data;
-    uint256 txNumberInblock;
-  }
 
   function claim(
     address, // currency
