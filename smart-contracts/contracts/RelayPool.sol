@@ -6,6 +6,7 @@ import {ERC20} from "solmate/src/tokens/ERC20.sol";
 import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
 import {IWETH} from "./interfaces/IWETH.sol";
 import {TypeCasts} from "./utils/TypeCasts.sol";
+import {HyperlaneMessage} from "./Types.sol";
 
 struct OriginSettings {
   uint256 maxDebt;
@@ -289,7 +290,7 @@ contract RelayPool is ERC4626, Ownable {
   function handle(
     uint32 chainId,
     bytes32 bridgeAddress,
-    bytes calldata message
+    bytes calldata data
   ) external payable {
     // Only `HYPERLANE_MAILBOX` is authorized to call this method
     if (msg.sender != HYPERLANE_MAILBOX) {
@@ -306,51 +307,57 @@ contract RelayPool is ERC4626, Ownable {
     }
 
     // Parse the data received from the sender chain
-    (uint256 nonce, address recipient, uint256 amount, uint256 timestamp) = abi
-      .decode(message, (uint256, address, uint256, uint256));
+    HyperlaneMessage memory message = abi.decode(data, (HyperlaneMessage));
 
     // if the message is too recent, we reject it
-    if (block.timestamp - timestamp < origin.coolDown) {
+    if (block.timestamp - message.timestamp < origin.coolDown) {
       revert TooRecentMessage(
         chainId,
         bridge,
-        nonce,
-        timestamp,
+        message.nonce,
+        message.timestamp,
         origin.coolDown
       );
     }
 
     // Check if message was already processed
-    if (messages[chainId][bridge][nonce].length > 0) {
-      revert MessageAlreadyProcessed(chainId, bridge, nonce);
+    if (messages[chainId][bridge][message.nonce].length > 0) {
+      revert MessageAlreadyProcessed(chainId, bridge, message.nonce);
     }
     // Mark as processed if not
-    messages[chainId][bridge][nonce] = message;
+    messages[chainId][bridge][message.nonce] = data;
 
-    uint256 feeAmount = (amount * origin.bridgeFee) / 10000;
+    uint256 feeAmount = (message.amount * origin.bridgeFee) / 10000;
     pendingBridgeFees += feeAmount;
 
     // Check if origin settings are respected
     // We look at the full amount, because feed are considered debt
     // (they are owed to the pool)
-    if (origin.outstandingDebt + amount > origin.maxDebt) {
+    if (origin.outstandingDebt + message.amount > origin.maxDebt) {
       revert TooMuchDebtFromOrigin(
         chainId,
         bridge,
         origin.maxDebt,
-        nonce,
-        recipient,
-        amount
+        message.nonce,
+        message.recipient,
+        message.amount
       );
     }
-    origin.outstandingDebt += amount;
-    increaseOutStandingDebt(amount);
+    origin.outstandingDebt += message.amount;
+    increaseOutStandingDebt(message.amount);
 
     // We only send the amount net of fees
-    sendFunds(amount - feeAmount, recipient);
+    sendFunds(message.amount - feeAmount, message.recipient);
 
     // TODO: handle insufficient funds?
-    emit LoanEmitted(nonce, recipient, asset, amount, chainId, bridge);
+    emit LoanEmitted(
+      message.nonce,
+      message.recipient,
+      asset,
+      message.amount,
+      chainId,
+      bridge
+    );
   }
 
   // Compute the streaming fees

@@ -7,15 +7,17 @@ import { MyToken, MyWeth, MyYieldPool, RelayPool } from '../../typechain-types'
 
 const relayBridgeOptimism = '0x0000000000000000000000000000000000000010'
 const oPStackNativeBridgeProxy = '0x0000000000000000000000000000000000000010'
+const now = () => Math.floor(new Date().getTime() / 1000)
 
 export const encodeData = (
   nonce: bigint,
   recipient: string,
-  amount: bigint
+  amount: bigint,
+  timestamp?: number
 ) => {
   const abiCoder = new AbiCoder()
-  const types = ['uint256', 'address', 'uint256']
-  return abiCoder.encode(types, [nonce, recipient, amount])
+  const types = ['uint256', 'address', 'uint256', 'uint256']
+  return abiCoder.encode(types, [nonce, recipient, amount, timestamp || now()])
 }
 
 describe('ERC20 RelayBridge: when receiving a message from the Hyperlane Mailbox', () => {
@@ -52,6 +54,7 @@ describe('ERC20 RelayBridge: when receiving a message from the Hyperlane Mailbox
             maxDebt: ethers.parseEther('10'),
             proxyBridge: oPStackNativeBridgeProxy,
             bridgeFee: 0,
+            coolDown: 0,
           },
         ],
         thirdPartyPool: await thirdPartyPool.getAddress(),
@@ -326,6 +329,7 @@ describe('WETH RelayBridge: when receiving a message from the Hyperlane Mailbox'
             maxDebt: ethers.parseEther('10'),
             proxyBridge: oPStackNativeBridgeProxy,
             bridgeFee: 0,
+            coolDown: 0,
           },
         ],
         thirdPartyPool: await thirdPartyPool.getAddress(),

@@ -1,21 +1,11 @@
 import { expect } from 'chai'
-import { AbiCoder } from 'ethers'
 import { ethers, ignition } from 'hardhat'
 import RelayPoolModule from '../../ignition/modules/RelayPoolModule'
 import { MyToken, MyWeth, MyYieldPool, RelayPool } from '../../typechain-types'
+import { encodeData } from './hyperlane.hardhat'
 
 const relayBridgeOptimism = '0x0000000000000000000000000000000000000010'
 const oPStackNativeBridgeProxy = '0x0000000000000000000000000000000000000010'
-
-export const encodeData = (
-  nonce: bigint,
-  recipient: string,
-  amount: bigint
-) => {
-  const abiCoder = new AbiCoder()
-  const types = ['uint256', 'address', 'uint256']
-  return abiCoder.encode(types, [nonce, recipient, amount])
-}
 
 describe('Fees', () => {
   let relayPool: RelayPool
@@ -51,6 +41,7 @@ describe('Fees', () => {
             maxDebt: ethers.parseEther('10'),
             proxyBridge: oPStackNativeBridgeProxy,
             bridgeFee: 5, // (0.05%)
+            coolDown: 0,
           },
         ],
         thirdPartyPool: await thirdPartyPool.getAddress(),
