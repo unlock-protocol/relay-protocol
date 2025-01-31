@@ -1834,7 +1834,7 @@ __metadata:
     "@relay-protocol/eslint-config": "workspace:^"
     "@relay-protocol/tsconfig": "workspace:./packages/tsconfig"
     "@relay-protocol/types": "workspace:./packages/types"
-    "@types/node": "npm:22.12.0"
+    "@types/node": "npm:22.10.0"
     eslint: "npm:9.19.0"
     graphql: "npm:16.10.0"
     graphql-request: "npm:7.1.2"
@@ -1929,7 +1929,7 @@ __metadata:
     "@types/chai": "npm:4.3.20"
     "@types/fs-extra": "npm:11.0.4"
     "@types/mocha": "npm:10.0.10"
-    "@types/node": "npm:22.12.0"
+    "@types/node": "npm:22.10.0"
     "@types/semver": "npm:^7"
     chai: "npm:4.5.0"
     eslint: "npm:9.19.0"
@@ -2521,6 +2521,15 @@ __metadata:
   dependencies:
     undici-types: "npm:~6.20.0"
   checksum: 10/64cde1c2f5e5f7d597d3bd462f52c3c2d688a66623eb75d25e1d1d63d384ef553a27100635ad0dbb7d74da517048aa636947863eb624cf85f25d2f22370ce474
+  languageName: node
+  linkType: hard
+
+"@types/node@npm:22.10.0":
+  version: 22.10.0
+  resolution: "@types/node@npm:22.10.0"
+  dependencies:
+    undici-types: "npm:~6.20.0"
+  checksum: 10/e2561e15eaac6261cf828cd7dcd4882a5ce2e10104db4123566b00418acf30e18518e39c7a906682f44118b420c555cc774ac3e0e6f80e37f55884cfe6cf1f78
   languageName: node
   linkType: hard
 
