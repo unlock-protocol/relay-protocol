@@ -66,7 +66,6 @@ contract RelayPool is ERC4626, Ownable {
   uint256 public pendingBridgeFees = 0;
 
   // All incoming assets are streamed (even though they are instantly deposited in the yield pool)
-  uint256 public totalCollectedAssets = 0;
   uint256 public totalAssetsToStream = 0;
   uint256 public lastAssetsCollectedAt = 0;
   uint256 public streamingPeriod = 7 days;
@@ -413,6 +412,16 @@ contract RelayPool is ERC4626, Ownable {
       payable(recipient).transfer(amount);
     } else {
       withdrawAssetsFromYieldPool(amount, recipient);
+    }
+  }
+
+  // This function is called by anyone to collect assets and start streaming them
+  // to avoid timely attacks.
+  function collectNonDepositedAssets() public {
+    uint256 balance = ERC20(asset).balanceOf(address(this));
+    if (balance > 0) {
+      depositAssetsInYieldPool(balance);
+      addToStreamingAssets(balance);
     }
   }
 
