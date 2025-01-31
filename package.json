@@ -30,7 +30,7 @@
     "backend:start": "yarn build && yarn workspace @relay-protocol/backend start"
   },
   "engines": {
-    "node": ">=20.0.0"
+    "node": "22"
   },
   "packageManager": "yarn@4.6.0",
   "dependencies": {
