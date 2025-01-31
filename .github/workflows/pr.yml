@@ -31,7 +31,7 @@ jobs:
         if: steps.changed-files.outputs.any_changed == 'true'
         shell: bash
 
-      - run: 'yarn build'
+      - run: 'node -v; yarn -v; yarn build'
         if: steps.changed-files.outputs.any_changed == 'true'
         shell: bash
 
@@ -41,6 +41,6 @@ jobs:
         shell: bash
 
       - name: 'run tests'
-        run: node -v; yarn -v; yarn workspace @relay-protocol/${{matrix.folders}} run test
+        run: yarn workspace @relay-protocol/${{matrix.folders}} run test
         if: steps.changed-files.outputs.any_changed == 'true'
         shell: bash
