@@ -35,9 +35,6 @@
     "prettier": "3.4.2",
     "typescript": "5.7.3"
   },
-  "engines": {
-    "node": ">=18.14"
-  },
   "lint-staged": {
     "*.{js,ts}": [
       "eslint --fix",
