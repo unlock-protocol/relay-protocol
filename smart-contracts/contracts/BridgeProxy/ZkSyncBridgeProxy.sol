@@ -62,8 +62,6 @@ library UnsafeBytes {
   }
 }
 
-// docs
-// https://developers.circle.com/stablecoins/message-format
 contract ZkSyncBridgeProxy is BridgeProxy {
   IL2SharedBridge public immutable L2_SHARED_BRIDGE;
   IL1SharedBridge public immutable L1_SHARED_BRIDGE;
