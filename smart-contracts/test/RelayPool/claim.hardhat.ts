@@ -75,13 +75,6 @@ describe('RelayBridge: claim', () => {
     await myWeth.deposit({ value: ethers.parseEther('3') })
     await myWeth.approve(await relayPool.getAddress(), ethers.parseEther('3'))
     await relayPool.deposit(ethers.parseEther('3'), userAddress)
-
-    // Borrow from the pool
-    await relayPool.handle(
-      origins[0].chainId,
-      ethers.zeroPadValue(origins[0].bridge, 32),
-      encodeData(5n, userAddress, ethers.parseEther('1'))
-    )
   })
 
   it('should fail to claim from an unauthorized chain', async () => {
@@ -113,6 +106,13 @@ describe('RelayBridge: claim', () => {
         ethers.parseEther('0.0001'), // minGasLimit,
         '0x', // message
       ]
+    )
+
+    // Borrow from the pool so we can claim later
+    await relayPool.handle(
+      origins[0].chainId,
+      ethers.zeroPadValue(origins[0].bridge, 32),
+      encodeData(5n, userAddress, bridgedAmount)
     )
 
     const myOpStackPortalBalance =
@@ -148,6 +148,13 @@ describe('RelayBridge: claim', () => {
         ethers.parseEther('0.0001'), // minGasLimit,
         '0x', // message
       ]
+    )
+
+    // Borrow from the pool so we can claim later
+    await relayPool.handle(
+      origins[0].chainId,
+      ethers.zeroPadValue(origins[0].bridge, 32),
+      encodeData(6n, userAddress, bridgedAmount)
     )
 
     const outstandingDebtBefore = await relayPool.outstandingDebt()
@@ -191,6 +198,13 @@ describe('RelayBridge: claim', () => {
       ]
     )
 
+    // Borrow from the pool so we can claim later
+    await relayPool.handle(
+      origins[0].chainId,
+      ethers.zeroPadValue(origins[0].bridge, 32),
+      encodeData(7n, userAddress, bridgedAmount)
+    )
+
     const claimData = abiCoder.encode(
       ['bytes', 'address'],
       [transaction, relayPoolAddress]
@@ -200,7 +214,7 @@ describe('RelayBridge: claim', () => {
     await ethers.provider.send('evm_increaseTime', [
       Number(streamingPeriod * 2n),
     ])
-    await relayPool.updateStreamedFees()
+    await relayPool.updateStreamedAssets()
     const poolAssetsBefore = await relayPool.totalAssets()
 
     const relayPoolBalanceBefore =

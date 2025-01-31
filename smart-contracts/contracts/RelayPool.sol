@@ -136,7 +136,7 @@ contract RelayPool is ERC4626, Ownable {
   }
 
   function updateStreamingPeriod(uint256 newPeriod) public onlyOwner {
-    updateStreamedFees();
+    updateStreamedAssets();
     uint256 oldPeriod = streamingPeriod;
     streamingPeriod = newPeriod;
     emit StreamingPeriodChanged(oldPeriod, newPeriod);
@@ -336,9 +336,8 @@ contract RelayPool is ERC4626, Ownable {
   }
 
   // Compute the streaming fees
-  // If the last fee collection was more than 7 days ago, we return the full amount
-  // Otherwise, we return the amount streamed so far to which we add the time-based
-  // pro-rata of the remaining fees to be streamed.
+  // If the last fee collection was more than 7 days ago, we have nothing left to stream
+  // Otherwise, we return the time-based pro-rata of what remains to stream.
   function remainsToStream() internal view returns (uint256) {
     if (block.timestamp - lastAssetsCollectedAt > streamingPeriod) {
       return 0; // Nothing left to stream
@@ -351,10 +350,16 @@ contract RelayPool is ERC4626, Ownable {
   }
 
   // Updates the streamed fees and returns the new value
-  function updateStreamedFees() public returns (uint256) {
+  function updateStreamedAssets() public returns (uint256) {
     totalAssetsToStream = remainsToStream();
     lastAssetsCollectedAt = block.timestamp;
     return totalAssetsToStream;
+  }
+
+  // Internal function to add assets to be accounted in a streaming fashgion
+  function addToStreamingAssets(uint256 amount) internal returns (uint256) {
+    updateStreamedAssets();
+    return totalAssetsToStream += amount;
   }
 
   // This function is called externally to claim funds from a bridge.
@@ -388,13 +393,12 @@ contract RelayPool is ERC4626, Ownable {
     // and we should deposit these funds into the yield pool
     depositAssetsInYieldPool(amount);
 
-    // The amount is the amount that was lended + the fees
+    // The amount is the amount that was loaned + the fees
     // TODO: what happens if the bridgeFee was changed?
-    updateStreamedFees();
     uint256 feeAmount = (amount * origin.bridgeFee) / 10000;
     pendingBridgeFees -= feeAmount;
-    totalAssetsToStream += feeAmount;
-    // This ^^ will create a bump in the total assets... so we need to stream them!
+    // We need to account for it in a streaming fashion
+    addToStreamingAssets(feeAmount);
 
     // TODO: include more details about the origin of the funds
     emit BridgeCompleted(chainId, bridge, amount, claimParams);
