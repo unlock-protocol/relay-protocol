@@ -307,6 +307,8 @@ contract RelayPool is ERC4626, Ownable {
     pendingBridgeFees += feeAmount;
 
     // Check if origin settings are respected
+    // We look at the full amount, because feed are considered debt
+    // (they are owed to the pool)
     if (origin.outstandingDebt + amount > origin.maxDebt) {
       revert TooMuchDebtFromOrigin(
         chainId,
@@ -317,7 +319,6 @@ contract RelayPool is ERC4626, Ownable {
         amount
       );
     }
-
     origin.outstandingDebt += amount;
     increaseOutStandingDebt(amount);
 
@@ -394,7 +395,7 @@ contract RelayPool is ERC4626, Ownable {
     depositAssetsInYieldPool(amount);
 
     // The amount is the amount that was lended + the fees
-    // TODO: what happens if the
+    // TODO: what happens if the bridgeFee was changed?
     uint256 feeAmount = (amount * origin.bridgeFee) / 10000;
     pendingBridgeFees -= feeAmount;
     // This ^^ will create a bump in the total assets... so we need to stream them!
