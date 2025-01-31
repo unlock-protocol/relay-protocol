@@ -7,17 +7,20 @@ import CCTPBridgeProxyModule from '../../ignition/modules/CCTPBridgeProxyModule'
 import OPStackNativeBridgeProxyModule from '../../ignition/modules/OPStackNativeBridgeProxyModule'
 import ArbitrumOrbitNativeBridgeProxyModule from '../../ignition/modules/ArbitrumOrbitNativeBridgeProxyModule'
 
-task('deploy:bridge-proxy', 'Deploy a bridge proxy').setAction(
-  async (_, { ethers, ignition }) => {
+task('deploy:bridge-proxy', 'Deploy a bridge proxy')
+  .addOptionalParam('type', 'the type of bridge to deploy')
+  .setAction(async ({ type }, { ethers, ignition }) => {
     const { chainId } = await ethers.provider.getNetwork()
 
     const { bridges } = networks[chainId.toString()]
 
-    const type = await new AutoComplete({
-      name: 'type',
-      message: 'Please choose a proxy type?',
-      choices: Object.keys(bridges),
-    }).run()
+    if (!type) {
+      type = await new AutoComplete({
+        name: 'type',
+        message: 'Please choose a proxy type?',
+        choices: Object.keys(bridges),
+      }).run()
+    }
 
     // get args value
     const { name } = networks[chainId.toString()]
@@ -42,7 +45,7 @@ task('deploy:bridge-proxy', 'Deploy a bridge proxy').setAction(
       // deploy CCTP bridge
       ;({ bridge: proxyBridge } = await ignition.deploy(CCTPBridgeProxyModule, {
         parameters,
-        deploymentId: `BridgeProxy-CCTP-${chainId.toString()}`,
+        deploymentId: `BridgeProxy-cctp-${chainId.toString()}`,
       }))
       console.log(`CCTP bridge deployed at: ${await proxyBridge.getAddress()}`)
     } else if (type === 'op') {
@@ -56,7 +59,7 @@ task('deploy:bridge-proxy', 'Deploy a bridge proxy').setAction(
         OPStackNativeBridgeProxyModule,
         {
           parameters,
-          deploymentId: `BridgeProxy-OPStack-${chainId.toString()}`,
+          deploymentId: `BridgeProxy-op-${chainId.toString()}`,
         }
       ))
       console.log(
@@ -75,12 +78,13 @@ task('deploy:bridge-proxy', 'Deploy a bridge proxy').setAction(
         ArbitrumOrbitNativeBridgeProxyModule,
         {
           parameters,
-          deploymentId: `BridgeProxy-ArbOrbit-${chainId.toString()}`,
+          deploymentId: `BridgeProxy-arb-${chainId.toString()}`,
         }
       ))
       console.log(
         `ArbOrbit bridge deployed at: ${await proxyBridge.getAddress()}`
       )
     }
-  }
-)
+
+    return proxyBridge.getAddress()
+  })

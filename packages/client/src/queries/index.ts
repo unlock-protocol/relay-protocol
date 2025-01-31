@@ -27,7 +27,7 @@ export const GET_RELAY_POOL = gql`
   query GetRelayPool($contractAddress: String!) {
     relayPool(contractAddress: $contractAddress) {
       contractAddress
-      creator
+      curator
       asset
       yieldPool
       outstandingDebt
@@ -102,6 +102,21 @@ export const GET_POOLS_BY_CURATOR = gql`
             originBridge
           }
         }
+      }
+    }
+  }
+`
+
+export const GET_RELAY_BRDGE_BY_ASSET = gql`
+  query GetBridgeByAsset($assetAddress: String!) {
+    relayBridges(where: { asset: $assetAddress }) {
+      items {
+        chainId
+        contractAddress
+        asset
+        transferNonce
+        createdAt
+        createdAtBlock
       }
     }
   }
