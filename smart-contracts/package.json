@@ -6,6 +6,8 @@
   "author": "Julien Genestoux <julien.genestoux@gmail.com>",
   "license": "MIT",
   "scripts": {
+    "build": "yarn hardhat compile",
+    "build:abis": "yarn hardhat export:abis",
     "test": "yarn run test:optimism && yarn run test:hardhat && yarn run test:ethereum && yarn test:sepolia",
     "test:hardhat": "yarn hardhat test test/**/*.hardhat.ts",
     "test:ethereum": "RPC_URL=https://rpc.unlock-protocol.com/1 yarn hardhat test test/**/*.ethereum.ts",
@@ -20,7 +22,7 @@
     "postpack": "pinst --enable"
   },
   "devDependencies": {
-    "@eslint/js": "9.18.0",
+    "@eslint/js": "9.19.0",
     "@nomicfoundation/hardhat-chai-matchers": "2.0.8",
     "@nomicfoundation/hardhat-ethers": "3.0.8",
     "@nomicfoundation/hardhat-ignition": "0.15.9",
@@ -34,9 +36,10 @@
     "@types/chai": "4.3.20",
     "@types/fs-extra": "11.0.4",
     "@types/mocha": "10.0.10",
-    "@types/node": "22.10.7",
+    "@types/node": "22.12.0",
+    "@types/semver": "^7",
     "chai": "4.5.0",
-    "eslint": "9.18.0",
+    "eslint": "9.19.0",
     "eslint-config-prettier": "10.0.1",
     "eslint-plugin-evm-address-to-checksummed": "0.0.6",
     "eslint-plugin-json": "4.0.1",
@@ -51,17 +54,19 @@
     "pinst": "3.0.0",
     "prettier": "3.4.2",
     "prettier-plugin-solidity": "1.4.2",
+    "semver": "7.6.3",
     "solhint": "5.0.5",
     "solidity-coverage": "0.8.14",
     "ts-node": "10.9.2",
     "typechain": "8.3.2",
     "typescript": "5.7.3",
-    "typescript-eslint": "8.21.0"
+    "typescript-eslint": "8.22.0"
   },
   "dependencies": {
     "@bgd-labs/aave-address-book": "4.8.1",
     "@eth-optimism/contracts-bedrock": "0.17.3",
     "@openzeppelin/contracts": "5.2.0",
-    "@uniswap/v3-periphery": "1.4.4"
+    "@uniswap/v3-periphery": "1.4.4",
+    "solmate": "6.8.0"
   }
 }

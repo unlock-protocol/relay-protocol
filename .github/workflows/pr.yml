@@ -1,9 +1,7 @@
-name: Run Tests
+name: Pull Request
 
 on:
   pull_request:
-  push:
-    branches: main
 
 jobs:
   run-tests:
@@ -27,7 +25,7 @@ jobs:
       - uses: actions/setup-node@v4
         if: steps.changed-files.outputs.any_changed == 'true'
         with:
-          node-version: 20
+          node-version: 22
 
       - run: yarn
         if: steps.changed-files.outputs.any_changed == 'true'

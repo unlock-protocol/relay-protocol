@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.28;
 
-import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import {ERC20} from "solmate/src/tokens/ERC20.sol";
 import {RelayPool, OriginParam} from "./RelayPool.sol";
 
 contract RelayPoolFactory {
@@ -15,8 +15,7 @@ contract RelayPoolFactory {
     string name,
     string symbol,
     OriginParam[] origins,
-    address thirdPartyPool,
-    uint8 bridgeFee
+    address thirdPartyPool
   );
 
   constructor(address hMailbox, address weth) {
@@ -25,12 +24,11 @@ contract RelayPoolFactory {
   }
 
   function deployPool(
-    IERC20 asset,
+    ERC20 asset,
     string memory name,
     string memory symbol,
     OriginParam[] memory origins,
-    address thirdPartyPool,
-    uint8 bridgeFee
+    address thirdPartyPool
   ) public returns (address) {
     RelayPool pool = new RelayPool(
       hyperlaneMailbox,
@@ -40,7 +38,6 @@ contract RelayPoolFactory {
       origins,
       thirdPartyPool,
       wrappedEth,
-      bridgeFee,
       msg.sender
     );
 
@@ -51,8 +48,7 @@ contract RelayPoolFactory {
       name,
       symbol,
       origins,
-      thirdPartyPool,
-      bridgeFee
+      thirdPartyPool
     );
 
     return address(pool);
