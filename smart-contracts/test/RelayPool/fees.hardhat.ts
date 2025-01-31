@@ -79,7 +79,6 @@ describe('Fees', () => {
     const fees = (amount * bridgeFee) / 10000n
     const recipientBalanceBefore = await myToken.balanceOf(recipientAddress) // Probably 0
     const outstandingDebtBefore = await relayPool.outstandingDebt() // Probably 0
-    const collectedFeesBefore = await relayPool.totalCollectedBridgeFees() // Probably 0
     const totalAssetsBefore = await relayPool.totalAssets()
     await relayPool.handle(
       10,
@@ -90,84 +89,9 @@ describe('Fees', () => {
     const userBalanceAfter = await myToken.balanceOf(recipientAddress)
     expect(userBalanceAfter).to.equal(recipientBalanceBefore + amount - fees)
     const outstandingDebtAfter = await relayPool.outstandingDebt()
-    expect(outstandingDebtAfter).to.equal(outstandingDebtBefore + amount - fees)
-    const collectedFeesAfter = await relayPool.totalCollectedBridgeFees()
-    expect(collectedFeesAfter).to.equal(collectedFeesBefore + fees) // fees are increased
+    expect(outstandingDebtAfter).to.equal(outstandingDebtBefore + amount) // fees are considered debt because they are owed to the pool!
+
     const totalAssetsAfter = await relayPool.totalAssets()
-    expect(totalAssetsBefore).to.equal(totalAssetsAfter) // remains unchanged because the fees are streaming from now!
-  })
-
-  describe('streaming', () => {
-    let streamingPeriod: bigint
-    before(async () => {
-      // Advance enough to make sure no fee is streaming anymore
-      streamingPeriod = await relayPool.streamingPeriod()
-      await ethers.provider.send('evm_increaseTime', [
-        Number(streamingPeriod + 1n),
-      ])
-    })
-
-    it('should stream the fees for 7 days and increase the assets progressively', async () => {
-      const recipientAddress = ethers.Wallet.createRandom().address
-      const collectedFeesBefore = await relayPool.totalCollectedBridgeFees() // Probably 0
-
-      const amount = ethers.parseUnits('1')
-      await relayPool.handle(
-        10,
-        ethers.zeroPadValue(relayBridgeOptimism, 32),
-        encodeData(2n, recipientAddress, amount)
-      )
-
-      const totalAssetsAfter = await relayPool.totalAssets()
-      const collectedFeesAfter = await relayPool.totalCollectedBridgeFees()
-      const fee = collectedFeesAfter - collectedFeesBefore
-
-      // Advance by 1/4 of streamingPeriod
-      await ethers.provider.send('evm_increaseTime', [
-        Number(streamingPeriod / 4n),
-      ])
-      // Mine a new block
-      await ethers.provider.send('evm_mine')
-      const totalAssetsAfterOneQuarter = await relayPool.totalAssets()
-      expect(totalAssetsAfterOneQuarter).to.equal(totalAssetsAfter + fee / 4n)
-
-      // Advance by another quarter of the remaining time
-      await ethers.provider.send('evm_increaseTime', [
-        Number(streamingPeriod / 4n),
-      ])
-      // Mine a new block
-      await ethers.provider.send('evm_mine')
-      const totalAssetsAfterOneHalf = await relayPool.totalAssets()
-      expect(totalAssetsAfterOneHalf).to.equal(totalAssetsAfter + fee / 2n)
-
-      // Advance by another quarter of the remaining time
-      await ethers.provider.send('evm_increaseTime', [
-        Number(streamingPeriod / 4n),
-      ])
-      // Mine a new block
-      await ethers.provider.send('evm_mine')
-      const totalAssetsAfterThreeQuarter = await relayPool.totalAssets()
-      expect(totalAssetsAfterThreeQuarter).to.equal(
-        totalAssetsAfter + (3n * fee) / 4n
-      )
-
-      // Advance all the way to the end!
-      await ethers.provider.send('evm_increaseTime', [
-        Number(streamingPeriod / 4n),
-      ])
-      // Mine a new block
-      await ethers.provider.send('evm_mine')
-      const totalAssetsAfterStreaming = await relayPool.totalAssets()
-      expect(totalAssetsAfterStreaming).to.equal(totalAssetsAfter + fee)
-
-      // Keep advancing time and make sure the assets remain the same
-      await ethers.provider.send('evm_increaseTime', [
-        Number(streamingPeriod / 4n),
-      ])
-      // Mine a new block
-      await ethers.provider.send('evm_mine')
-      const totalAssetsAfterMoreTime = await relayPool.totalAssets()
-      expect(totalAssetsAfterMoreTime).to.equal(totalAssetsAfter + fee)
-    })
+    expect(totalAssetsAfter).to.equal(totalAssetsBefore) // remains unchanged because the fees are streaming from now!
   })
 })

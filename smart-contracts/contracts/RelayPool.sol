@@ -63,9 +63,11 @@ contract RelayPool is ERC4626, Ownable {
   address public yieldPool;
 
   // Keeping track of the total fees collected
-  uint256 public totalCollectedBridgeFees = 0;
-  uint256 public streamedFees = 0; // Full streamed fees
-  uint256 public lastFeeCollectedAt = 0; // timestamp to account for streaming fees
+  uint256 public pendingBridgeFees = 0;
+
+  // All incoming assets are streamed (even though they are instantly deposited in the yield pool)
+  uint256 public totalAssetsToStream = 0;
+  uint256 public lastAssetsCollectedAt = 0;
   uint256 public streamingPeriod = 7 days;
 
   event LoanEmitted(
@@ -133,7 +135,7 @@ contract RelayPool is ERC4626, Ownable {
   }
 
   function updateStreamingPeriod(uint256 newPeriod) public onlyOwner {
-    updateStreamedFees();
+    updateStreamedAssets();
     uint256 oldPeriod = streamingPeriod;
     streamingPeriod = newPeriod;
     emit StreamingPeriodChanged(oldPeriod, newPeriod);
@@ -164,6 +166,7 @@ contract RelayPool is ERC4626, Ownable {
     emit OriginAdded(origin);
   }
 
+  // TOFIX: We should not support this... just block the origin from getting more traffic
   function removeOrigin(uint32 chainId, address bridge) public onlyOwner {
     OriginSettings memory origin = authorizedOrigins[chainId][bridge];
     delete authorizedOrigins[chainId][bridge];
@@ -236,8 +239,14 @@ contract RelayPool is ERC4626, Ownable {
     uint256 yieldPoolBalance = ERC4626(yieldPool).previewRedeem(
       balanceOfYieldPoolTokens
     );
-
-    return yieldPoolBalance + outstandingDebt + streamingFees();
+    // Pending bridge fees are still in the yield pool!
+    // So we need to extract them from this pool's asset until
+    // The bridge is claimed!
+    return
+      yieldPoolBalance +
+      outstandingDebt -
+      pendingBridgeFees -
+      remainsToStream();
   }
 
   // Helper function
@@ -299,74 +308,69 @@ contract RelayPool is ERC4626, Ownable {
     // Mark as processed if not
     messages[chainId][bridge][nonce] = message;
 
-    // Pull funds from the yield pool to get the amount to be loaned
-    uint256 loanAmount = collectBridgeFees(origin.bridgeFee, amount);
+    uint256 feeAmount = (amount * origin.bridgeFee) / 10000;
+    pendingBridgeFees += feeAmount;
 
     // Check if origin settings are respected
-    if (origin.outstandingDebt + loanAmount > origin.maxDebt) {
+    // We look at the full amount, because feed are considered debt
+    // (they are owed to the pool)
+    if (origin.outstandingDebt + amount > origin.maxDebt) {
       revert TooMuchDebtFromOrigin(
         chainId,
         bridge,
         origin.maxDebt,
         nonce,
         recipient,
-        loanAmount
+        amount
       );
     }
+    origin.outstandingDebt += amount;
+    increaseOutStandingDebt(amount);
 
-    origin.outstandingDebt += loanAmount;
-    increaseOutStandingDebt(loanAmount);
-
-    sendFunds(loanAmount, recipient);
+    // We only send the amount net of fees
+    sendFunds(amount - feeAmount, recipient);
 
     // TODO: handle insufficient funds?
-
-    emit LoanEmitted(nonce, recipient, asset, loanAmount, chainId, bridge);
+    emit LoanEmitted(nonce, recipient, asset, amount, chainId, bridge);
   }
 
   // Compute the streaming fees
-  // If the last fee collection was more than 7 days ago, we return the full amount
-  // Otherwise, we return the amount streamed so far to which we add the time-based
-  // pro-rata of the remaining fees to be streamed.
-  function streamingFees() internal view returns (uint256) {
-    if (block.timestamp - lastFeeCollectedAt > streamingPeriod) {
-      return totalCollectedBridgeFees;
+  // If the last fee collection was more than 7 days ago, we have nothing left to stream
+  // Otherwise, we return the time-based pro-rata of what remains to stream.
+  function remainsToStream() internal view returns (uint256) {
+    if (block.timestamp - lastAssetsCollectedAt > streamingPeriod) {
+      return 0; // Nothing left to stream
     } else {
       return
-        streamedFees +
-        ((totalCollectedBridgeFees - streamedFees) *
-          (block.timestamp - lastFeeCollectedAt)) /
+        totalAssetsToStream -
+        (totalAssetsToStream * (block.timestamp - lastAssetsCollectedAt)) /
         streamingPeriod;
     }
   }
 
   // Updates the streamed fees and returns the new value
-  function updateStreamedFees() internal returns (uint256) {
-    streamedFees = streamingFees();
-    lastFeeCollectedAt = block.timestamp;
-    return streamedFees;
+  function updateStreamedAssets() public returns (uint256) {
+    totalAssetsToStream = remainsToStream();
+    lastAssetsCollectedAt = block.timestamp;
+    return totalAssetsToStream;
   }
 
-  // Collect the bridge fees and returns the remainder.
-  function collectBridgeFees(
-    uint8 bridgeFee,
-    uint256 bridgedAmount
-  ) internal returns (uint256) {
-    uint256 feeAmount = (bridgedAmount * bridgeFee) / 10000;
-    updateStreamedFees();
-    totalCollectedBridgeFees += feeAmount;
-    return bridgedAmount - feeAmount;
+  // Internal function to add assets to be accounted in a streaming fashgion
+  function addToStreamingAssets(uint256 amount) internal returns (uint256) {
+    updateStreamedAssets();
+    return totalAssetsToStream += amount;
   }
 
   // This function is called externally to claim funds from a bridge.
   // The funds are immediately added to the yieldPool
+  // TODO: handle cases where the origin might have been removed/changed (fees, etc.)
   function claim(
     uint32 chainId,
     address bridge,
     bytes calldata claimParams
   ) external {
     OriginSettings storage origin = authorizedOrigins[chainId][bridge];
-    if (origin.maxDebt == 0) {
+    if (origin.proxyBridge == address(0)) {
       revert UnauthorizedOrigin(chainId, bridge);
     }
 
@@ -388,6 +392,13 @@ contract RelayPool is ERC4626, Ownable {
     // and we should deposit these funds into the yield pool
     depositAssetsInYieldPool(amount);
 
+    // The amount is the amount that was loaned + the fees
+    // TODO: what happens if the bridgeFee was changed?
+    uint256 feeAmount = (amount * origin.bridgeFee) / 10000;
+    pendingBridgeFees -= feeAmount;
+    // We need to account for it in a streaming fashion
+    addToStreamingAssets(feeAmount);
+
     // TODO: include more details about the origin of the funds
     emit BridgeCompleted(chainId, bridge, amount, claimParams);
   }
@@ -401,6 +412,16 @@ contract RelayPool is ERC4626, Ownable {
       payable(recipient).transfer(amount);
     } else {
       withdrawAssetsFromYieldPool(amount, recipient);
+    }
+  }
+
+  // This function is called by anyone to collect assets and start streaming them
+  // to avoid timely attacks.
+  function collectNonDepositedAssets() public {
+    uint256 balance = ERC20(asset).balanceOf(address(this));
+    if (balance > 0) {
+      depositAssetsInYieldPool(balance);
+      addToStreamingAssets(balance);
     }
   }
 
