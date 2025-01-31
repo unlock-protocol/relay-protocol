@@ -12,6 +12,7 @@ struct OriginSettings {
   uint256 outstandingDebt;
   address proxyBridge;
   uint8 bridgeFee; // basis points
+  uint32 coolDown; // in seconds
 }
 
 struct OriginParam {
@@ -20,6 +21,7 @@ struct OriginParam {
   address proxyBridge;
   uint256 maxDebt;
   uint8 bridgeFee; // basis points
+  uint32 coolDown; // in seconds
 }
 
 error UnauthorizedCaller(address sender);
@@ -40,6 +42,13 @@ error ClaimingFailed(
   bytes claimParams
 );
 error NotAWethPool();
+error TooRecentMessage(
+  uint32 chainId,
+  address bridge,
+  uint256 nonce,
+  uint256 timestamp,
+  uint32 coolDown
+);
 
 contract RelayPool is ERC4626, Ownable {
   // The address of the Hyperlane mailbox
@@ -161,7 +170,8 @@ contract RelayPool is ERC4626, Ownable {
       maxDebt: origin.maxDebt,
       outstandingDebt: 0,
       proxyBridge: origin.proxyBridge,
-      bridgeFee: origin.bridgeFee
+      bridgeFee: origin.bridgeFee,
+      coolDown: origin.coolDown
     });
     emit OriginAdded(origin);
   }
@@ -296,10 +306,19 @@ contract RelayPool is ERC4626, Ownable {
     }
 
     // Parse the data received from the sender chain
-    (uint256 nonce, address recipient, uint256 amount) = abi.decode(
-      message,
-      (uint256, address, uint256)
-    );
+    (uint256 nonce, address recipient, uint256 amount, uint256 timestamp) = abi
+      .decode(message, (uint256, address, uint256, uint256));
+
+    // if the message is too recent, we reject it
+    if (block.timestamp - timestamp < origin.coolDown) {
+      revert TooRecentMessage(
+        chainId,
+        bridge,
+        nonce,
+        timestamp,
+        origin.coolDown
+      );
+    }
 
     // Check if message was already processed
     if (messages[chainId][bridge][nonce].length > 0) {
