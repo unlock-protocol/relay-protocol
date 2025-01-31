@@ -8,8 +8,6 @@ import {IWETH} from "./interfaces/IWETH.sol";
 import {TypeCasts} from "./utils/TypeCasts.sol";
 import {HyperlaneMessage} from "./Types.sol";
 
-import "hardhat/console.sol";
-
 struct OriginSettings {
   uint256 maxDebt;
   uint256 outstandingDebt;
