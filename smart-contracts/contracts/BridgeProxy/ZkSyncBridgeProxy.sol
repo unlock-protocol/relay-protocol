@@ -157,7 +157,6 @@ contract ZkSyncBridgeProxy is BridgeProxy {
       // this message is a base token withdrawal
       (, offset) = UnsafeBytes.readAddress(_l2ToL1message, offset);
       (amount, offset) = UnsafeBytes.readUint256(_l2ToL1message, offset);
-      // l1Token = BRIDGE_HUB.baseToken(_chainId);
     } else if (
       bytes4(functionSignature) == 0x11a2ccc1 // IL1ERC20Bridge.finalizeWithdrawal.selector
     ) {
