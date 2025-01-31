@@ -63,6 +63,7 @@ contract RelayPool is ERC4626, Ownable {
   address public yieldPool;
 
   // Keeping track of the total fees collected
+  uint256 public pendingBridgeFees = 0;
   uint256 public totalCollectedBridgeFees = 0;
   uint256 public streamedFees = 0; // Full streamed fees
   uint256 public lastFeeCollectedAt = 0; // timestamp to account for streaming fees
@@ -164,6 +165,7 @@ contract RelayPool is ERC4626, Ownable {
     emit OriginAdded(origin);
   }
 
+  // TOFIX: We should not support this... just block the origin from getting more traffic
   function removeOrigin(uint32 chainId, address bridge) public onlyOwner {
     OriginSettings memory origin = authorizedOrigins[chainId][bridge];
     delete authorizedOrigins[chainId][bridge];
@@ -236,8 +238,10 @@ contract RelayPool is ERC4626, Ownable {
     uint256 yieldPoolBalance = ERC4626(yieldPool).previewRedeem(
       balanceOfYieldPoolTokens
     );
-
-    return yieldPoolBalance + outstandingDebt + streamingFees();
+    // Pending bridge fees are still in the yield pool!
+    // So we need to extract them from this pool's asset until
+    // The bridge is claimed!
+    return yieldPoolBalance + outstandingDebt - pendingBridgeFees;
   }
 
   // Helper function
@@ -299,29 +303,29 @@ contract RelayPool is ERC4626, Ownable {
     // Mark as processed if not
     messages[chainId][bridge][nonce] = message;
 
-    // Pull funds from the yield pool to get the amount to be loaned
-    uint256 loanAmount = collectBridgeFees(origin.bridgeFee, amount);
+    uint256 feeAmount = (amount * origin.bridgeFee) / 10000;
+    pendingBridgeFees += feeAmount;
 
     // Check if origin settings are respected
-    if (origin.outstandingDebt + loanAmount > origin.maxDebt) {
+    if (origin.outstandingDebt + amount > origin.maxDebt) {
       revert TooMuchDebtFromOrigin(
         chainId,
         bridge,
         origin.maxDebt,
         nonce,
         recipient,
-        loanAmount
+        amount
       );
     }
 
-    origin.outstandingDebt += loanAmount;
-    increaseOutStandingDebt(loanAmount);
+    origin.outstandingDebt += amount;
+    increaseOutStandingDebt(amount);
 
-    sendFunds(loanAmount, recipient);
+    // We only send the amount net of fees
+    sendFunds(amount - feeAmount, recipient);
 
     // TODO: handle insufficient funds?
-
-    emit LoanEmitted(nonce, recipient, asset, loanAmount, chainId, bridge);
+    emit LoanEmitted(nonce, recipient, asset, amount, chainId, bridge);
   }
 
   // Compute the streaming fees
@@ -360,13 +364,14 @@ contract RelayPool is ERC4626, Ownable {
 
   // This function is called externally to claim funds from a bridge.
   // The funds are immediately added to the yieldPool
+  // TODO: handle cases where the origin might have been removed/changed (fees, etc.)
   function claim(
     uint32 chainId,
     address bridge,
     bytes calldata claimParams
   ) external {
     OriginSettings storage origin = authorizedOrigins[chainId][bridge];
-    if (origin.maxDebt == 0) {
+    if (origin.proxyBridge == address(0)) {
       revert UnauthorizedOrigin(chainId, bridge);
     }
 
@@ -387,6 +392,12 @@ contract RelayPool is ERC4626, Ownable {
     decreaseOutStandingDebt(amount);
     // and we should deposit these funds into the yield pool
     depositAssetsInYieldPool(amount);
+
+    // The amount is the amount that was lended + the fees
+    // TODO: what happens if the
+    uint256 feeAmount = (amount * origin.bridgeFee) / 10000;
+    pendingBridgeFees -= feeAmount;
+    // This ^^ will create a bump in the total assets... so we need to stream them!
 
     // TODO: include more details about the origin of the funds
     emit BridgeCompleted(chainId, bridge, amount, claimParams);

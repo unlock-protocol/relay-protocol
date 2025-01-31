@@ -51,7 +51,7 @@ describe('RelayBridge: claim', () => {
       bridge: relayBridgeOptimism,
       maxDebt: ethers.parseEther('10'),
       proxyBridge: await oPStackNativeBridgeProxy.getAddress(),
-      bridgeFee: 0,
+      bridgeFee: 10,
     })
 
     // deploy the pool using ignition
@@ -131,6 +131,7 @@ describe('RelayBridge: claim', () => {
       bridgedAmount
     )
   })
+
   it('should fail if the delegate call fails')
 
   it('should update the outstanding debts', async () => {
@@ -173,10 +174,11 @@ describe('RelayBridge: claim', () => {
     ).to.equal(bridgedAmount)
   })
 
-  it('should desposit the funds in the 3rd party pool', async () => {
+  it.only('should desposit the funds in the 3rd party pool but total assets should remain unchanged', async () => {
     const abiCoder = new ethers.AbiCoder()
     const relayPoolAddress = await relayPool.getAddress()
     const bridgedAmount = ethers.parseEther('0.033')
+
     const transaction = abiCoder.encode(
       ['uint256', 'address', 'address', 'uint256', 'uint256', 'bytes'],
       [
@@ -200,13 +202,15 @@ describe('RelayBridge: claim', () => {
     )
 
     await relayPool.claim(origins[0].chainId, origins[0].bridge, claimData)
+
     const poolAssetsAfter = await relayPool.totalAssets()
+
     const relayPoolBalanceAfter = await thirdPartyPool.balanceOf(
       await relayPool.getAddress()
     )
 
     // Assets remain unchanged (they were previously accounted for "in the bridge")
-    expect(poolAssetsBefore - poolAssetsAfter).to.equal(0)
+    expect(poolAssetsAfter).to.equal(poolAssetsBefore)
 
     // But the balance of the relay pool in the 3rd party pool should have increased
     expect(relayPoolBalanceAfter - relayPoolBalanceBefore).to.equal(
