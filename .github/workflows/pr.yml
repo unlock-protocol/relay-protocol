@@ -31,7 +31,7 @@ jobs:
         if: steps.changed-files.outputs.any_changed == 'true'
         shell: bash
 
-      - run: 'node -v; yarn -v; yarn build'
+      - run: 'yarn build'
         if: steps.changed-files.outputs.any_changed == 'true'
         shell: bash
 
