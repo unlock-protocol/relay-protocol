@@ -2709,7 +2709,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@relay-protocol/abis@workspace:packages/abis":
+"@relay-protocol/abis@workspace:*, @relay-protocol/abis@workspace:packages/abis":
   version: 0.0.0-use.local
   resolution: "@relay-protocol/abis@workspace:packages/abis"
   dependencies:
@@ -2724,6 +2724,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@relay-protocol/backend@workspace:backend"
   dependencies:
+    "@relay-protocol/abis": "workspace:*"
     "@types/node": "npm:22.12.0"
     "@typescript-eslint/eslint-plugin": "npm:8.22.0"
     "@typescript-eslint/parser": "npm:8.22.0"

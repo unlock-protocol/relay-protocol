@@ -16,6 +16,7 @@
     "lint-staged": "lint-staged"
   },
   "dependencies": {
+    "@relay-protocol/abis": "workspace:*",
     "hono": "4.6.19",
     "ponder": "0.8.33",
     "viem": "2.22.17"
@@ -33,9 +34,6 @@
     "lint-staged": "15.4.3",
     "prettier": "3.4.2",
     "typescript": "5.7.3"
-  },
-  "engines": {
-    "node": ">=18.14"
   },
   "lint-staged": {
     "*.{js,ts}": [

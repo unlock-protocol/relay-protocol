@@ -15,7 +15,7 @@ const ignored = [
 
 task('export:abis', 'Export ABIs to a node package')
   .addOptionalParam('previousVersion', 'version of the package to publish')
-  .setAction(async ({ previousVersion }, { ethers, artifacts }) => {
+  .setAction(async ({ previousVersion }, { artifacts }) => {
     const version = semver.inc(previousVersion, 'patch')
     console.log(`Releasing version : ${version}`)
 
@@ -36,7 +36,7 @@ task('export:abis', 'Export ABIs to a node package')
         const toExport = {
           sourceName,
           contractName,
-          abi: [new ethers.Interface(abi)].flat(),
+          abi,
         }
 
         const abiFileName = path.resolve(
