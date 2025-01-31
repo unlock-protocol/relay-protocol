@@ -8,6 +8,7 @@ import {IWETH} from "./interfaces/IWETH.sol";
 import {TypeCasts} from "./utils/TypeCasts.sol";
 
 struct OriginSettings {
+  address curator;
   uint256 maxDebt;
   uint256 outstandingDebt;
   address proxyBridge;
@@ -15,6 +16,7 @@ struct OriginSettings {
 }
 
 struct OriginParam {
+  address curator;
   uint32 chainId;
   address bridge;
   address proxyBridge;
@@ -95,7 +97,7 @@ contract RelayPool is ERC4626, Ownable {
   event StreamingPeriodChanged(uint256 oldPeriod, uint256 newPeriod);
 
   event OriginAdded(OriginParam origin);
-  event OriginRemoved(
+  event OriginDisabled(
     uint32 chainId,
     address bridge,
     uint256 maxDebt,
@@ -158,6 +160,7 @@ contract RelayPool is ERC4626, Ownable {
 
   function addOrigin(OriginParam memory origin) public onlyOwner {
     authorizedOrigins[origin.chainId][origin.bridge] = OriginSettings({
+      curator: origin.curator, // We can't use msg.sender here, because we recommend msg.sender to be a timelock and this address should be able to disable an origin quickly!
       maxDebt: origin.maxDebt,
       outstandingDebt: 0,
       proxyBridge: origin.proxyBridge,
@@ -166,11 +169,15 @@ contract RelayPool is ERC4626, Ownable {
     emit OriginAdded(origin);
   }
 
-  // TOFIX: We should not support this... just block the origin from getting more traffic
-  function removeOrigin(uint32 chainId, address bridge) public onlyOwner {
+  // We cannot completely remove an origin, because the funds might still be in transit...
+  // But we can "block" new funds from being sent
+  function disableOrigin(uint32 chainId, address bridge) public {
     OriginSettings memory origin = authorizedOrigins[chainId][bridge];
-    delete authorizedOrigins[chainId][bridge];
-    emit OriginRemoved(
+    if (msg.sender != origin.curator) {
+      revert UnauthorizedCaller(msg.sender);
+    }
+    authorizedOrigins[chainId][bridge].maxDebt = 0;
+    emit OriginDisabled(
       chainId,
       bridge,
       origin.maxDebt,

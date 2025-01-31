@@ -52,6 +52,7 @@ describe('ERC20 RelayBridge: when receiving a message from the Hyperlane Mailbox
             maxDebt: ethers.parseEther('10'),
             proxyBridge: oPStackNativeBridgeProxy,
             bridgeFee: 0,
+            curator: userAddress,
           },
         ],
         thirdPartyPool: await thirdPartyPool.getAddress(),
@@ -188,7 +189,7 @@ describe('ERC20 RelayBridge: when receiving a message from the Hyperlane Mailbox
       originChainId,
       originBridge
     )
-    expect(originSettingsAfter[1]).to.equal(originSettingsBefore[1] + amount)
+    expect(originSettingsAfter[2]).to.equal(originSettingsBefore[2] + amount)
   })
 
   it('should transfer the assets from the pool to the recipient', async () => {
@@ -326,6 +327,7 @@ describe('WETH RelayBridge: when receiving a message from the Hyperlane Mailbox'
             maxDebt: ethers.parseEther('10'),
             proxyBridge: oPStackNativeBridgeProxy,
             bridgeFee: 0,
+            curator: userAddress,
           },
         ],
         thirdPartyPool: await thirdPartyPool.getAddress(),

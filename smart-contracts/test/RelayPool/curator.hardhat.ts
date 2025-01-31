@@ -103,13 +103,14 @@ describe('RelayPool: curator', () => {
     })
   })
 
-  describe('addOrigin', () => {
+  describe('addOrigin', async () => {
     const newOrigin = {
       chainId: 10,
       bridge: ethers.Wallet.createRandom().address,
       maxDebt: ethers.parseEther('10'),
       proxyBridge: ethers.Wallet.createRandom().address,
       bridgeFee: 5,
+      curator: ethers.Wallet.createRandom().address,
     }
 
     it('should only be callable by the curator', async () => {
@@ -149,47 +150,50 @@ describe('RelayPool: curator', () => {
     })
   })
 
-  describe('removeOrigin', () => {
+  describe('disableOrigin', () => {
     let originToRemove: {
       chainId: number
       bridge: string
       maxDebt: bigint
       proxyBridge: string
       bridgeFee: number
+      curator: string
     }
     before(async () => {
+      const [user] = await ethers.getSigners()
+
       originToRemove = {
         chainId: 10,
         bridge: ethers.Wallet.createRandom().address,
         maxDebt: ethers.parseEther('10'),
         proxyBridge: ethers.Wallet.createRandom().address,
         bridgeFee: 0,
+        curator: await user.getAddress(),
       }
 
       // Let's first add it!
       await relayPool.addOrigin(originToRemove)
     })
-    it('should only be callable by the curator', async () => {
+
+    it("should only be callable by the origin's curator", async () => {
       const [, another] = await ethers.getSigners()
       await expect(
         relayPool
           .connect(another)
-          .removeOrigin(originToRemove.chainId, originToRemove.bridge)
+          .disableOrigin(originToRemove.chainId, originToRemove.bridge)
       )
-        .to.be.revertedWithCustomError(relayPool, 'OwnableUnauthorizedAccount')
+        .to.be.revertedWithCustomError(relayPool, 'UnauthorizedCaller')
         .withArgs(await another.getAddress())
     })
 
-    it('should remove the origin from the list of approved origins and emit an event', async () => {
+    it('should change the maximum debt on the origin and emit an event', async () => {
       const authorizedOriginBefore = await relayPool.authorizedOrigins(
         originToRemove.chainId,
         originToRemove.bridge
       )
-      expect(authorizedOriginBefore.proxyBridge).to.not.equal(
-        ethers.ZeroAddress
-      )
+      expect(authorizedOriginBefore.maxDebt).to.not.equal(0n)
       const receipt = await (
-        await relayPool.removeOrigin(
+        await relayPool.disableOrigin(
           originToRemove.chainId,
           originToRemove.bridge
         )
@@ -198,11 +202,11 @@ describe('RelayPool: curator', () => {
         originToRemove.chainId,
         originToRemove.bridge
       )
-      expect(authorizedOriginAfter.proxyBridge).to.equal(ethers.ZeroAddress)
+      expect(authorizedOriginAfter.maxDebt).to.equal(0n)
 
       const { event } = await getEvent(
         receipt!,
-        'OriginRemoved',
+        'OriginDisabled',
         relayPool.interface
       )
       expect(event.args.chainId).to.equal(originToRemove.chainId)
