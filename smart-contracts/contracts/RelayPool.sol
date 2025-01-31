@@ -64,9 +64,11 @@ contract RelayPool is ERC4626, Ownable {
 
   // Keeping track of the total fees collected
   uint256 public pendingBridgeFees = 0;
-  uint256 public totalCollectedBridgeFees = 0;
-  uint256 public streamedFees = 0; // Full streamed fees
-  uint256 public lastFeeCollectedAt = 0; // timestamp to account for streaming fees
+
+  // All incoming assets are streamed (even though they are instantly deposited in the yield pool)
+  uint256 public totalCollectedAssets = 0;
+  uint256 public totalAssetsToStream = 0;
+  uint256 public lastAssetsCollectedAt = 0;
   uint256 public streamingPeriod = 7 days;
 
   event LoanEmitted(
@@ -241,7 +243,11 @@ contract RelayPool is ERC4626, Ownable {
     // Pending bridge fees are still in the yield pool!
     // So we need to extract them from this pool's asset until
     // The bridge is claimed!
-    return yieldPoolBalance + outstandingDebt - pendingBridgeFees;
+    return
+      yieldPoolBalance +
+      outstandingDebt -
+      pendingBridgeFees -
+      remainsToStream();
   }
 
   // Helper function
@@ -333,34 +339,22 @@ contract RelayPool is ERC4626, Ownable {
   // If the last fee collection was more than 7 days ago, we return the full amount
   // Otherwise, we return the amount streamed so far to which we add the time-based
   // pro-rata of the remaining fees to be streamed.
-  function streamingFees() internal view returns (uint256) {
-    if (block.timestamp - lastFeeCollectedAt > streamingPeriod) {
-      return totalCollectedBridgeFees;
+  function remainsToStream() internal view returns (uint256) {
+    if (block.timestamp - lastAssetsCollectedAt > streamingPeriod) {
+      return 0; // Nothing left to stream
     } else {
       return
-        streamedFees +
-        ((totalCollectedBridgeFees - streamedFees) *
-          (block.timestamp - lastFeeCollectedAt)) /
+        totalAssetsToStream -
+        (totalAssetsToStream * (block.timestamp - lastAssetsCollectedAt)) /
         streamingPeriod;
     }
   }
 
   // Updates the streamed fees and returns the new value
-  function updateStreamedFees() internal returns (uint256) {
-    streamedFees = streamingFees();
-    lastFeeCollectedAt = block.timestamp;
-    return streamedFees;
-  }
-
-  // Collect the bridge fees and returns the remainder.
-  function collectBridgeFees(
-    uint8 bridgeFee,
-    uint256 bridgedAmount
-  ) internal returns (uint256) {
-    uint256 feeAmount = (bridgedAmount * bridgeFee) / 10000;
-    updateStreamedFees();
-    totalCollectedBridgeFees += feeAmount;
-    return bridgedAmount - feeAmount;
+  function updateStreamedFees() public returns (uint256) {
+    totalAssetsToStream = remainsToStream();
+    lastAssetsCollectedAt = block.timestamp;
+    return totalAssetsToStream;
   }
 
   // This function is called externally to claim funds from a bridge.
@@ -396,8 +390,10 @@ contract RelayPool is ERC4626, Ownable {
 
     // The amount is the amount that was lended + the fees
     // TODO: what happens if the bridgeFee was changed?
+    updateStreamedFees();
     uint256 feeAmount = (amount * origin.bridgeFee) / 10000;
     pendingBridgeFees -= feeAmount;
+    totalAssetsToStream += feeAmount;
     // This ^^ will create a bump in the total assets... so we need to stream them!
 
     // TODO: include more details about the origin of the funds

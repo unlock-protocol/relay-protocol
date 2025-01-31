@@ -191,24 +191,27 @@ describe('RelayBridge: claim', () => {
       ]
     )
 
-    const poolAssetsBefore = await relayPool.totalAssets()
-    const relayPoolBalanceBefore = await thirdPartyPool.balanceOf(
-      await relayPool.getAddress()
-    )
-
     const claimData = abiCoder.encode(
       ['bytes', 'address'],
       [transaction, relayPoolAddress]
     )
 
+    const streamingPeriod = await relayPool.streamingPeriod()
+    await ethers.provider.send('evm_increaseTime', [
+      Number(streamingPeriod * 2n),
+    ])
+    await relayPool.updateStreamedFees()
+    const poolAssetsBefore = await relayPool.totalAssets()
+
+    const relayPoolBalanceBefore =
+      await thirdPartyPool.balanceOf(relayPoolAddress)
+
     await relayPool.claim(origins[0].chainId, origins[0].bridge, claimData)
 
     const poolAssetsAfter = await relayPool.totalAssets()
 
-    const relayPoolBalanceAfter = await thirdPartyPool.balanceOf(
-      await relayPool.getAddress()
-    )
-
+    const relayPoolBalanceAfter =
+      await thirdPartyPool.balanceOf(relayPoolAddress)
     // Assets remain unchanged (they were previously accounted for "in the bridge")
     expect(poolAssetsAfter).to.equal(poolAssetsBefore)
 
