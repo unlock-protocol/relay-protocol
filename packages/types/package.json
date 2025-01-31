@@ -21,7 +21,7 @@
     "directory": "packages/types"
   },
   "scripts": {
-    "build": "tsc",
+    "build": "node -v; tsc",
     "clean": "rm -rf dist",
     "lint": "eslint"
   },
