@@ -107,7 +107,7 @@ export const GET_POOLS_BY_CURATOR = gql`
   }
 `
 
-export const GET_RELAY_BRDGE_BY_ASSET = gql`
+export const GET_RELAY_BRIDGE_BY_ASSET = gql`
   query GetBridgeByAsset($assetAddress: String!) {
     relayBridges(where: { asset: $assetAddress }) {
       items {

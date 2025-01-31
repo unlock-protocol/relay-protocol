@@ -3,7 +3,7 @@ import { AutoComplete, Input } from 'enquirer'
 import { networks } from '@relay-protocol/networks'
 import {
   GET_POOLS_BY_CURATOR,
-  GET_RELAY_BRDGE_BY_ASSET,
+  GET_RELAY_BRIDGE_BY_ASSET,
   GET_RELAY_POOL,
   RelayVaultService,
 } from '@relay-protocol/client'
@@ -107,7 +107,7 @@ task('pool:add-origin', 'Add origin for a pool')
         // And now let's get the
         // Ok, let's list all the bridges we have!
         const { relayBridges } = await vaultService.query(
-          GET_RELAY_BRDGE_BY_ASSET,
+          GET_RELAY_BRIDGE_BY_ASSET,
           {
             assetAddress: l2AssetAddress,
           }
