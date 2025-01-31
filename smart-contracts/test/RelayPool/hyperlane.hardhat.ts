@@ -54,7 +54,7 @@ describe('ERC20 RelayBridge: when receiving a message from the Hyperlane Mailbox
             maxDebt: ethers.parseEther('10'),
             proxyBridge: oPStackNativeBridgeProxy,
             bridgeFee: 0,
-            coolDown: 0,
+            coolDown: 10, // 10 seconds!
           },
         ],
         thirdPartyPool: await thirdPartyPool.getAddress(),
@@ -293,6 +293,29 @@ describe('ERC20 RelayBridge: when receiving a message from the Hyperlane Mailbox
     expect(outstandingDebtChanged.args.newDebt).to.equal(
       outstandingDebtChanged.args.oldDebt + amount
     )
+  })
+
+  it('should reject an event if it is received too early', async () => {
+    const [user] = await ethers.getSigners()
+    const userAddress = await user.getAddress()
+    const blockTimestamp = (await ethers.provider.getBlock('latest'))!.timestamp
+    await expect(
+      relayPool
+        .connect(user)
+        .handle(
+          10,
+          ethers.zeroPadValue(relayBridgeOptimism, 32),
+          encodeData(10n, userAddress, ethers.parseUnits('1'), blockTimestamp)
+        )
+    )
+      .to.be.revertedWithCustomError(relayPool, 'MessageTooRecent')
+      .withArgs(
+        10,
+        relayBridgeOptimism,
+        10n,
+        blockTimestamp,
+        (await relayPool.authorizedOrigins(10, relayBridgeOptimism)).coolDown
+      )
   })
 })
 

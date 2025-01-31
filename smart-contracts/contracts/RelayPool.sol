@@ -8,6 +8,8 @@ import {IWETH} from "./interfaces/IWETH.sol";
 import {TypeCasts} from "./utils/TypeCasts.sol";
 import {HyperlaneMessage} from "./Types.sol";
 
+import "hardhat/console.sol";
+
 struct OriginSettings {
   uint256 maxDebt;
   uint256 outstandingDebt;
@@ -43,7 +45,7 @@ error ClaimingFailed(
   bytes claimParams
 );
 error NotAWethPool();
-error TooRecentMessage(
+error MessageTooRecent(
   uint32 chainId,
   address bridge,
   uint256 nonce,
@@ -311,7 +313,7 @@ contract RelayPool is ERC4626, Ownable {
 
     // if the message is too recent, we reject it
     if (block.timestamp - message.timestamp < origin.coolDown) {
-      revert TooRecentMessage(
+      revert MessageTooRecent(
         chainId,
         bridge,
         message.nonce,
