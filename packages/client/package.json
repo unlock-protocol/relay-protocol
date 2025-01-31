@@ -25,7 +25,7 @@
     "@relay-protocol/eslint-config": "workspace:^",
     "@relay-protocol/tsconfig": "workspace:./packages/tsconfig",
     "@relay-protocol/types": "workspace:./packages/types",
-    "@types/node": "22.13.0",
+    "@types/node": "22.12.0",
     "eslint": "9.19.0",
     "tsup": "8.3.6",
     "typescript": "5.7.3"

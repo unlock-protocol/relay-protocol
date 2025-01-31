@@ -1834,7 +1834,7 @@ __metadata:
     "@relay-protocol/eslint-config": "workspace:^"
     "@relay-protocol/tsconfig": "workspace:./packages/tsconfig"
     "@relay-protocol/types": "workspace:./packages/types"
-    "@types/node": "npm:22.10.0"
+    "@types/node": "npm:22.12.0"
     eslint: "npm:9.19.0"
     graphql: "npm:16.10.0"
     graphql-request: "npm:7.1.2"
@@ -1864,8 +1864,8 @@ __metadata:
     "@bgd-labs/aave-address-book": "npm:4.8.1"
     "@relay-protocol/networks": "workspace:^"
     "@relay-protocol/tsconfig": "workspace:^"
-    "@types/copyfiles": "npm:^2"
-    "@types/fs-extra": "npm:^11"
+    "@types/copyfiles": "npm:2"
+    "@types/fs-extra": "npm:11"
     copyfiles: "npm:2.4.1"
     eslint: "npm:9.19.0"
     ethers: "npm:6.13.5"
@@ -1929,8 +1929,8 @@ __metadata:
     "@types/chai": "npm:4.3.20"
     "@types/fs-extra": "npm:11.0.4"
     "@types/mocha": "npm:10.0.10"
-    "@types/node": "npm:22.10.0"
-    "@types/semver": "npm:^7"
+    "@types/node": "npm:22.12.0"
+    "@types/semver": "npm:7"
     chai: "npm:4.5.0"
     eslint: "npm:9.19.0"
     eslint-config-prettier: "npm:10.0.1"
@@ -2430,7 +2430,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/copyfiles@npm:^2":
+"@types/copyfiles@npm:2":
   version: 2.4.4
   resolution: "@types/copyfiles@npm:2.4.4"
   checksum: 10/0513199240828feda5f6ed04c69d6a642c47e6ab66b81214716807f948ed3e865e9b3d2b69f75cbcc6fbe2154630755c47ca473b3913f0a831179366c709a8cc
@@ -2451,7 +2451,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/fs-extra@npm:11.0.4, @types/fs-extra@npm:^11":
+"@types/fs-extra@npm:11, @types/fs-extra@npm:11.0.4":
   version: 11.0.4
   resolution: "@types/fs-extra@npm:11.0.4"
   dependencies:
@@ -2524,15 +2524,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/node@npm:22.10.0":
-  version: 22.10.0
-  resolution: "@types/node@npm:22.10.0"
-  dependencies:
-    undici-types: "npm:~6.20.0"
-  checksum: 10/e2561e15eaac6261cf828cd7dcd4882a5ce2e10104db4123566b00418acf30e18518e39c7a906682f44118b420c555cc774ac3e0e6f80e37f55884cfe6cf1f78
-  languageName: node
-  linkType: hard
-
 "@types/node@npm:22.12.0":
   version: 22.12.0
   resolution: "@types/node@npm:22.12.0"
@@ -2576,7 +2567,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/semver@npm:^7":
+"@types/semver@npm:7":
   version: 7.5.8
   resolution: "@types/semver@npm:7.5.8"
   checksum: 10/3496808818ddb36deabfe4974fd343a78101fa242c4690044ccdc3b95dcf8785b494f5d628f2f47f38a702f8db9c53c67f47d7818f2be1b79f2efb09692e1178
