@@ -11,7 +11,7 @@
     }
   },
   "scripts": {
-    "build": "tsup src/index.ts --dts --format cjs",
+    "build": "tsup src/index.ts --dts --format  esm,cjs",
     "clean": "rm -rf dist",
     "lint:fix": "yarn lint --fix",
     "lint": "eslint"
