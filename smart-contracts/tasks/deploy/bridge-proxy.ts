@@ -9,7 +9,7 @@ import ArbitrumOrbitNativeBridgeProxyModule from '../../ignition/modules/Arbitru
 
 task('deploy:bridge-proxy', 'Deploy a bridge proxy')
   .addOptionalParam('type', 'the type of bridge to deploy')
-  .setAction(async ({ type }, { ethers, ignition }) => {
+  .setAction(async ({ type }, { ethers, ignition, run }) => {
     const { chainId } = await ethers.provider.getNetwork()
 
     const { bridges } = networks[chainId.toString()]
@@ -25,6 +25,8 @@ task('deploy:bridge-proxy', 'Deploy a bridge proxy')
     // get args value
     const { name } = networks[chainId.toString()]
     console.log(`deploying ${type} proxy bridge on ${name} (${chainId})...`)
+
+    let proxyBridgeAddress
 
     // deploy bridge proxy
     let proxyBridge: BaseContract
@@ -42,49 +44,72 @@ task('deploy:bridge-proxy', 'Deploy a bridge proxy')
           usdc: USDC,
         },
       }
+      const deploymentId = `BridgeProxy-cctp-${chainId.toString()}`
       // deploy CCTP bridge
       ;({ bridge: proxyBridge } = await ignition.deploy(CCTPBridgeProxyModule, {
         parameters,
-        deploymentId: `BridgeProxy-cctp-${chainId.toString()}`,
+        deploymentId,
       }))
-      console.log(`CCTP bridge deployed at: ${await proxyBridge.getAddress()}`)
+      proxyBridgeAddress = await proxyBridge.getAddress()
+
+      // verify!
+      await run('verify:verify', {
+        address: proxyBridgeAddress,
+        constructorArguments: [messenger, transmitter, USDC],
+      })
+      console.log(`CCTP bridge deployed at: ${proxyBridgeAddress}`)
     } else if (type === 'op') {
+      const portalProxy = bridges.op!.portalProxy! || ethers.ZeroAddress // Only used on the L1 deployments (to claim the assets)
       const parameters = {
         OPStackNativeBridgeProxy: {
-          portalProxy: bridges.op!.portalProxy! || ethers.ZeroAddress, // Only used on the L1 deployments (to claim the assets)
+          portalProxy,
         },
       }
+      const deploymentId = `BridgeProxy-op-${chainId.toString()}`
       // deploy OP bridge
       ;({ bridge: proxyBridge } = await ignition.deploy(
         OPStackNativeBridgeProxyModule,
         {
           parameters,
-          deploymentId: `BridgeProxy-op-${chainId.toString()}`,
+          deploymentId,
         }
       ))
-      console.log(
-        `OPStack bridge deployed at: ${await proxyBridge.getAddress()}`
-      )
+      proxyBridgeAddress = await proxyBridge.getAddress()
+
+      // verify!
+      await run('verify:verify', {
+        address: proxyBridgeAddress,
+        constructorArguments: [portalProxy],
+      })
+      console.log(`OPStack bridge deployed at: ${proxyBridgeAddress}`)
     } else if (type === 'arb') {
+      const routerGateway = bridges.arb!.routerGateway
+      const outbox = bridges.arb!.outbox || ethers.ZeroAddress // Only used on the L1 deployments (to claim the assets)
+
       const parameters = {
         ArbitrumOrbitNativeBridgeProxy: {
-          routerGateway: bridges.arb!.routerGateway,
-          outbox: bridges.arb!.outbox || ethers.ZeroAddress, // Only used on the L1 deployments (to claim the assets)
+          routerGateway,
+          outbox,
         },
       }
-
+      const deploymentId = `BridgeProxy-arb-${chainId.toString()}`
       // deploy ARB bridge
       ;({ bridge: proxyBridge } = await ignition.deploy(
         ArbitrumOrbitNativeBridgeProxyModule,
         {
           parameters,
-          deploymentId: `BridgeProxy-arb-${chainId.toString()}`,
+          deploymentId,
         }
       ))
-      console.log(
-        `ArbOrbit bridge deployed at: ${await proxyBridge.getAddress()}`
-      )
+      proxyBridgeAddress = await proxyBridge.getAddress()
+
+      // verify!
+      await run('verify:verify', {
+        address: proxyBridgeAddress,
+        constructorArguments: [routerGateway, outbox],
+      })
+      console.log(`ArbOrbit bridge deployed at: ${proxyBridgeAddress}`)
     }
 
-    return proxyBridge.getAddress()
+    return proxyBridgeAddress
   })
