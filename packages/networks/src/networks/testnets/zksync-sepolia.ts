@@ -2,7 +2,7 @@ import { NetworkConfig } from '@relay-protocol/types'
 
 export const zkSyncSepolia: NetworkConfig = {
   chainId: 300,
-  hyperlaneMailbox: '',
+  hyperlaneMailbox: '0x1E45f767d51FA1Ec326d35e3BD4904fF0f30fCDa',
   isTestnet: true,
   name: 'ZKsync Sepolia Testnet',
   slug: 'zksync-sepolia',
