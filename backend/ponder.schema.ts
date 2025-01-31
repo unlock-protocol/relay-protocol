@@ -61,6 +61,7 @@ export const poolOrigin = onchainTable(
     originChainId: t.integer().notNull(),
     originBridge: t.hex().notNull(),
     maxDebt: t.bigint().notNull(),
+    bridgeFee: t.bigint().notNull(),
   }),
   (table) => ({
     pk: primaryKey({
