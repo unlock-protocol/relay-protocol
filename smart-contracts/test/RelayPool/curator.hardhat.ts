@@ -111,6 +111,7 @@ describe('RelayPool: curator', () => {
       proxyBridge: ethers.Wallet.createRandom().address,
       bridgeFee: 5,
       curator: ethers.Wallet.createRandom().address,
+      coolDown: 0,
     }
 
     it('should only be callable by the curator', async () => {
@@ -158,6 +159,7 @@ describe('RelayPool: curator', () => {
       proxyBridge: string
       bridgeFee: number
       curator: string
+      coolDown: number
     }
     before(async () => {
       const [user] = await ethers.getSigners()
@@ -169,6 +171,7 @@ describe('RelayPool: curator', () => {
         proxyBridge: ethers.Wallet.createRandom().address,
         bridgeFee: 0,
         curator: await user.getAddress(),
+        coolDown: 0,
       }
 
       // Let's first add it!

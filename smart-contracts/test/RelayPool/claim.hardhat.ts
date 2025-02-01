@@ -53,6 +53,7 @@ describe('RelayBridge: claim', () => {
       proxyBridge: await oPStackNativeBridgeProxy.getAddress(),
       bridgeFee: 10,
       curator: userAddress,
+      coolDown: 0,
     })
 
     // deploy the pool using ignition
