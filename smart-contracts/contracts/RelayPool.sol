@@ -5,6 +5,7 @@ import {ERC4626} from "solmate/src/tokens/ERC4626.sol";
 import {ERC20} from "solmate/src/tokens/ERC20.sol";
 import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
 import {IWETH} from "./interfaces/IWETH.sol";
+import {ITokenSwap} from "./interfaces/ITokenSwap.sol";
 import {TypeCasts} from "./utils/TypeCasts.sol";
 import {HyperlaneMessage} from "./Types.sol";
 
@@ -26,6 +27,7 @@ struct OriginParam {
 }
 
 error UnauthorizedCaller(address sender);
+error UnauthorizedSwap(address token);
 error UnauthorizedOrigin(uint32 chainId, address bridge);
 error MessageAlreadyProcessed(uint32 chainId, address bridge, uint256 nonce);
 error TooMuchDebtFromOrigin(
@@ -72,6 +74,9 @@ contract RelayPool is ERC4626, Ownable {
   // The address of the yield pool where funds are deposited
   address public yieldPool;
 
+  // unswap wrapper contract
+  address public tokenSwapAddress;
+
   // Keeping track of the total fees collected
   uint256 public pendingBridgeFees = 0;
 
@@ -100,6 +105,7 @@ contract RelayPool is ERC4626, Ownable {
 
   event AssetsDepositedIntoYieldPool(uint256 amount, address yieldPool);
   event AssetsWithdrawnFromYieldPool(uint256 amount, address yieldPool);
+  event TokenSwapChanged(address prevAddress, address newAddress);
 
   event YieldPoolChanged(address oldPool, address newPool);
   event StreamingPeriodChanged(uint256 oldPeriod, uint256 newPeriod);
@@ -439,6 +445,34 @@ contract RelayPool is ERC4626, Ownable {
     } else {
       withdrawAssetsFromYieldPool(amount, recipient);
     }
+  }
+
+  /**
+   * Set the Swap and Deposit contract address
+   */
+  function setTokenSwap(address _tokenSwapAddress) external onlyOwner {
+    address prevTokenSwapAddress = tokenSwapAddress;
+    tokenSwapAddress = _tokenSwapAddress;
+    emit TokenSwapChanged(prevTokenSwapAddress, tokenSwapAddress);
+  }
+
+  function swapAndDeposit(
+    address token,
+    uint256 amount,
+    uint24 uniswapWethPoolFeeToken,
+    uint24 uniswapWethPoolFeeAsset
+  ) public {
+    if (token == address(asset)) {
+      revert UnauthorizedSwap(token);
+    }
+
+    ERC20(token).transfer(tokenSwapAddress, amount);
+    ITokenSwap(tokenSwapAddress).swap(
+      token,
+      uniswapWethPoolFeeToken,
+      uniswapWethPoolFeeAsset
+    );
+    collectNonDepositedAssets();
   }
 
   // This function is called by anyone to collect assets and start streaming them
