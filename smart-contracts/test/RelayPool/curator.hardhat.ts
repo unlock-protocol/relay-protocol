@@ -110,6 +110,7 @@ describe('RelayPool: curator', () => {
       maxDebt: ethers.parseEther('10'),
       proxyBridge: ethers.Wallet.createRandom().address,
       bridgeFee: 5,
+      coolDown: 0,
     }
 
     it('should only be callable by the curator', async () => {
@@ -156,6 +157,7 @@ describe('RelayPool: curator', () => {
       maxDebt: bigint
       proxyBridge: string
       bridgeFee: number
+      coolDown: number
     }
     before(async () => {
       originToRemove = {
@@ -164,6 +166,7 @@ describe('RelayPool: curator', () => {
         maxDebt: ethers.parseEther('10'),
         proxyBridge: ethers.Wallet.createRandom().address,
         bridgeFee: 0,
+        coolDown: 0,
       }
 
       // Let's first add it!
