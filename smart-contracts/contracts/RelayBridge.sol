@@ -60,7 +60,7 @@ contract RelayBridge is IRelayBridge {
 
     // Encode the data for the cross-chain message
     // No need to pass the asset since the pool is asset-specific
-    bytes memory data = abi.encode(nonce, recipient, amount);
+    bytes memory data = abi.encode(nonce, recipient, amount, block.timestamp);
 
     // Get the fee for the cross-chain message
     uint256 hyperlaneFee = IHyperlaneMailbox(hyperlaneMailbox).quoteDispatch(
