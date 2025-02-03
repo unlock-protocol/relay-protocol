@@ -19,7 +19,7 @@
     "@relay-protocol/abis": "workspace:*",
     "hono": "4.6.20",
     "ponder": "0.8.33",
-    "viem": "2.22.17"
+    "viem": "2.22.19"
   },
   "devDependencies": {
     "@types/node": "22.13.0",
