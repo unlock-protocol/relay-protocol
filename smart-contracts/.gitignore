@@ -20,3 +20,8 @@ ignition/params
 artifacts
 build-info
 journal.jsonl
+
+# zksync
+artifacts-zk
+cache-zk
+deployments-zk

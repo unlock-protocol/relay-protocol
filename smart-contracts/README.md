@@ -101,3 +101,9 @@ TK
 
 yarn hardhat deploy:bridge-proxy --network sepolia
 ```
+
+## Use with ZkSync
+
+```
+yarn hardhat compile --network zksync
+```

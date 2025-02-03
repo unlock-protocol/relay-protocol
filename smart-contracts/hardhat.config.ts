@@ -2,6 +2,7 @@ import { HardhatUserConfig } from 'hardhat/config'
 import '@nomicfoundation/hardhat-toolbox'
 import '@nomicfoundation/hardhat-ignition-ethers'
 import { networks as nets } from '@relay-protocol/networks'
+import '@matterlabs/hardhat-zksync'
 
 // Interracting
 import './tasks/pool'
@@ -9,6 +10,7 @@ import './tasks/bridge'
 import './tasks/claim/cctp'
 import './tasks/claim/arb'
 import './tasks/claim/native'
+import './tasks/claim/zksync'
 
 // Actual contracts
 import './tasks/deploy/pool'
@@ -37,15 +39,30 @@ if (!DEPLOYER_PRIVATE_KEY) {
 // parse networks from file
 const networks = { hardhat: {} }
 Object.keys(nets).forEach((id) => {
-  const { slug, rpc } = nets[id]
+  const { slug, rpc, isTestnet, isZKsync } = nets[id]
+  let accounts
+  let zksync = {}
   const network = {
     url: rpc || `https://rpc.unlock-protocol.com/${id}`,
     chainId: Number(id),
   }
   if (DEPLOYER_PRIVATE_KEY) {
-    network.accounts = [DEPLOYER_PRIVATE_KEY]
+    accounts = [DEPLOYER_PRIVATE_KEY]
   }
-  networks[slug] = network
+  if (isZKsync) {
+    zksync = {
+      zksync: true,
+      ethNetwork: isTestnet ? 'sepolia' : 'mainnet',
+      verifyURL: isTestnet
+        ? 'https://explorer.sepolia.era.zksync.dev/contract_verification'
+        : 'https://zksync2-mainnet-explorer.zksync.io/contract_verification',
+    }
+  }
+  networks[slug] = {
+    ...network,
+    accounts,
+    ...zksync,
+  }
 })
 
 // parse fork URL for tests
@@ -78,6 +95,8 @@ const etherscan = {
     scroll: 'BZEXNPN6KKKJQ8VIMNXZDZNEX7QQZWZQ3P',
     opSepolia: 'V51DWC44XURIGPP49X85VZQGH1DCBAW5EC',
     'arbitrum-sepolia': 'W5XNFPZS8D6JZ5AXVWD4XCG8B5ZH5JCD4Y',
+    zksyncsepolia: '9RJM97KMNID76WJQZD7SFB5QE7Q1342ANF',
+    zksyncmainnet: '9RJM97KMNID76WJQZD7SFB5QE7Q1342ANF',
   },
   customChains: [
     {

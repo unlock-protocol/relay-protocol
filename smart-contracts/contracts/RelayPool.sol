@@ -448,7 +448,8 @@ contract RelayPool is ERC4626, Ownable {
     if (address(asset) == WETH) {
       withdrawAssetsFromYieldPool(amount, address(this));
       IWETH(WETH).withdraw(amount);
-      payable(recipient).transfer(amount);
+      (bool s, ) = recipient.call{value: amount}("");
+      require(s);
     } else {
       withdrawAssetsFromYieldPool(amount, recipient);
     }

@@ -1,7 +1,7 @@
 import { task } from 'hardhat/config'
 import { AutoComplete, Input } from 'enquirer'
 import { networks } from '@relay-protocol/networks'
-import { getStataToken, getEvent } from '@relay-protocol/helpers'
+import { getStataToken, getEvent, getProvider } from '@relay-protocol/helpers'
 import { getAddresses } from '../../lib/utils/deployed'
 
 task('deploy:pool', 'Deploy a relay pool')
@@ -10,9 +10,9 @@ task('deploy:pool', 'Deploy a relay pool')
   .addOptionalParam('factory', 'Address of the factory')
   .addOptionalParam('asset', 'An ERC20 asset')
   .addOptionalParam('yieldPool', 'A yield pool address')
-  .addOptionalParam(
+  .addParam(
     'origins',
-    'Origins, as JSON: [{"chainId": 11155420, "bridge": "0xD26c05a33349a6DeD02DD9360e1ef303d1246fb6", "maxDebt": 1000000000000, "proxyBridge": "0x4e46Dc422c61d41Ce835234D29e7f9f1C54968Fb"}]'
+    'Origins, as JSON array: [{"chainId": 11155420, "bridge": "0xD26c05a33349a6DeD02DD9360e1ef303d1246fb6", "maxDebt": 1000000000000, "proxyBridge": "0x4e46Dc422c61d41Ce835234D29e7f9f1C54968Fb"}]'
   )
   .setAction(
     async (
@@ -20,16 +20,14 @@ task('deploy:pool', 'Deploy a relay pool')
       { ethers, run }
     ) => {
       const [user] = await ethers.getSigners()
-
-      // get args value
       const { chainId } = await ethers.provider.getNetwork()
       const { name: networkName, assets } = networks[chainId.toString()]
 
-      const { RelayPoolFactory } = (await getAddresses())[chainId.toString()]
-
       console.log(`deploying on ${networkName} (${chainId})...`)
 
+      // pool factory
       if (!factory) {
+        const { RelayPoolFactory } = (await getAddresses())[chainId.toString()]
         factory = RelayPoolFactory
       }
 
@@ -43,7 +41,7 @@ task('deploy:pool', 'Deploy a relay pool')
         asset = assets[assetName]
       }
 
-      // get aave yield pool
+      // yield pool
       if (!yieldPool) {
         const yieldPoolName = await new AutoComplete({
           name: 'yieldPoolName',
@@ -107,10 +105,9 @@ task('deploy:pool', 'Deploy a relay pool')
       // Check that each origin's asset matches
       // We need to check the symbols...
       const authorizedOrigins = JSON.parse(origins)
-      // TODO: suggest origins from the addresses if none passed
       for (let i = 0; i < authorizedOrigins.length; i++) {
         const origin = authorizedOrigins[i]
-        const originProvider = await ethers.getDefaultProvider(origin.chainId)
+        const originProvider = await getProvider(origin.chainId)
         const originBridgeContract = new ethers.Contract(
           origin.bridge,
           ['function asset() view returns (address)'],
@@ -133,7 +130,7 @@ task('deploy:pool', 'Deploy a relay pool')
           }
           const originAssetContract = new ethers.Contract(
             originAsset,
-            ['function asset() view returns (address)'],
+            ['function symbol() view returns (string)'],
             originProvider
           )
           const originAssetSymbol = await originAssetContract.symbol()

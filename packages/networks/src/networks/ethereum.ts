@@ -16,6 +16,10 @@ export const ethereum: NetworkConfig = {
       messenger: '0xBd3fa81B58Ba92a82136038B25aDec7066af3155',
       transmitter: '0x0a992d191DEeC32aFe36203Ad87D7d289a738F81',
     },
+    zksync: {
+      l1SharedDefaultBridge: '0xD7f9f54194C633F36CCD5F3da84ad4a1c38cB2cB',
+      l2SharedDefaultBridge: '0x11f943b2c77b743AB90f4A0Ae7d5A4e7FCA3E102',
+    },
   },
   chainId: 1,
   hyperlaneMailbox: '0xc005dc82818d67AF737725bD4bf75435d065D239',
