@@ -1,9 +1,7 @@
 {
   "extends": "@relay-protocol/tsconfig",
   "compilerOptions": {
-    "outDir": "dist",
-    "module": "ESNext",
-    "moduleResolution": "node"
+    "outDir": "dist"
   },
   "exclude": ["dist", "bin"]
 }
