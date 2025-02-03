@@ -52,6 +52,7 @@ describe('RelayBridge: claim', () => {
       maxDebt: ethers.parseEther('10'),
       proxyBridge: await oPStackNativeBridgeProxy.getAddress(),
       bridgeFee: 10,
+      curator: userAddress,
       coolDown: 0,
     })
 

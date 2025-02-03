@@ -41,6 +41,7 @@ describe('Fees', () => {
             maxDebt: ethers.parseEther('10'),
             proxyBridge: oPStackNativeBridgeProxy,
             bridgeFee: 5, // (0.05%)
+            curator: userAddress,
             coolDown: 0,
           },
         ],
@@ -63,7 +64,7 @@ describe('Fees', () => {
     const recipientAddress = ethers.Wallet.createRandom().address
 
     const amount = ethers.parseUnits('1')
-    const [, , , bridgeFee] = await relayPool.authorizedOrigins(
+    const [, , , , bridgeFee] = await relayPool.authorizedOrigins(
       10,
       relayBridgeOptimism
     )
