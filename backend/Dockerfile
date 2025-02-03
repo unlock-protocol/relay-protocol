@@ -7,9 +7,10 @@ WORKDIR /app
 # Enable corepack and set yarn version
 RUN corepack enable && corepack prepare yarn@4.6.0 --activate
 
-# Copy package files
+# Copy package files and workspace configurations
 COPY package.json yarn.lock .yarnrc.yml ./
 COPY .yarn ./.yarn
+COPY packages ./packages
 COPY backend/package.json ./backend/
 
 # Install dependencies
@@ -30,15 +31,17 @@ WORKDIR /app
 # Enable corepack and set yarn version
 RUN corepack enable && corepack prepare yarn@4.6.0 --activate
 
-# Copy package files
+# Copy package files and workspace configurations
 COPY package.json yarn.lock .yarnrc.yml ./
 COPY .yarn ./.yarn
+COPY packages ./packages
 COPY backend/package.json ./backend/
 
 # Copy built files from builder
 COPY --from=builder /app/backend/generated ./backend/generated
 COPY --from=builder /app/backend/dist ./backend/dist
 COPY --from=builder /app/backend/node_modules ./backend/node_modules
+COPY --from=builder /app/packages ./packages
 
 # Set environment variables
 ENV NODE_ENV=production
