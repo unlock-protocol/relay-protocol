@@ -1,5 +1,6 @@
 import { task } from 'hardhat/config'
 import { getBalance, checkAllowance } from '@relay-protocol/helpers'
+import { networks } from 'networks'
 
 task('bridge:send', 'Send tokens to a pool across a relay bridge')
   .addParam('bridge', 'The Relay Bridge contract address')
@@ -20,9 +21,11 @@ task('bridge:send', 'Send tokens to a pool across a relay bridge')
         destChain = 11155111,
         // asset: assetAddress,
       },
-      { ethers: rawEthers, zksyncEthers, network }
+      { ethers: rawEthers, zksyncEthers }
     ) => {
-      const ethers = network.zksync ? zksyncEthers : rawEthers
+      const { chainId } = await rawEthers.provider.getNetwork()
+      const { isZksync } = networks[chainId.toString()]
+      const ethers = isZksync ? zksyncEthers : rawEthers
       const bridge = await ethers.getContractAt('RelayBridge', bridgeAddress)
       const assetAddress = await bridge.asset()
       const [user] = await ethers.getSigners()
@@ -93,9 +96,11 @@ task('bridge:send-proxy', 'Send tokens across a proxy bridge (test purposes)')
         asset: assetAddress,
         recipient,
       },
-      { ethers: rawEthers, zksyncEthers, network }
+      { ethers: rawEthers, zksyncEthers }
     ) => {
-      const ethers = network.zksync ? zksyncEthers : rawEthers
+      const { chainId } = await rawEthers.provider.getNetwork()
+      const { isZksync } = networks[chainId.toString()]
+      const ethers = isZksync ? zksyncEthers : rawEthers
       const bridge = await ethers.getContractAt('BridgeProxy', bridgeAddress)
       const [user] = await ethers.getSigners()
       const userAddress = await user.getAddress()
