@@ -36,18 +36,11 @@ WORKDIR /app
 # Enable corepack and set yarn version
 RUN corepack enable && corepack prepare yarn@4.6.0 --activate
 
-# Copy root workspace files
-COPY package.json yarn.lock .yarnrc.yml ./
-COPY .yarn ./.yarn
+# Copy all files from builder
+COPY --from=builder /app .
 
-# Copy all workspace packages
-COPY packages ./packages
-COPY backend/package.json ./backend/
-COPY smart-contracts/package.json ./smart-contracts/
-
-# Copy built files from builder
-COPY --from=builder /app/packages ./packages
-COPY --from=builder /app/backend ./backend
+# Install production dependencies
+RUN yarn install --mode=skip-build
 
 # Set environment variables
 ENV NODE_ENV=production
