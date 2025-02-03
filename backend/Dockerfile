@@ -1,5 +1,5 @@
 # Build stage
-FROM node:22.13-yarn AS builder
+FROM node:22.13.1-alpine3.21 AS builder
 
 # Set working directory
 WORKDIR /app
@@ -18,7 +18,7 @@ COPY . .
 RUN yarn build
 
 # Production stage
-FROM node:22.13-yarn AS runner
+FROM node:22.13.1-alpine3.21 AS runner
 
 # Set working directory
 WORKDIR /app
