@@ -1,39 +1,67 @@
-# Use Node.js 22 as base image
+# *****************************************************************************
+# This Dockerfile builds the monorepo by installing all workspace dependencies,
+# then builds the backend package by executing its codegen. Finally, it sets the
+# runtime directory to the backend folder for starting the application.
+# *****************************************************************************
+
+# Use Node.js 22 as the base image
 FROM node:22.12.0
 
-# Accept Railway deployment ID as build argument
+# Accept the Railway deployment ID as a build argument
 ARG RAILWAY_DEPLOYMENT_ID
 
 # Install system dependencies including curl for health checks
 RUN apk add --no-cache python3 make g++ curl
 
-# Set working directory
+# Set the working directory to the monorepo's root
 WORKDIR /app
 
-# Copy root package files and backend package manifest for dependency installation
+# -----------------------------------------------------------------------------
+# COPY package files
+# -----------------------------------------------------------------------------
+# Copy the root package.json and yarn.lock so that we can install the monorepo
+# dependencies via Yarn workspaces.
 COPY package.json yarn.lock ./
-COPY backend/package.json ./backend/
 
-# Install dependencies for both root and backend
+# -----------------------------------------------------------------------------
+# INSTALL DEPENDENCIES
+# -----------------------------------------------------------------------------
+# Run Yarn install to bootstrap the entire monorepo, including all workspaces.
 RUN yarn install --frozen-lockfile
 
-# Copy entire source code into the container
+# -----------------------------------------------------------------------------
+# COPY SOURCE CODE
+# -----------------------------------------------------------------------------
+# Copy the complete repository into the container. This ensures that all files,
+# including those in the 'backend' folder, are available.
 COPY . .
 
-# Build the backend application
-RUN cd backend && yarn codegen
+# -----------------------------------------------------------------------------
+# BUILD THE BACKEND PACKAGE
+# -----------------------------------------------------------------------------
+# Run the code generation command for the backend using Yarn workspaces.
+# (This corresponds to the prebuild script in the monorepo’s package.json.)
+RUN yarn workspace @relay-protocol/backend codegen
 
-# Expose the port (Ponder typically runs on 42069)
+# -----------------------------------------------------------------------------
+# SET ENVIRONMENT VARIABLES FOR PRODUCTION
+# -----------------------------------------------------------------------------
 ENV NODE_ENV=production
 ENV PORT=42069
 ENV SCHEMA=$RAILWAY_DEPLOYMENT_ID
 
-# Health check to ensure the application is running
+# -----------------------------------------------------------------------------
+# HEALTHCHECK
+# -----------------------------------------------------------------------------
+# Define a healthcheck that pings the backend's /health endpoint regularly.
 HEALTHCHECK --interval=60s --timeout=10s --start-period=5s --retries=3 \
   CMD curl -f http://localhost:42069/health || exit 1
 
-# Change working directory to the backend folder for runtime
+# -----------------------------------------------------------------------------
+# SET RUNTIME WORKING DIRECTORY & START APPLICATION
+# -----------------------------------------------------------------------------
+# At runtime, change the working directory to the backend so that the correct
+# package.json is used and the start script is executed there.
 WORKDIR /app/backend
 
-# Start the application using the SCHEMA environment variable
 CMD yarn start --schema $SCHEMA
