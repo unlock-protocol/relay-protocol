@@ -19,18 +19,15 @@ task('deploy:pool', 'Deploy a relay pool')
       { name, symbol, factory, asset, yieldPool, origins = '[]' },
       { ethers, run }
     ) => {
-      // get args value
       const [user] = await ethers.getSigners()
-
-      // get args value
       const { chainId } = await ethers.provider.getNetwork()
       const { name: networkName, assets } = networks[chainId.toString()]
 
       console.log(`deploying on ${networkName} (${chainId})...`)
 
       // pool factory
-      const { RelayPoolFactory } = (await getAddresses())[chainId.toString()]
       if (!factory) {
+        const { RelayPoolFactory } = (await getAddresses())[chainId.toString()]
         factory = RelayPoolFactory
       }
 
@@ -133,10 +130,7 @@ task('deploy:pool', 'Deploy a relay pool')
           }
           const originAssetContract = new ethers.Contract(
             originAsset,
-            [
-              'function asset() view returns (address)',
-              'function symbol() view returns (string)',
-            ],
+            ['function symbol() view returns (string)'],
             originProvider
           )
           const originAssetSymbol = await originAssetContract.symbol()
