@@ -5,62 +5,7 @@ import {BridgeProxy} from "./BridgeProxy.sol";
 import {IL1SharedBridge} from "../interfaces/zksync/IL1SharedBridge.sol";
 import {IL2SharedBridge} from "../interfaces/zksync/IL2SharedBridge.sol";
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-
-/**
- * from https://github.com/matter-labs/era-contracts/blob/3288adb0aee6c1c3022f6c817f95234764e0d611/l1-contracts/contracts/common/libraries/UnsafeBytes.sol
- * @author Matter Labs
- * @custom:security-contact security@matterlabs.dev
- * @dev The library provides a set of functions that help read data from an "abi.encodePacked" byte array.
- * @dev Each of the functions accepts the `bytes memory` and the offset where data should be read and returns a value of a certain type.
- *
- * @dev WARNING!
- * 1) Functions don't check the length of the bytes array, so it can go out of bounds.
- * The user of the library must check for bytes length before using any functions from the library!
- *
- * 2) Read variables are not cleaned up - https://docs.soliditylang.org/en/v0.8.16/internals/variable_cleanup.html.
- * Using data in inline assembly can lead to unexpected behavior!
- */
-library UnsafeBytes {
-  function readUint32(
-    bytes memory _bytes,
-    uint256 _start
-  ) internal pure returns (uint32 result, uint256 offset) {
-    assembly {
-      offset := add(_start, 4)
-      result := mload(add(_bytes, offset))
-    }
-  }
-
-  function readAddress(
-    bytes memory _bytes,
-    uint256 _start
-  ) internal pure returns (address result, uint256 offset) {
-    assembly {
-      offset := add(_start, 20)
-      result := mload(add(_bytes, offset))
-    }
-  }
-
-  function readUint256(
-    bytes memory _bytes,
-    uint256 _start
-  ) internal pure returns (uint256 result, uint256 offset) {
-    assembly {
-      offset := add(_start, 32)
-      result := mload(add(_bytes, offset))
-    }
-  }
-
-  function readBytes32(
-    bytes memory _bytes,
-    uint256 _start
-  ) internal pure returns (bytes32 result, uint256 offset) {
-    assembly {
-      offset := add(_start, 32)
-      result := mload(add(_bytes, offset))
-    }
-  }
-}
+import {UnsafeBytes} from "../utils/UnsafeBytes.sol";
 
 contract ZkSyncBridgeProxy is BridgeProxy {
   IL2SharedBridge public immutable L2_SHARED_BRIDGE;
@@ -96,7 +41,6 @@ contract ZkSyncBridgeProxy is BridgeProxy {
     bytes message;
     bytes32[] merkleProof;
   }
-
 
   function claim(
     address, // currency
