@@ -24,7 +24,7 @@ RUN yarn install --mode=skip-build
 # Copy all source files
 COPY . .
 
-# Build packages
+# Generate Ponder files and build packages
 RUN yarn build
 
 # Production stage
@@ -46,10 +46,8 @@ COPY backend/package.json ./backend/
 COPY smart-contracts/package.json ./smart-contracts/
 
 # Copy built files from builder
-COPY --from=builder /app/backend/generated ./backend/generated
-COPY --from=builder /app/backend/dist ./backend/dist
-COPY --from=builder /app/backend/node_modules ./backend/node_modules
 COPY --from=builder /app/packages ./packages
+COPY --from=builder /app/backend ./backend
 
 # Set environment variables
 ENV NODE_ENV=production
@@ -58,6 +56,5 @@ ENV DATABASE_URL=postgresql://postgres:postgres@localhost:5432/relay
 # Expose port
 EXPOSE 3000
 
-# Start the backend service
-WORKDIR /app/backend
-CMD ["yarn", "start"]
+# Start the backend service using workspace command
+CMD ["yarn", "backend:start"]
