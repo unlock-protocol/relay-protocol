@@ -39,7 +39,7 @@ if (!DEPLOYER_PRIVATE_KEY) {
 // parse networks from file
 const networks = { hardhat: {} }
 Object.keys(nets).forEach((id) => {
-  const { slug, rpc, isTestnet } = nets[id]
+  const { slug, rpc, isTestnet, isZKsync } = nets[id]
   let accounts
   let zksync = {}
   const network = {
@@ -49,7 +49,7 @@ Object.keys(nets).forEach((id) => {
   if (DEPLOYER_PRIVATE_KEY) {
     accounts = [DEPLOYER_PRIVATE_KEY]
   }
-  if (slug.includes('zksync')) {
+  if (isZKsync) {
     zksync = {
       zksync: true,
       ethNetwork: isTestnet ? 'sepolia' : 'mainnet',

@@ -24,13 +24,13 @@ export interface NetworkConfig {
     }
   }
   rpc?: string
+  isZKsync?: boolean
   hyperlaneMailbox: string
   isTestnet: boolean
   assets: NetworkAssets
   uniswapV3?: {
     universalRouterAddress: string
   }
-  
 }
 
 interface NetworkAssets {

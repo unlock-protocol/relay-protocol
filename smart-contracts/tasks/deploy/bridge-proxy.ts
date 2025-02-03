@@ -14,7 +14,7 @@ task('deploy:bridge-proxy', 'Deploy a bridge proxy').setAction(
     const { ethers, ignition, network } = hre
     const { chainId } = await ethers.provider.getNetwork()
 
-    const { bridges } = networks[chainId.toString()]
+    const { bridges, isZKsync } = networks[chainId.toString()]
 
     const type = await new AutoComplete({
       name: 'type',
@@ -88,7 +88,7 @@ task('deploy:bridge-proxy', 'Deploy a bridge proxy').setAction(
       let zkSyncBridgeAddress: string
       const l2SharedDefaultBridge = bridges.zksync!.l2SharedDefaultBridge!
       const l1SharedDefaultBridge = bridges.zksync!.l1SharedDefaultBridge!
-      if (network.zksync) {
+      if (isZKsync) {
         // deploy using `deployContract` helper (for zksync L2s)
         const deployArgs = [l2SharedDefaultBridge, l1SharedDefaultBridge]
 
@@ -98,7 +98,7 @@ task('deploy:bridge-proxy', 'Deploy a bridge proxy').setAction(
           deployArgs as any
         ))
       } else {
-        // used to deploy zksync bridge on L1
+        // used ignition to deploy bridge on L1
         const parameters = {
           ZkSyncBridgeProxy: {
             l2SharedDefaultBridge,

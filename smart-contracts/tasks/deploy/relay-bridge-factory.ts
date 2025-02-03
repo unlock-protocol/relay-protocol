@@ -6,15 +6,19 @@ import { deployContract } from '../../lib/zksync'
 
 task('deploy:bridge-factory', 'Deploy a relay bridge factory').setAction(
   async (_params, hre) => {
-    const { ethers, ignition, network } = hre
+    const { ethers, ignition } = hre
 
     // get args value
     const { chainId } = await ethers.provider.getNetwork()
-    const { hyperlaneMailbox, name: networkName } = networks[chainId.toString()]
+    const {
+      hyperlaneMailbox,
+      name: networkName,
+      isZKsync,
+    } = networks[chainId.toString()]
     console.log(`deploying on ${networkName} (${chainId})...`)
 
     let relayBridgeAddress: string
-    if (network.zksync) {
+    if (isZKsync) {
       ;({ address: relayBridgeAddress } = await deployContract(
         hre,
         'RelayBridgeFactory',

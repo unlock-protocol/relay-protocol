@@ -16,6 +16,7 @@ export const zksync: NetworkConfig = {
       l2SharedDefaultBridge: '0x11f943b2c77b743AB90f4A0Ae7d5A4e7FCA3E102',
     },
   },
+  isZKsync: true,
   assets: {
     usdc: '0x3355df6D4c9C3035724Fd0e3914dE96A5a83aaf4',
     dai: '0x4B9eb6c0b6ea15176BBF62841C6B2A8a398cb656',

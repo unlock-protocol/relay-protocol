@@ -117,10 +117,6 @@ task('deploy:pool', 'Deploy a relay pool')
       // Check that each origin's asset matches
       // We need to check the symbols...
       const authorizedOrigins = JSON.parse(origins)
-      if (authorizedOrigins.length === 0) {
-        console.error('No authorized origins provided!')
-        process.exit(1)
-      }
       for (let i = 0; i < authorizedOrigins.length; i++) {
         const origin = authorizedOrigins[i]
         const originProvider = await getProvider(origin.chainId)
@@ -168,8 +164,7 @@ task('deploy:pool', 'Deploy a relay pool')
         name,
         symbol,
         JSON.parse(origins),
-        yieldPool,
-        bridgeFee
+        yieldPool
       )
       const receipt = await tx.wait()
       const event = await getEvent(
