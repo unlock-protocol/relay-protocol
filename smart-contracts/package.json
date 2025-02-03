@@ -38,7 +38,7 @@
     "@types/fs-extra": "11.0.4",
     "@types/mocha": "10.0.10",
     "@types/semver": "7",
-    "chai": "4.5.0",
+    "chai": "4.3.7",
     "eslint": "9.19.0",
     "eslint-config-prettier": "10.0.1",
     "eslint-plugin-evm-address-to-checksummed": "0.0.6",
