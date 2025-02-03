@@ -60,7 +60,7 @@
     "ts-node": "10.9.2",
     "typechain": "8.3.2",
     "typescript": "5.7.3",
-    "typescript-eslint": "8.22.0"
+    "typescript-eslint": "8.23.0"
   },
   "dependencies": {
     "@bgd-labs/aave-address-book": "4.8.1",
