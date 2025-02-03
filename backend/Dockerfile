@@ -4,12 +4,16 @@ FROM node:22.13.1-alpine3.21 AS builder
 # Set working directory
 WORKDIR /app
 
+# Enable corepack and set yarn version
+RUN corepack enable && corepack prepare yarn@4.6.0 --activate
+
 # Copy package files
-COPY package.json yarn.lock ./
+COPY package.json yarn.lock .yarnrc.yml ./
+COPY .yarn ./.yarn
 COPY backend/package.json ./backend/
 
 # Install dependencies
-RUN yarn install --frozen-lockfile
+RUN yarn install --immutable
 
 # Copy source files
 COPY . .
@@ -23,8 +27,12 @@ FROM node:22.13.1-alpine3.21 AS runner
 # Set working directory
 WORKDIR /app
 
+# Enable corepack and set yarn version
+RUN corepack enable && corepack prepare yarn@4.6.0 --activate
+
 # Copy package files
-COPY package.json yarn.lock ./
+COPY package.json yarn.lock .yarnrc.yml ./
+COPY .yarn ./.yarn
 COPY backend/package.json ./backend/
 
 # Copy built files from builder
