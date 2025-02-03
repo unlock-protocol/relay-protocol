@@ -32,15 +32,13 @@ RUN yarn install --frozen-lockfile
 # -----------------------------------------------------------------------------
 # COPY SOURCE CODE
 # -----------------------------------------------------------------------------
-# Copy the complete repository into the container. This ensures that all files,
-# including those in the 'backend' folder, are available.
+# Copy the complete repository into the container.
 COPY . .
 
 # -----------------------------------------------------------------------------
 # BUILD THE BACKEND PACKAGE
 # -----------------------------------------------------------------------------
-# Run the code generation command for the backend using Yarn workspaces.
-# (This corresponds to the prebuild script in the monorepo’s package.json.)
+# Build the backend by running its codegen using Yarn workspaces.
 RUN yarn workspace @relay-protocol/backend codegen
 
 # -----------------------------------------------------------------------------
@@ -53,15 +51,12 @@ ENV SCHEMA=$RAILWAY_DEPLOYMENT_ID
 # -----------------------------------------------------------------------------
 # HEALTHCHECK
 # -----------------------------------------------------------------------------
-# Define a healthcheck that pings the backend's /health endpoint regularly.
 HEALTHCHECK --interval=60s --timeout=10s --start-period=5s --retries=3 \
   CMD curl -f http://localhost:42069/health || exit 1
 
 # -----------------------------------------------------------------------------
 # SET RUNTIME WORKING DIRECTORY & START APPLICATION
 # -----------------------------------------------------------------------------
-# At runtime, change the working directory to the backend so that the correct
-# package.json is used and the start script is executed there.
 WORKDIR /app/backend
 
 CMD yarn start --schema $SCHEMA
