@@ -2470,6 +2470,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@openzeppelin/contracts@npm:3.4.2-solc-0.7":
+  version: 3.4.2-solc-0.7
+  resolution: "@openzeppelin/contracts@npm:3.4.2-solc-0.7"
+  checksum: 10/a21aa0a623f020cb32cd3c6b7903d806ec458b2a750feb86f5e3bcf0b7ae124d844b9d1c029f9e0707d6263b561f35a694bafc1b0bff30c3e95541124f8fd41c
+  languageName: node
+  linkType: hard
+
 "@openzeppelin/defender-sdk-base-client@npm:^1.10.0, @openzeppelin/defender-sdk-base-client@npm:^1.15.2":
   version: 1.15.2
   resolution: "@openzeppelin/defender-sdk-base-client@npm:1.15.2"
@@ -2725,7 +2732,7 @@ __metadata:
   resolution: "@relay-protocol/backend@workspace:backend"
   dependencies:
     "@relay-protocol/abis": "workspace:*"
-    "@types/node": "npm:22.12.0"
+    "@types/node": "npm:22.13.0"
     "@typescript-eslint/eslint-plugin": "npm:8.22.0"
     "@typescript-eslint/parser": "npm:8.22.0"
     eslint: "npm:9.19.0"
@@ -2750,7 +2757,7 @@ __metadata:
     "@relay-protocol/eslint-config": "workspace:^"
     "@relay-protocol/tsconfig": "workspace:./packages/tsconfig"
     "@relay-protocol/types": "workspace:./packages/types"
-    "@types/node": "npm:22.12.0"
+    "@types/node": "npm:22.13.0"
     eslint: "npm:9.19.0"
     graphql: "npm:16.10.0"
     graphql-request: "npm:7.1.2"
@@ -2845,8 +2852,9 @@ __metadata:
     "@types/chai": "npm:4.3.20"
     "@types/fs-extra": "npm:11.0.4"
     "@types/mocha": "npm:10.0.10"
-    "@types/node": "npm:22.12.0"
+    "@types/node": "npm:22.13.0"
     "@types/semver": "npm:^7"
+    "@uniswap/v3-periphery": "npm:1.4.4"
     chai: "npm:4.5.0"
     eslint: "npm:9.19.0"
     eslint-config-prettier: "npm:10.0.1"
@@ -4040,12 +4048,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/node@npm:22.12.0, @types/node@npm:>=13.7.0":
-  version: 22.12.0
-  resolution: "@types/node@npm:22.12.0"
+"@types/node@npm:22.13.0":
+  version: 22.13.0
+  resolution: "@types/node@npm:22.13.0"
   dependencies:
     undici-types: "npm:~6.20.0"
-  checksum: 10/aac2b6f6a845ec3540c3d979b3150efe3162165bfda953af10b579df2d1cc4f5c48506922bf6bf661a2e5a7ebb571c5729bf1f9f12488a810bb1a5fa9522ef9d
+  checksum: 10/a7563e57df48cb7e28f936dbabe228316dcdb4c7c3a88a6c1659fae898ffde2647a7193a9e29e0cbcb7dacc05a91fb3bc30c1a1d6fc9294694a734ff71a5f12e
   languageName: node
   linkType: hard
 
@@ -4055,6 +4063,15 @@ __metadata:
   dependencies:
     undici-types: "npm:~6.19.2"
   checksum: 10/e8ba102f8c1aa7623787d625389be68d64e54fcbb76d41f6c2c64e8cf4c9f4a2370e7ef5e5f1732f3c57529d3d26afdcb2edc0101c5e413a79081449825c57ac
+  languageName: node
+  linkType: hard
+
+"@types/node@npm:>=13.7.0":
+  version: 22.12.0
+  resolution: "@types/node@npm:22.12.0"
+  dependencies:
+    undici-types: "npm:~6.20.0"
+  checksum: 10/aac2b6f6a845ec3540c3d979b3150efe3162165bfda953af10b579df2d1cc4f5c48506922bf6bf661a2e5a7ebb571c5729bf1f9f12488a810bb1a5fa9522ef9d
   languageName: node
   linkType: hard
 
@@ -4199,6 +4216,40 @@ __metadata:
     "@typescript-eslint/types": "npm:8.22.0"
     eslint-visitor-keys: "npm:^4.2.0"
   checksum: 10/1a172620d46e23362c5d1e1e7c8186856dff6b6f1c2697d67f9aac1b3dfd0de96c2c73487e4deed80fad3bfa5cf74cfed3519221657c6ede602b04ac091525a4
+  languageName: node
+  linkType: hard
+
+"@uniswap/lib@npm:^4.0.1-alpha":
+  version: 4.0.1-alpha
+  resolution: "@uniswap/lib@npm:4.0.1-alpha"
+  checksum: 10/5a80159c1b6b3dc7eace55d4d348a170a8a32162e0f01bb965c5cf540f243b274c57e76e61aba76f62abac7fba83239b51b3f230c86b86ecd9e09f1b1a4ec868
+  languageName: node
+  linkType: hard
+
+"@uniswap/v2-core@npm:^1.0.1":
+  version: 1.0.1
+  resolution: "@uniswap/v2-core@npm:1.0.1"
+  checksum: 10/a98cbafba613c088be4b439138e0a68f1d79c1f26c3bbe6ba20088832be4d8fa4a3f22569982e5d05f01a1d51586b58d83d64206f8f029c5bfb41282fcb8d62d
+  languageName: node
+  linkType: hard
+
+"@uniswap/v3-core@npm:^1.0.0":
+  version: 1.0.1
+  resolution: "@uniswap/v3-core@npm:1.0.1"
+  checksum: 10/704e865c9440f7eaa118673224a8ffde258aaa43e63605c77711cf70d562cca8a53648c528107e471a0f8183a7f7a01ed50fb01d658cf38cea0a055365f1aa21
+  languageName: node
+  linkType: hard
+
+"@uniswap/v3-periphery@npm:1.4.4":
+  version: 1.4.4
+  resolution: "@uniswap/v3-periphery@npm:1.4.4"
+  dependencies:
+    "@openzeppelin/contracts": "npm:3.4.2-solc-0.7"
+    "@uniswap/lib": "npm:^4.0.1-alpha"
+    "@uniswap/v2-core": "npm:^1.0.1"
+    "@uniswap/v3-core": "npm:^1.0.0"
+    base64-sol: "npm:1.0.1"
+  checksum: 10/4045aa06c336c152786f750a51f504423bad4a9f7ff589a2fa080027d522ca3e5545f6d207f8be00f67b149f9fb10e33c8710a7c881045359347288ff3757b3e
   languageName: node
   linkType: hard
 
@@ -4759,6 +4810,13 @@ __metadata:
   version: 1.5.1
   resolution: "base64-js@npm:1.5.1"
   checksum: 10/669632eb3745404c2f822a18fc3a0122d2f9a7a13f7fb8b5823ee19d1d2ff9ee5b52c53367176ea4ad093c332fd5ab4bd0ebae5a8e27917a4105a4cfc86b1005
+  languageName: node
+  linkType: hard
+
+"base64-sol@npm:1.0.1":
+  version: 1.0.1
+  resolution: "base64-sol@npm:1.0.1"
+  checksum: 10/be0f9e8cf3c744256913223fbae8187773f530cc096e98a77f49ef0bd6cedeb294d15a784e439419f7cb99f07bf85b08999169feafafa1a9e29c3affc0bc6d0a
   languageName: node
   linkType: hard
 

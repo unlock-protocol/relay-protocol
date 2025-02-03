@@ -36,7 +36,7 @@
     "@types/chai": "4.3.20",
     "@types/fs-extra": "11.0.4",
     "@types/mocha": "10.0.10",
-    "@types/node": "22.12.0",
+    "@types/node": "22.13.0",
     "@types/semver": "^7",
     "chai": "4.5.0",
     "eslint": "9.19.0",
@@ -67,6 +67,7 @@
     "@eth-optimism/contracts-bedrock": "0.17.3",
     "@matterlabs/hardhat-zksync": "1.3.0",
     "@openzeppelin/contracts": "5.2.0",
+    "@uniswap/v3-periphery": "1.4.4",
     "solmate": "6.8.0"
   }
 }

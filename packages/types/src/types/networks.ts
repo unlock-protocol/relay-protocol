@@ -27,6 +27,10 @@ export interface NetworkConfig {
   hyperlaneMailbox: string
   isTestnet: boolean
   assets: NetworkAssets
+  uniswapV3?: {
+    universalRouterAddress: string
+  }
+  
 }
 
 interface NetworkAssets {
