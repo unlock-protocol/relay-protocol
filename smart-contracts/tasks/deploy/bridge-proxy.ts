@@ -89,7 +89,7 @@ task('deploy:bridge-proxy', 'Deploy a bridge proxy').setAction(
       const l2SharedDefaultBridge = bridges.zksync!.l2SharedDefaultBridge!
       const l1SharedDefaultBridge = bridges.zksync!.l1SharedDefaultBridge!
       if (network.zksync) {
-        // deploy using `deployContract` helper
+        // deploy using `deployContract` helper (for zksync L2s)
         const deployArgs = [l2SharedDefaultBridge, l1SharedDefaultBridge]
 
         ;({ address: zkSyncBridgeAddress } = await deployContract(
@@ -98,7 +98,7 @@ task('deploy:bridge-proxy', 'Deploy a bridge proxy').setAction(
           deployArgs as any
         ))
       } else {
-        // deploy ARB bridge
+        // used to deploy zksync bridge on L1
         const parameters = {
           ZkSyncBridgeProxy: {
             l2SharedDefaultBridge,
