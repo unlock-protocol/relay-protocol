@@ -567,10 +567,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@bgd-labs/aave-address-book@npm:4.8.1":
-  version: 4.8.1
-  resolution: "@bgd-labs/aave-address-book@npm:4.8.1"
-  checksum: 10/7371935e1c5688ef8bf8850cef7bd5cb9d4735259e4cfd83cf621c4a12f835ffc100fb0a37d0e5c1ceab8a5cca63d85040099bc2344fb03d0f6ab27805d82119
+"@bgd-labs/aave-address-book@npm:4.9.0":
+  version: 4.9.0
+  resolution: "@bgd-labs/aave-address-book@npm:4.9.0"
+  checksum: 10/3e4dd43e648c31148b99afe93cbc43a3cc048afb5122cb65865af1e96818c237b35d4e4229e16fb220a825925ac838e09e807d38fecec1667c76c9a29585c69c
   languageName: node
   linkType: hard
 
@@ -2784,7 +2784,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@relay-protocol/helpers@workspace:packages/helpers"
   dependencies:
-    "@bgd-labs/aave-address-book": "npm:4.8.1"
+    "@bgd-labs/aave-address-book": "npm:4.9.0"
     "@relay-protocol/networks": "workspace:^"
     "@relay-protocol/tsconfig": "workspace:^"
     "@types/copyfiles": "npm:^2"
@@ -2834,7 +2834,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@relay-protocol/smart-contracts@workspace:smart-contracts"
   dependencies:
-    "@bgd-labs/aave-address-book": "npm:4.8.1"
+    "@bgd-labs/aave-address-book": "npm:4.9.0"
     "@eslint/js": "npm:9.19.0"
     "@eth-optimism/contracts-bedrock": "npm:0.17.3"
     "@matterlabs/hardhat-zksync": "npm:1.3.0"
