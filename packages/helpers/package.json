@@ -25,7 +25,7 @@
     "lint:fix": "yarn lint --fix",
     "lint": "eslint",
     "build": "yarn build:index && yarn build:copy-abis && yarn build:ts",
-    "build:ts": "tsup src/index.ts --dts --format  esm,cjs",
+    "build:ts": "tsup src/index.ts --dts --format esm,cjs",
     "build:copy-abis": "cp -r src/abis dist/src/abis",
     "build:index": "tsc && node dist/scripts/buildAbisIndex.js && tsc"
   },

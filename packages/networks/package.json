@@ -17,7 +17,7 @@
     "lint:fix": "yarn lint --fix",
     "lint": "eslint",
     "clean": "rm -rf ./dist",
-    "build": "tsup src/index.ts --dts --format  esm,cjs"
+    "build": "tsup src/index.ts --dts --format esm,cjs"
   },
   "devDependencies": {
     "@relay-protocol/eslint-config": "workspace:^",

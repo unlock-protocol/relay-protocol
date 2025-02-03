@@ -20,7 +20,7 @@
     "clean": "rm -rf src dist",
     "build:contracts": "yarn workspace @relay-protocol/smart-contracts build",
     "build:export-abis": "yarn workspace @relay-protocol/smart-contracts build:abis",
-    "build:ts": "tsup src/index.ts --dts --format cjs",
+    "build:ts": "tsup src/index.ts --dts --format esm,cjs",
     "build": "yarn build:contracts && yarn build:export-abis && yarn build:ts"
   },
   "devDependencies": {
