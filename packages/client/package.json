@@ -1,17 +1,17 @@
 {
   "name": "@relay-protocol/client",
   "version": "1.0.0",
-  "main": "dist/index.mjs",
+  "main": "dist/index.js",
   "module": "dist/index.mjs",
-  "types": "dist/index.d.mts",
+  "types": "dist/index.d.ts",
   "exports": {
     ".": {
       "import": "./dist/index.mjs",
-      "require": "./dist/index.mjs"
+      "require": "./dist/index.js"
     }
   },
   "scripts": {
-    "build": "tsup src/index.ts --dts --format esm",
+    "build": "tsup src/index.ts --dts --format esm,cjs",
     "clean": "rm -rf dist",
     "lint:fix": "yarn lint --fix",
     "lint": "eslint"
