@@ -51,7 +51,9 @@ describe('RelayBridge: claim', () => {
       bridge: relayBridgeOptimism,
       maxDebt: ethers.parseEther('10'),
       proxyBridge: await oPStackNativeBridgeProxy.getAddress(),
-      bridgeFee: 0,
+      bridgeFee: 10,
+      curator: userAddress,
+      coolDown: 0,
     })
 
     // deploy the pool using ignition
@@ -75,13 +77,6 @@ describe('RelayBridge: claim', () => {
     await myWeth.deposit({ value: ethers.parseEther('3') })
     await myWeth.approve(await relayPool.getAddress(), ethers.parseEther('3'))
     await relayPool.deposit(ethers.parseEther('3'), userAddress)
-
-    // Borrow from the pool
-    await relayPool.handle(
-      origins[0].chainId,
-      ethers.zeroPadValue(origins[0].bridge, 32),
-      encodeData(5n, userAddress, ethers.parseEther('1'))
-    )
   })
 
   it('should fail to claim from an unauthorized chain', async () => {
@@ -115,6 +110,13 @@ describe('RelayBridge: claim', () => {
       ]
     )
 
+    // Borrow from the pool so we can claim later
+    await relayPool.handle(
+      origins[0].chainId,
+      ethers.zeroPadValue(origins[0].bridge, 32),
+      encodeData(5n, userAddress, bridgedAmount)
+    )
+
     const myOpStackPortalBalance =
       await ethers.provider.getBalance(myOpStackPortal)
 
@@ -131,6 +133,7 @@ describe('RelayBridge: claim', () => {
       bridgedAmount
     )
   })
+
   it('should fail if the delegate call fails')
 
   it('should update the outstanding debts', async () => {
@@ -147,6 +150,13 @@ describe('RelayBridge: claim', () => {
         ethers.parseEther('0.0001'), // minGasLimit,
         '0x', // message
       ]
+    )
+
+    // Borrow from the pool so we can claim later
+    await relayPool.handle(
+      origins[0].chainId,
+      ethers.zeroPadValue(origins[0].bridge, 32),
+      encodeData(6n, userAddress, bridgedAmount)
     )
 
     const outstandingDebtBefore = await relayPool.outstandingDebt()
@@ -173,10 +183,11 @@ describe('RelayBridge: claim', () => {
     ).to.equal(bridgedAmount)
   })
 
-  it('should desposit the funds in the 3rd party pool', async () => {
+  it('should desposit the funds in the 3rd party pool but total assets should remain unchanged', async () => {
     const abiCoder = new ethers.AbiCoder()
     const relayPoolAddress = await relayPool.getAddress()
     const bridgedAmount = ethers.parseEther('0.033')
+
     const transaction = abiCoder.encode(
       ['uint256', 'address', 'address', 'uint256', 'uint256', 'bytes'],
       [
@@ -189,9 +200,11 @@ describe('RelayBridge: claim', () => {
       ]
     )
 
-    const poolAssetsBefore = await relayPool.totalAssets()
-    const relayPoolBalanceBefore = await thirdPartyPool.balanceOf(
-      await relayPool.getAddress()
+    // Borrow from the pool so we can claim later
+    await relayPool.handle(
+      origins[0].chainId,
+      ethers.zeroPadValue(origins[0].bridge, 32),
+      encodeData(7n, userAddress, bridgedAmount)
     )
 
     const claimData = abiCoder.encode(
@@ -199,14 +212,24 @@ describe('RelayBridge: claim', () => {
       [transaction, relayPoolAddress]
     )
 
-    await relayPool.claim(origins[0].chainId, origins[0].bridge, claimData)
-    const poolAssetsAfter = await relayPool.totalAssets()
-    const relayPoolBalanceAfter = await thirdPartyPool.balanceOf(
-      await relayPool.getAddress()
-    )
+    const streamingPeriod = await relayPool.streamingPeriod()
+    await ethers.provider.send('evm_increaseTime', [
+      Number(streamingPeriod * 2n),
+    ])
+    await relayPool.updateStreamedAssets()
+    const poolAssetsBefore = await relayPool.totalAssets()
 
+    const relayPoolBalanceBefore =
+      await thirdPartyPool.balanceOf(relayPoolAddress)
+
+    await relayPool.claim(origins[0].chainId, origins[0].bridge, claimData)
+
+    const poolAssetsAfter = await relayPool.totalAssets()
+
+    const relayPoolBalanceAfter =
+      await thirdPartyPool.balanceOf(relayPoolAddress)
     // Assets remain unchanged (they were previously accounted for "in the bridge")
-    expect(poolAssetsBefore - poolAssetsAfter).to.equal(0)
+    expect(poolAssetsAfter).to.equal(poolAssetsBefore)
 
     // But the balance of the relay pool in the 3rd party pool should have increased
     expect(relayPoolBalanceAfter - relayPoolBalanceBefore).to.equal(

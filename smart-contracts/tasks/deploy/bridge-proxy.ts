@@ -6,13 +6,16 @@ import { AutoComplete } from 'enquirer'
 import CCTPBridgeProxyModule from '../../ignition/modules/CCTPBridgeProxyModule'
 import OPStackNativeBridgeProxyModule from '../../ignition/modules/OPStackNativeBridgeProxyModule'
 import ArbitrumOrbitNativeBridgeProxyModule from '../../ignition/modules/ArbitrumOrbitNativeBridgeProxyModule'
+import { getZkSyncBridgeContracts, deployContract } from '../../lib/zksync'
+import ZkSyncBridgeProxyModule from '../../ignition/modules/ZkSyncBridgeProxyModule'
 
 task('deploy:bridge-proxy', 'Deploy a bridge proxy')
   .addOptionalParam('type', 'the type of bridge to deploy')
-  .setAction(async ({ type }, { ethers, ignition, run }) => {
+  .setAction(async (_, hre) => {
+    const { ethers, ignition, network } = hre
     const { chainId } = await ethers.provider.getNetwork()
 
-    const { bridges } = networks[chainId.toString()]
+    const { bridges, isZKsync } = networks[chainId.toString()]
 
     if (!type) {
       type = await new AutoComplete({
@@ -109,6 +112,43 @@ task('deploy:bridge-proxy', 'Deploy a bridge proxy')
         constructorArguments: [routerGateway, outbox],
       })
       console.log(`ArbOrbit bridge deployed at: ${proxyBridgeAddress}`)
+    } else if (type === 'zksync') {
+      let zkSyncBridgeAddress: string
+      const l2SharedDefaultBridge = bridges.zksync!.l2SharedDefaultBridge!
+      const l1SharedDefaultBridge = bridges.zksync!.l1SharedDefaultBridge!
+      if (isZKsync) {
+        // deploy using `deployContract` helper (for zksync L2s)
+        const deployArgs = [l2SharedDefaultBridge, l1SharedDefaultBridge]
+
+        ;({ address: zkSyncBridgeAddress } = await deployContract(
+          hre,
+          'ZkSyncBridgeProxy',
+          deployArgs as any
+        ))
+      } else {
+        // used ignition to deploy bridge on L1
+        const parameters = {
+          ZkSyncBridgeProxy: {
+            l2SharedDefaultBridge,
+            l1SharedDefaultBridge,
+          },
+        }
+        ;({ bridge: proxyBridge } = await ignition.deploy(
+          ZkSyncBridgeProxyModule,
+          {
+            parameters,
+            deploymentId: `BridgeProxy-ZkSync-${chainId.toString()}`,
+          }
+        ))
+        proxyBridgeAddress = await proxyBridge.getAddress()
+        console.log(
+          `Zksync BridgeProxy contract deployed at ${proxyBridgeAddress}`
+        )
+        await run('verify:verify', {
+          address: proxyBridgeAddress,
+          constructorArguments: [routerGateway, outbox],
+        })
+      }
     }
 
     return proxyBridgeAddress

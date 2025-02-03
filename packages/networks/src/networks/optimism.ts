@@ -22,4 +22,7 @@ export const optimism: NetworkConfig = {
     usdc: '0x0b2C639c533813f4Aa9D7837CAf62653d097Ff85',
     weth: '0x4200000000000000000000000000000000000006',
   },
+  uniswapV3: {
+    universalRouterAddress: '0xb555edF5dcF85f42cEeF1f3630a52A108E55A654',
+  },
 }
