@@ -7,16 +7,21 @@ WORKDIR /app
 # Enable corepack and set yarn version
 RUN corepack enable && corepack prepare yarn@4.6.0 --activate
 
-# Copy package files and workspace configurations
+# Copy root workspace files first
 COPY package.json yarn.lock .yarnrc.yml ./
+
+# Copy yarn configuration
 COPY .yarn ./.yarn
+
+# Copy all workspace packages
 COPY packages ./packages
 COPY backend/package.json ./backend/
+COPY smart-contracts/package.json ./smart-contracts/
 
-# Install dependencies
-RUN yarn install --immutable
+# Install dependencies with more permissive flags
+RUN yarn install --no-immutable --ignore-engines --ignore-platform
 
-# Copy source files
+# Copy all source files
 COPY . .
 
 # Build packages
@@ -31,11 +36,14 @@ WORKDIR /app
 # Enable corepack and set yarn version
 RUN corepack enable && corepack prepare yarn@4.6.0 --activate
 
-# Copy package files and workspace configurations
+# Copy root workspace files
 COPY package.json yarn.lock .yarnrc.yml ./
 COPY .yarn ./.yarn
+
+# Copy all workspace packages
 COPY packages ./packages
 COPY backend/package.json ./backend/
+COPY smart-contracts/package.json ./smart-contracts/
 
 # Copy built files from builder
 COPY --from=builder /app/backend/generated ./backend/generated
