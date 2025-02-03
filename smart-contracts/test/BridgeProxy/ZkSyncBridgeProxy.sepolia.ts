@@ -23,6 +23,10 @@ const recipientAddress = '0x246A13358Fb27523642D86367a51C2aEB137Ac6C'
 const amount = 1000n
 
 // construct the actual proof
+// NB: to retrieve the actual proof, we use the `ethers-zksync` methods `finalizeWithdrawalParams`
+// as demonstrated in `smart-contracts/tasks/claim/zksync.ts
+// https://sdk.zksync.io/js/ethers/api/v6/accounts/wallet#finalizewithdrawal
+
 const returnedProof = {
   l1BatchNumber: 13523,
   l2MessageIndex: 6,
