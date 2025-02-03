@@ -18,8 +18,8 @@ COPY packages ./packages
 COPY backend/package.json ./backend/
 COPY smart-contracts/package.json ./smart-contracts/
 
-# Install dependencies with more permissive flags
-RUN yarn install --no-immutable --ignore-engines --ignore-platform
+# Install dependencies
+RUN yarn install --mode=skip-build
 
 # Copy all source files
 COPY . .
