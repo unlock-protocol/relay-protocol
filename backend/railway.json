@@ -1,0 +1,18 @@
+{
+  "$schema": "https://railway.com/railway.schema.json",
+  "build": {
+    "nixpacksPlan": {
+      "phases": {
+        "setup": {
+          "nixPkgs": ["yarn"]
+        },
+        "install": {
+          "dependsOn": ["setup"],
+          "cmds": [
+            "yarn install --frozen-lockfile && yarn packages:build && cd backend"
+          ]
+        }
+      }
+    }
+  }
+}
