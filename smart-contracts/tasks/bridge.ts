@@ -1,6 +1,6 @@
 import { task } from 'hardhat/config'
 import { getBalance, checkAllowance } from '@relay-protocol/helpers'
-import { networks } from 'networks'
+import { networks } from '@relay-protocol/networks'
 
 task('bridge:send', 'Send tokens to a pool across a relay bridge')
   .addParam('bridge', 'The Relay Bridge contract address')
