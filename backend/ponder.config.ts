@@ -25,7 +25,7 @@ export default createConfig({
       abi: RelayPoolFactory as Abi,
       network: {
         sepolia: {
-          address: '0xa6A1E3FE900282372a8c7d2a758aBAa1ba3EC7D5',
+          address: '0x1c1601077b3eeF14E5825a5fB0b87926Ad23cB90',
         },
       },
     },
@@ -33,28 +33,25 @@ export default createConfig({
       abi: RelayPool as Abi,
       network: 'sepolia',
       address: factory({
-        address: '0xa6A1E3FE900282372a8c7d2a758aBAa1ba3EC7D5',
+        address: '0x1c1601077b3eeF14E5825a5fB0b87926Ad23cB90',
         event: RelayPoolFactory.find(
           (e) => e.name === 'PoolDeployed'
         ) as AbiEvent,
         parameter: 'pool',
       }),
-      startBlock: 7499300,
+      startBlock: 7609300,
     },
     RelayBridgeFactory: {
       abi: RelayBridgeFactory as Abi,
       network: {
         opSepolia: {
-          address: [
-            '0xacDFfaA0323440e123D68C25a073e99DeB82e3fC',
-            '0x70e4A2b8de43459Fef02419A406158cD34A88dc3',
-          ],
+          address: '0x5765883E120F707A528F3e476636304De9280b6c',
         },
         baseSepolia: {
-          address: '0xBB68C66467699faB205304810a1b288487F460d4',
+          address: '0x5e30883816434C8C92534241729b80309B520A30',
         },
         arbSepolia: {
-          address: '0x2499D94880B30fA505543550ac8a1e24cfFeFe78',
+          address: '0x1402D55BF0D6566ca8F569041000a8015b608632',
         },
       },
     },
@@ -63,36 +60,33 @@ export default createConfig({
       network: {
         opSepolia: {
           address: factory({
-            address: [
-              '0xacDFfaA0323440e123D68C25a073e99DeB82e3fC',
-              '0x70e4A2b8de43459Fef02419A406158cD34A88dc3',
-            ],
+            address: '0x5765883E120F707A528F3e476636304De9280b6c',
             event: RelayBridgeFactory.find(
               (e) => e.name === 'BridgeDeployed'
             ) as AbiEvent,
             parameter: 'bridge',
           }),
-          startBlock: 7499300,
+          startBlock: 23446570,
         },
         baseSepolia: {
           address: factory({
-            address: ['0xBB68C66467699faB205304810a1b288487F460d4'],
+            address: '0x5e30883816434C8C92534241729b80309B520A30',
             event: RelayBridgeFactory.find(
               (e) => e.name === 'BridgeDeployed'
             ) as AbiEvent,
             parameter: 'bridge',
           }),
-          startBlock: 20991910,
+          startBlock: 21463700,
         },
         arbSepolia: {
           address: factory({
-            address: ['0x2499D94880B30fA505543550ac8a1e24cfFeFe78'],
+            address: '0x1402D55BF0D6566ca8F569041000a8015b608632',
             event: RelayBridgeFactory.find(
               (e) => e.name === 'BridgeDeployed'
             ) as AbiEvent,
             parameter: 'bridge',
           }),
-          startBlock: 117524900,
+          startBlock: 121036190,
         },
       },
     },
