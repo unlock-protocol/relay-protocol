@@ -2750,7 +2750,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@relay-protocol/client@workspace:packages/client":
+"@relay-protocol/client@workspace:*, @relay-protocol/client@workspace:packages/client":
   version: 0.0.0-use.local
   resolution: "@relay-protocol/client@workspace:packages/client"
   dependencies:
@@ -2787,8 +2787,8 @@ __metadata:
     "@bgd-labs/aave-address-book": "npm:4.9.0"
     "@relay-protocol/networks": "workspace:^"
     "@relay-protocol/tsconfig": "workspace:^"
-    "@types/copyfiles": "npm:^2"
-    "@types/fs-extra": "npm:^11"
+    "@types/copyfiles": "npm:2"
+    "@types/fs-extra": "npm:11"
     copyfiles: "npm:2.4.1"
     eslint: "npm:9.19.0"
     ethers: "npm:6.13.5"
@@ -2846,6 +2846,7 @@ __metadata:
     "@nomicfoundation/hardhat-toolbox": "npm:5.0.0"
     "@nomicfoundation/hardhat-verify": "npm:2.0.12"
     "@openzeppelin/contracts": "npm:5.2.0"
+    "@relay-protocol/client": "workspace:*"
     "@relay-protocol/helpers": "workspace:*"
     "@typechain/ethers-v6": "npm:0.5.1"
     "@typechain/hardhat": "npm:9.1.0"
@@ -2853,7 +2854,7 @@ __metadata:
     "@types/fs-extra": "npm:11.0.4"
     "@types/mocha": "npm:10.0.10"
     "@types/node": "npm:22.13.0"
-    "@types/semver": "npm:^7"
+    "@types/semver": "npm:7"
     "@uniswap/v3-periphery": "npm:1.4.4"
     chai: "npm:4.5.0"
     eslint: "npm:9.19.0"
@@ -3954,7 +3955,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/copyfiles@npm:^2":
+"@types/copyfiles@npm:2":
   version: 2.4.4
   resolution: "@types/copyfiles@npm:2.4.4"
   checksum: 10/0513199240828feda5f6ed04c69d6a642c47e6ab66b81214716807f948ed3e865e9b3d2b69f75cbcc6fbe2154630755c47ca473b3913f0a831179366c709a8cc
@@ -3975,7 +3976,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/fs-extra@npm:11.0.4, @types/fs-extra@npm:^11":
+"@types/fs-extra@npm:11, @types/fs-extra@npm:11.0.4":
   version: 11.0.4
   resolution: "@types/fs-extra@npm:11.0.4"
   dependencies:
@@ -4100,7 +4101,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/semver@npm:^7":
+"@types/semver@npm:7":
   version: 7.5.8
   resolution: "@types/semver@npm:7.5.8"
   checksum: 10/3496808818ddb36deabfe4974fd343a78101fa242c4690044ccdc3b95dcf8785b494f5d628f2f47f38a702f8db9c53c67f47d7818f2be1b79f2efb09692e1178
