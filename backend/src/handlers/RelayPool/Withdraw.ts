@@ -9,7 +9,7 @@ export default async function ({
   event: Event<'RelayPool:Withdraw'>
   context: Context<'RelayPool:Withdraw'>
 }) {
-  const { receiver, owner, assets, shares } = event.args
+  const { owner, receiver, assets, shares } = event.args
   const blockNumber = event.block.number
   const transactionHash = event.transaction.hash
   const timestamp = event.block.timestamp
