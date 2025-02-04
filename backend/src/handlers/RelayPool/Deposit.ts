@@ -9,7 +9,7 @@ export default async function ({
   event: Event<'RelayPool:Deposit'>
   context: Context<'RelayPool:Deposit'>
 }) {
-  const { sender, assets, shares } = event.args
+  const { owner, assets, shares } = event.args
   const blockNumber = event.block.number
   const transactionHash = event.transaction.hash
   const timestamp = event.block.timestamp
@@ -74,7 +74,7 @@ export default async function ({
     context.db.insert(poolAction).values({
       id: eventId,
       type: 'DEPOSIT',
-      user: sender,
+      user: owner,
       receiver: event.log.address,
       owner: event.log.address,
       relayPool: event.log.address,
@@ -86,14 +86,14 @@ export default async function ({
     }),
   ])
 
-  // Update user balance - using insert with `onConflictDoUpdate` for atomic operations
-  const balanceId = `${sender}-${event.log.address}` // wallet-pool format
+  // Update user balance - using owner for the balance tracking
+  const balanceId = `${owner}-${event.log.address}` // wallet-pool format
 
   await context.db
     .insert(userBalance)
     .values({
       id: balanceId,
-      wallet: sender,
+      wallet: owner,
       relayPool: event.log.address,
       shareBalance: shares,
       totalDeposited: assets,
