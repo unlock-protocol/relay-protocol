@@ -9,7 +9,7 @@ export default async function ({
   event: Event<'RelayPool:Withdraw'>
   context: Context<'RelayPool:Withdraw'>
 }) {
-  const { sender, receiver, owner, assets, shares } = event.args
+  const { owner, receiver, assets, shares } = event.args
   const blockNumber = event.block.number
   const transactionHash = event.transaction.hash
   const timestamp = event.block.timestamp
@@ -71,7 +71,7 @@ export default async function ({
     context.db.insert(poolAction).values({
       id: `${transactionHash}-${event.log.logIndex}`,
       type: 'WITHDRAW',
-      user: sender,
+      user: owner,
       receiver,
       owner,
       relayPool: event.log.address,
@@ -84,12 +84,12 @@ export default async function ({
   ])
 
   // Get user balance
-  const balanceId = `${sender}-${event.log.address}` // wallet-pool format
+  const balanceId = `${owner}-${event.log.address}` // wallet-pool format
   const user = await context.db.find(userBalance, { id: balanceId })
 
   if (!user) {
     throw new Error(
-      `User ${sender} attempting to withdraw without existing balance record`
+      `User ${owner} attempting to withdraw without existing balance record`
     )
   }
 

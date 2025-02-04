@@ -1,8 +1,7 @@
 {
   "extends": "@relay-protocol/tsconfig",
   "compilerOptions": {
-    "outDir": "dist",
-    "resolveJsonModule": true
+    "outDir": "dist"
   },
   "exclude": ["dist", "bin"]
 }

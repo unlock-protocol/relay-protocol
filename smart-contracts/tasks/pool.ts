@@ -1,5 +1,6 @@
 import { task } from 'hardhat/config'
 import { checkAllowance } from '@relay-protocol/helpers'
+
 task('pool:deposit', 'Deposit ERC20 tokens in a relay pool')
   // .addParam('asset', 'The ERC20 asset to deposit')
   .addParam('pool', 'The relay pool address')
@@ -23,7 +24,7 @@ task('pool:deposit', 'Deposit ERC20 tokens in a relay pool')
     }
 
     // check allowance
-    await checkAllowance(asset, poolAddress, amount)
+    await checkAllowance(asset, poolAddress, amount, userAddress)
 
     // make deposit
     const tx = await pool.deposit(amount, userAddress)

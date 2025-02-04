@@ -16,6 +16,10 @@ export const sepolia: NetworkConfig = {
       messenger: '0x9f3B8679c73C2Fef8b59B4f3444d4e156fb70AA5',
       transmitter: '0x7865fAfC2db2093669d92c0F33AeEF291086BEFD',
     },
+    zksync: {
+      l1SharedDefaultBridge: '0x3E8b2fe58675126ed30d0d12dea2A9bda72D18Ae',
+      l2SharedDefaultBridge: '0x681A1AFdC2e06776816386500D2D461a6C96cB45',
+    },
   },
   chainId: 11155111,
   hyperlaneMailbox: '0xfFAEF09B3cd11D9b20d1a19bECca54EEC2884766',

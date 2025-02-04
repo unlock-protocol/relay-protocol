@@ -64,65 +64,46 @@ yarn hardhat deploy:relay-bridge --network op-sepolia
 
 #### Deploy the pool on the L1
 
+We start by deploying the pool without any origin configured.
+
+```
+# Deploy a relay pool on the L1 (the cli will prompt for parameters and may deploy a base yield pool):
+yarn hardhat deploy:pool --network sepolia
+⚠️ Using account from DEPLOYER_PRIVATE_KEY environment variable.
+deploying on Ethereum Sepolia (11155111)...
+✔ Please choose the asset for your relay bridge (make sure it is supported by the proxy bridge you selected): · weth
+✔ Please choose a yield pool: · dummy
+Dummy yield pool deployed at 0xC08DCC23F847C566104964d11Be638FE34C78E8e
+Verifying...
+The contract 0xC08DCC23F847C566104964d11Be638FE34C78E8e has already been verified on the block explorer. If you're trying to verify a partially verified contract, please use the --force flag.
+https://sepolia.etherscan.io/address/0xC08DCC23F847C566104964d11Be638FE34C78E8e#code
+
+The contract 0xC08DCC23F847C566104964d11Be638FE34C78E8e has already been verified on Sourcify.
+https://repo.sourcify.dev/contracts/full_match/11155111/0xC08DCC23F847C566104964d11Be638FE34C78E8e/
+
+✔ Please enter a pool name: · Wrapped Ether Relay Pool
+✔ Please enter a pool symbol: · WETH-REL
+relayPool deployed to: 0x794dE8b61567D0dE557CE60f1968f6C9E188e97E
+The contract 0x794dE8b61567D0dE557CE60f1968f6C9E188e97E has already been verified on the block explorer. If you're trying to verify a partially verified contract, please use the --force flag.
+https://sepolia.etherscan.io/address/0x794dE8b61567D0dE557CE60f1968f6C9E188e97E#code
+
+Successfully verified contract RelayPool on Sourcify.
+https://repo.sourcify.dev/contracts/full_match/11155111/0x794dE8b61567D0dE557CE60f1968f6C9E188e97E/
+
+```
+
+#### Adding origins
+
+TK
+
 ```
 # Deploy a bridge proxy on an L1
+
 yarn hardhat deploy:bridge-proxy --network sepolia
-
-# Optional on test networks: you may want to deploy a yield pool (here we use WETH as the asset):
-yarn hardhat deploy:dummy-yield-pool --network sepolia --asset 0x7b79995e5f793A07Bc00c21412e50Ecae098E7f9
-
-# Deploy a relay pool on the L1 (here we use WETH as the asset):
-# For `yield-pool` you can use the yield pool address from the previous step, or an existing AAVE, Morpho... etc
-# For `origins` you need a stringified JSON object that includes the chainId (L2), bridge contract (L2), max debt from that bridge and the L1 proxy bridge.
-
-yarn hardhat deploy:pool \
-  --network sepolia \
-  --factory 0xF06fB9fBC957e99D4B527B0a73a894A483EA1c46 \
-  --asset 0x7b79995e5f793A07Bc00c21412e50Ecae098E7f9 \
-  --yield-pool 0x3FEB26d09420Bfdbb0E2F6Cf4777aFf0bd7e7953 \
-  --origins '[{
-      "chainId": 11155420,
-      "bridge": "0xD7d4F627C80908Ef9fa70a40E671b155B1A3595f",
-      "maxDebt": 1000000000000,
-      "proxyBridge": "0x22CfA4db4eB5d67D3C022206545A45d1554A8A40"
-    },{
-      "chainId": 421614,
-      "bridge": "0xF241F12506fb6Bf1909c6bC176A199166414007a",
-      "maxDebt": 1000000000000,
-      "proxyBridge": "0xbb3cd7ced6a8d6efda6c1e549a3ca0431390566a"
-    }]'
 ```
 
-You can also use Hardhat Ignition directly
+## Use with ZkSync
 
 ```
-# 1. build per network file with params
-yarn hardhat run scripts/ignitionParams.ts
-
-# 2. deploy contract
-yarn hardhat ignition deploy ignition/modules/CCTPBridgeProxyModule.ts --parameters ignition/params/1.json --network optimism
-```
-
-## Verify contracts
-
-Using deployment ids found in `ignition/deployments` folder
-
-```
-# example
-yarn hardhat ignition verify RelayPool-USDC-REL-11155111
-```
-
-## Interacting
-
-Once the contracts have been deployed you can start to use them.
-First, you need to add liquidity to the pool (you may need to ERC20 approve the newly created prool before issuing a `deposit`). (amount in wei)
-
-```
-yarn hardhat pool:deposit --network sepolia --pool 0xFf7c09b2aeC469E0D11Be84B84Ef30E2f3147B52 --amount 1000000000000
-```
-
-Then you can use the `bridge` function on the Relay Bridge contract! Make sure you initiate a bridge with _less_ than the amount in the pool. (amount in wei)
-
-```
-yarn hardhat bridge:send --network op-sepolia --bridge 0xd0b14797b9D08493392865647384974470202A78 --dest-chain 11155111 --pool 0xFf7c09b2aeC469E0D11Be84B84Ef30E2f3147B52 --amount 10000
+yarn hardhat compile --network zksync
 ```

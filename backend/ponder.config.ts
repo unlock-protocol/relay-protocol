@@ -1,89 +1,13 @@
 import { createConfig, factory } from 'ponder'
 
-// ABIs
-import { relayPoolAbi } from './abis/relayPool'
-import { relayBridgeAbi } from './abis/relayBridge'
-import { relayPoolFactoryAbi } from './abis/relayPoolFactory'
-import { relayBridgeFactoryAbi } from './abis/relayBridgeFactory'
+import {
+  RelayPool,
+  RelayBridge,
+  RelayPoolFactory,
+  RelayBridgeFactory,
+} from '@relay-protocol/abis'
 import { createNetworkConfig } from './src/utils/rpc'
-import { AbiEvent } from 'viem'
-
-const poolDeployedEvent: AbiEvent = {
-  anonymous: false,
-  inputs: [
-    {
-      indexed: false,
-      internalType: 'address',
-      name: 'pool',
-      type: 'address',
-    },
-    {
-      indexed: false,
-      internalType: 'address',
-      name: 'creator',
-      type: 'address',
-    },
-    {
-      indexed: false,
-      internalType: 'address',
-      name: 'asset',
-      type: 'address',
-    },
-    { indexed: false, internalType: 'string', name: 'name', type: 'string' },
-    {
-      indexed: false,
-      internalType: 'string',
-      name: 'symbol',
-      type: 'string',
-    },
-    {
-      components: [
-        { internalType: 'uint32', name: 'chainId', type: 'uint32' },
-        { internalType: 'address', name: 'bridge', type: 'address' },
-        { internalType: 'address', name: 'proxyBridge', type: 'address' },
-        { internalType: 'uint256', name: 'maxDebt', type: 'uint256' },
-      ],
-      indexed: false,
-      internalType: 'struct OriginParam[]',
-      name: 'origins',
-      type: 'tuple[]',
-    },
-    {
-      indexed: false,
-      internalType: 'address',
-      name: 'thirdPartyPool',
-      type: 'address',
-    },
-  ],
-  name: 'PoolDeployed',
-  type: 'event',
-}
-
-const bridgeDeployedEvent: AbiEvent = {
-  anonymous: false,
-  inputs: [
-    {
-      indexed: false,
-      internalType: 'address',
-      name: 'bridge',
-      type: 'address',
-    },
-    {
-      indexed: true,
-      internalType: 'address',
-      name: 'asset',
-      type: 'address',
-    },
-    {
-      indexed: true,
-      internalType: 'address',
-      name: 'proxyBridge',
-      type: 'address',
-    },
-  ],
-  name: 'BridgeDeployed',
-  type: 'event',
-}
+import { Abi, AbiEvent } from 'viem'
 
 export default createConfig({
   database: {
@@ -98,79 +22,71 @@ export default createConfig({
   },
   contracts: {
     RelayPoolFactory: {
-      abi: relayPoolFactoryAbi,
+      abi: RelayPoolFactory as Abi,
       network: {
         sepolia: {
-          address: '0xF06fB9fBC957e99D4B527B0a73a894A483EA1c46',
+          address: '0x1c1601077b3eeF14E5825a5fB0b87926Ad23cB90',
         },
       },
     },
     RelayPool: {
-      abi: relayPoolAbi,
+      abi: RelayPool as Abi,
       network: 'sepolia',
       address: factory({
-        address: '0xF06fB9fBC957e99D4B527B0a73a894A483EA1c46',
-        event: poolDeployedEvent,
+        address: '0x1c1601077b3eeF14E5825a5fB0b87926Ad23cB90',
+        event: RelayPoolFactory.find(
+          (e) => e.name === 'PoolDeployed'
+        ) as AbiEvent,
         parameter: 'pool',
       }),
-      startBlock: 7499300,
+      startBlock: 7609300,
     },
     RelayBridgeFactory: {
-      abi: relayBridgeFactoryAbi,
+      abi: RelayBridgeFactory as Abi,
       network: {
         opSepolia: {
-          address: [
-            '0xacDFfaA0323440e123D68C25a073e99DeB82e3fC',
-            '0x70e4A2b8de43459Fef02419A406158cD34A88dc3',
-          ],
+          address: '0x5765883E120F707A528F3e476636304De9280b6c',
         },
         baseSepolia: {
-          address: '0xBB68C66467699faB205304810a1b288487F460d4',
+          address: '0x5e30883816434C8C92534241729b80309B520A30',
         },
         arbSepolia: {
-          address: '0x2499D94880B30fA505543550ac8a1e24cfFeFe78',
+          address: '0x1402D55BF0D6566ca8F569041000a8015b608632',
         },
       },
     },
     RelayBridge: {
-      abi: relayBridgeAbi,
+      abi: RelayBridge as Abi,
       network: {
         opSepolia: {
           address: factory({
-            address: [
-              '0xacDFfaA0323440e123D68C25a073e99DeB82e3fC',
-              '0x70e4A2b8de43459Fef02419A406158cD34A88dc3',
-            ],
-            event: bridgeDeployedEvent,
+            address: '0x5765883E120F707A528F3e476636304De9280b6c',
+            event: RelayBridgeFactory.find(
+              (e) => e.name === 'BridgeDeployed'
+            ) as AbiEvent,
             parameter: 'bridge',
           }),
-          startBlock: 7499300,
+          startBlock: 23446570,
         },
         baseSepolia: {
           address: factory({
-            address: ['0xBB68C66467699faB205304810a1b288487F460d4'],
-            event: bridgeDeployedEvent,
+            address: '0x5e30883816434C8C92534241729b80309B520A30',
+            event: RelayBridgeFactory.find(
+              (e) => e.name === 'BridgeDeployed'
+            ) as AbiEvent,
             parameter: 'bridge',
           }),
-          startBlock: 20991910,
+          startBlock: 21463700,
         },
         arbSepolia: {
           address: factory({
-            address: ['0x2499D94880B30fA505543550ac8a1e24cfFeFe78'],
-            event: bridgeDeployedEvent,
+            address: '0x1402D55BF0D6566ca8F569041000a8015b608632',
+            event: RelayBridgeFactory.find(
+              (e) => e.name === 'BridgeDeployed'
+            ) as AbiEvent,
             parameter: 'bridge',
           }),
-          startBlock: 117524900,
-        },
-      },
-    },
-  },
-  blocks: {
-    YieldUpdate: {
-      network: {
-        sepolia: {
-          startBlock: 7441464,
-          interval: 100, // Every 100 blocks
+          startBlock: 121036190,
         },
       },
     },

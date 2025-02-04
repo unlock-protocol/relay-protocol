@@ -4,7 +4,7 @@ export interface NetworkConfig {
   name: string
   slug: string
   bridges: {
-    cctp: {
+    cctp?: {
       domain: bigint
       messenger: string
       transmitter: string
@@ -18,11 +18,19 @@ export interface NetworkConfig {
       portalProxy?: string
       disputeGame?: string
     }
+    zksync?: {
+      l1SharedDefaultBridge: string
+      l2SharedDefaultBridge: string
+    }
   }
   rpc?: string
+  isZKsync?: boolean
   hyperlaneMailbox: string
   isTestnet: boolean
   assets: NetworkAssets
+  uniswapV3?: {
+    universalRouterAddress: string
+  }
 }
 
 interface NetworkAssets {

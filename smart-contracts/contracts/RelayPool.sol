@@ -5,24 +5,31 @@ import {ERC4626} from "solmate/src/tokens/ERC4626.sol";
 import {ERC20} from "solmate/src/tokens/ERC20.sol";
 import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
 import {IWETH} from "./interfaces/IWETH.sol";
+import {ITokenSwap} from "./interfaces/ITokenSwap.sol";
 import {TypeCasts} from "./utils/TypeCasts.sol";
+import {HyperlaneMessage} from "./Types.sol";
 
 struct OriginSettings {
+  address curator;
   uint256 maxDebt;
   uint256 outstandingDebt;
   address proxyBridge;
   uint8 bridgeFee; // basis points
+  uint32 coolDown; // in seconds
 }
 
 struct OriginParam {
+  address curator;
   uint32 chainId;
   address bridge;
   address proxyBridge;
   uint256 maxDebt;
   uint8 bridgeFee; // basis points
+  uint32 coolDown; // in seconds
 }
 
 error UnauthorizedCaller(address sender);
+error UnauthorizedSwap(address token);
 error UnauthorizedOrigin(uint32 chainId, address bridge);
 error MessageAlreadyProcessed(uint32 chainId, address bridge, uint256 nonce);
 error TooMuchDebtFromOrigin(
@@ -40,6 +47,13 @@ error ClaimingFailed(
   bytes claimParams
 );
 error NotAWethPool();
+error MessageTooRecent(
+  uint32 chainId,
+  address bridge,
+  uint256 nonce,
+  uint256 timestamp,
+  uint32 coolDown
+);
 
 contract RelayPool is ERC4626, Ownable {
   // The address of the Hyperlane mailbox
@@ -62,10 +76,15 @@ contract RelayPool is ERC4626, Ownable {
   // The address of the yield pool where funds are deposited
   address public yieldPool;
 
+  // unswap wrapper contract
+  address public tokenSwapAddress;
+
   // Keeping track of the total fees collected
-  uint256 public totalCollectedBridgeFees = 0;
-  uint256 public streamedFees = 0; // Full streamed fees
-  uint256 public lastFeeCollectedAt = 0; // timestamp to account for streaming fees
+  uint256 public pendingBridgeFees = 0;
+
+  // All incoming assets are streamed (even though they are instantly deposited in the yield pool)
+  uint256 public totalAssetsToStream = 0;
+  uint256 public lastAssetsCollectedAt = 0;
   uint256 public streamingPeriod = 7 days;
 
   event LoanEmitted(
@@ -88,12 +107,13 @@ contract RelayPool is ERC4626, Ownable {
 
   event AssetsDepositedIntoYieldPool(uint256 amount, address yieldPool);
   event AssetsWithdrawnFromYieldPool(uint256 amount, address yieldPool);
+  event TokenSwapChanged(address prevAddress, address newAddress);
 
   event YieldPoolChanged(address oldPool, address newPool);
   event StreamingPeriodChanged(uint256 oldPeriod, uint256 newPeriod);
 
   event OriginAdded(OriginParam origin);
-  event OriginRemoved(
+  event OriginDisabled(
     uint32 chainId,
     address bridge,
     uint256 maxDebt,
@@ -133,7 +153,7 @@ contract RelayPool is ERC4626, Ownable {
   }
 
   function updateStreamingPeriod(uint256 newPeriod) public onlyOwner {
-    updateStreamedFees();
+    updateStreamedAssets();
     uint256 oldPeriod = streamingPeriod;
     streamingPeriod = newPeriod;
     emit StreamingPeriodChanged(oldPeriod, newPeriod);
@@ -156,18 +176,25 @@ contract RelayPool is ERC4626, Ownable {
 
   function addOrigin(OriginParam memory origin) public onlyOwner {
     authorizedOrigins[origin.chainId][origin.bridge] = OriginSettings({
+      curator: origin.curator, // We can't use msg.sender here, because we recommend msg.sender to be a timelock and this address should be able to disable an origin quickly!
       maxDebt: origin.maxDebt,
       outstandingDebt: 0,
       proxyBridge: origin.proxyBridge,
-      bridgeFee: origin.bridgeFee
+      bridgeFee: origin.bridgeFee,
+      coolDown: origin.coolDown
     });
     emit OriginAdded(origin);
   }
 
-  function removeOrigin(uint32 chainId, address bridge) public onlyOwner {
+  // We cannot completely remove an origin, because the funds might still be in transit...
+  // But we can "block" new funds from being sent
+  function disableOrigin(uint32 chainId, address bridge) public {
     OriginSettings memory origin = authorizedOrigins[chainId][bridge];
-    delete authorizedOrigins[chainId][bridge];
-    emit OriginRemoved(
+    if (msg.sender != origin.curator) {
+      revert UnauthorizedCaller(msg.sender);
+    }
+    authorizedOrigins[chainId][bridge].maxDebt = 0;
+    emit OriginDisabled(
       chainId,
       bridge,
       origin.maxDebt,
@@ -236,8 +263,14 @@ contract RelayPool is ERC4626, Ownable {
     uint256 yieldPoolBalance = ERC4626(yieldPool).previewRedeem(
       balanceOfYieldPoolTokens
     );
-
-    return yieldPoolBalance + outstandingDebt + streamingFees();
+    // Pending bridge fees are still in the yield pool!
+    // So we need to extract them from this pool's asset until
+    // The bridge is claimed!
+    return
+      yieldPoolBalance +
+      outstandingDebt -
+      pendingBridgeFees -
+      remainsToStream();
   }
 
   // Helper function
@@ -270,7 +303,7 @@ contract RelayPool is ERC4626, Ownable {
   function handle(
     uint32 chainId,
     bytes32 bridgeAddress,
-    bytes calldata message
+    bytes calldata data
   ) external payable {
     // Only `HYPERLANE_MAILBOX` is authorized to call this method
     if (msg.sender != HYPERLANE_MAILBOX) {
@@ -287,86 +320,96 @@ contract RelayPool is ERC4626, Ownable {
     }
 
     // Parse the data received from the sender chain
-    (uint256 nonce, address recipient, uint256 amount) = abi.decode(
-      message,
-      (uint256, address, uint256)
-    );
+    HyperlaneMessage memory message = abi.decode(data, (HyperlaneMessage));
+
+    // if the message is too recent, we reject it
+    if (block.timestamp - message.timestamp < origin.coolDown) {
+      revert MessageTooRecent(
+        chainId,
+        bridge,
+        message.nonce,
+        message.timestamp,
+        origin.coolDown
+      );
+    }
 
     // Check if message was already processed
-    if (messages[chainId][bridge][nonce].length > 0) {
-      revert MessageAlreadyProcessed(chainId, bridge, nonce);
+    if (messages[chainId][bridge][message.nonce].length > 0) {
+      revert MessageAlreadyProcessed(chainId, bridge, message.nonce);
     }
     // Mark as processed if not
-    messages[chainId][bridge][nonce] = message;
+    messages[chainId][bridge][message.nonce] = data;
 
-    // Pull funds from the yield pool to get the amount to be loaned
-    uint256 loanAmount = collectBridgeFees(origin.bridgeFee, amount);
+    uint256 feeAmount = (message.amount * origin.bridgeFee) / 10000;
+    pendingBridgeFees += feeAmount;
 
     // Check if origin settings are respected
-    if (origin.outstandingDebt + loanAmount > origin.maxDebt) {
+    // We look at the full amount, because feed are considered debt
+    // (they are owed to the pool)
+    if (origin.outstandingDebt + message.amount > origin.maxDebt) {
       revert TooMuchDebtFromOrigin(
         chainId,
         bridge,
         origin.maxDebt,
-        nonce,
-        recipient,
-        loanAmount
+        message.nonce,
+        message.recipient,
+        message.amount
       );
     }
+    origin.outstandingDebt += message.amount;
+    increaseOutStandingDebt(message.amount);
 
-    origin.outstandingDebt += loanAmount;
-    increaseOutStandingDebt(loanAmount);
-
-    sendFunds(loanAmount, recipient);
+    // We only send the amount net of fees
+    sendFunds(message.amount - feeAmount, message.recipient);
 
     // TODO: handle insufficient funds?
-
-    emit LoanEmitted(nonce, recipient, asset, loanAmount, chainId, bridge);
+    emit LoanEmitted(
+      message.nonce,
+      message.recipient,
+      asset,
+      message.amount,
+      chainId,
+      bridge
+    );
   }
 
   // Compute the streaming fees
-  // If the last fee collection was more than 7 days ago, we return the full amount
-  // Otherwise, we return the amount streamed so far to which we add the time-based
-  // pro-rata of the remaining fees to be streamed.
-  function streamingFees() internal view returns (uint256) {
-    if (block.timestamp - lastFeeCollectedAt > streamingPeriod) {
-      return totalCollectedBridgeFees;
+  // If the last fee collection was more than 7 days ago, we have nothing left to stream
+  // Otherwise, we return the time-based pro-rata of what remains to stream.
+  function remainsToStream() internal view returns (uint256) {
+    if (block.timestamp - lastAssetsCollectedAt > streamingPeriod) {
+      return 0; // Nothing left to stream
     } else {
       return
-        streamedFees +
-        ((totalCollectedBridgeFees - streamedFees) *
-          (block.timestamp - lastFeeCollectedAt)) /
+        totalAssetsToStream -
+        (totalAssetsToStream * (block.timestamp - lastAssetsCollectedAt)) /
         streamingPeriod;
     }
   }
 
   // Updates the streamed fees and returns the new value
-  function updateStreamedFees() internal returns (uint256) {
-    streamedFees = streamingFees();
-    lastFeeCollectedAt = block.timestamp;
-    return streamedFees;
+  function updateStreamedAssets() public returns (uint256) {
+    totalAssetsToStream = remainsToStream();
+    lastAssetsCollectedAt = block.timestamp;
+    return totalAssetsToStream;
   }
 
-  // Collect the bridge fees and returns the remainder.
-  function collectBridgeFees(
-    uint8 bridgeFee,
-    uint256 bridgedAmount
-  ) internal returns (uint256) {
-    uint256 feeAmount = (bridgedAmount * bridgeFee) / 10000;
-    updateStreamedFees();
-    totalCollectedBridgeFees += feeAmount;
-    return bridgedAmount - feeAmount;
+  // Internal function to add assets to be accounted in a streaming fashgion
+  function addToStreamingAssets(uint256 amount) internal returns (uint256) {
+    updateStreamedAssets();
+    return totalAssetsToStream += amount;
   }
 
   // This function is called externally to claim funds from a bridge.
   // The funds are immediately added to the yieldPool
+  // TODO: handle cases where the origin might have been removed/changed (fees, etc.)
   function claim(
     uint32 chainId,
     address bridge,
     bytes calldata claimParams
   ) external {
     OriginSettings storage origin = authorizedOrigins[chainId][bridge];
-    if (origin.maxDebt == 0) {
+    if (origin.proxyBridge == address(0)) {
       revert UnauthorizedOrigin(chainId, bridge);
     }
 
@@ -388,6 +431,13 @@ contract RelayPool is ERC4626, Ownable {
     // and we should deposit these funds into the yield pool
     depositAssetsInYieldPool(amount);
 
+    // The amount is the amount that was loaned + the fees
+    // TODO: what happens if the bridgeFee was changed?
+    uint256 feeAmount = (amount * origin.bridgeFee) / 10000;
+    pendingBridgeFees -= feeAmount;
+    // We need to account for it in a streaming fashion
+    addToStreamingAssets(feeAmount);
+
     // TODO: include more details about the origin of the funds
     emit BridgeCompleted(chainId, bridge, amount, claimParams);
   }
@@ -398,9 +448,48 @@ contract RelayPool is ERC4626, Ownable {
     if (address(asset) == WETH) {
       withdrawAssetsFromYieldPool(amount, address(this));
       IWETH(WETH).withdraw(amount);
-      payable(recipient).transfer(amount);
+      (bool s, ) = recipient.call{value: amount}("");
+      require(s);
     } else {
       withdrawAssetsFromYieldPool(amount, recipient);
+    }
+  }
+
+  /**
+   * Set the Swap and Deposit contract address
+   */
+  function setTokenSwap(address _tokenSwapAddress) external onlyOwner {
+    address prevTokenSwapAddress = tokenSwapAddress;
+    tokenSwapAddress = _tokenSwapAddress;
+    emit TokenSwapChanged(prevTokenSwapAddress, tokenSwapAddress);
+  }
+
+  function swapAndDeposit(
+    address token,
+    uint256 amount,
+    uint24 uniswapWethPoolFeeToken,
+    uint24 uniswapWethPoolFeeAsset
+  ) public {
+    if (token == address(asset)) {
+      revert UnauthorizedSwap(token);
+    }
+
+    ERC20(token).transfer(tokenSwapAddress, amount);
+    ITokenSwap(tokenSwapAddress).swap(
+      token,
+      uniswapWethPoolFeeToken,
+      uniswapWethPoolFeeAsset
+    );
+    collectNonDepositedAssets();
+  }
+
+  // This function is called by anyone to collect assets and start streaming them
+  // to avoid timely attacks.
+  function collectNonDepositedAssets() public {
+    uint256 balance = ERC20(asset).balanceOf(address(this));
+    if (balance > 0) {
+      depositAssetsInYieldPool(balance);
+      addToStreamingAssets(balance);
     }
   }
 
