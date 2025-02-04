@@ -97,14 +97,4 @@ export default createConfig({
       },
     },
   },
-  blocks: {
-    YieldUpdate: {
-      network: {
-        sepolia: {
-          startBlock: 7441464,
-          interval: 100, // Every 100 blocks
-        },
-      },
-    },
-  },
 })
