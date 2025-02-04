@@ -10,7 +10,7 @@ task('deploy:pool', 'Deploy a relay pool')
   .addOptionalParam('factory', 'Address of the factory')
   .addOptionalParam('asset', 'An ERC20 asset')
   .addOptionalParam('yieldPool', 'A yield pool address')
-  .addParam(
+  .addOptionalParam(
     'origins',
     'Origins, as JSON array: [{"chainId": 11155420, "bridge": "0xD26c05a33349a6DeD02DD9360e1ef303d1246fb6", "maxDebt": 1000000000000, "proxyBridge": "0x4e46Dc422c61d41Ce835234D29e7f9f1C54968Fb"}]'
   )
