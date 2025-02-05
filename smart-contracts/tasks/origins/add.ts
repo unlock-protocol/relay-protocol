@@ -33,7 +33,7 @@ task('pool:add-origin', 'Add origin for a pool')
       const { chainId } = await ethers.provider.getNetwork()
       const network = networks[chainId.toString()]
       const vaultService = new RelayVaultService(
-        'https://relay-pools-backend-production.up.railway.app/' // TODO: add to config?
+        'https://relay-protocol-production.up.railway.app/' // TODO: add to config?
       )
 
       let pool
