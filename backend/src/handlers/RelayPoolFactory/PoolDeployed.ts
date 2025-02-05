@@ -67,18 +67,4 @@ export default async function ({
     name,
     symbol,
   })
-
-  // Create origins as well
-  await Promise.all(
-    origins.map(async ({ chainId, bridge, proxyBridge, maxDebt }) => {
-      await context.db.insert(poolOrigin).values({
-        chainId: context.network.chainId,
-        pool: pool as `0x${string}`,
-        proxyBridge: proxyBridge as `0x${string}`,
-        originChainId: chainId,
-        originBridge: bridge as `0x${string}`,
-        maxDebt: maxDebt,
-      })
-    })
-  )
 }
