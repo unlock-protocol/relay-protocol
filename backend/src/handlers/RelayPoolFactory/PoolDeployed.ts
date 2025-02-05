@@ -1,6 +1,6 @@
 import { Context, Event } from 'ponder:registry'
 import { poolOrigin, relayPool, yieldPool } from 'ponder:schema'
-import { erc4626Abi, erc20Abi } from 'viem'
+import { erc20Abi } from 'viem'
 
 export default async function ({
   event,
@@ -11,55 +11,41 @@ export default async function ({
 }) {
   const { pool, asset, creator, thirdPartyPool, origins } = event.args
 
-  // Fetch yield pool details from the third-party yield pool contract and
-  // relay pool details from the pool contract.
-  const [yieldTotalAssets, yieldTotalShares, yieldName, poolName, poolSymbol] =
-    await Promise.all([
-      context.client.readContract({
-        abi: erc4626Abi,
-        address: thirdPartyPool,
-        functionName: 'totalAssets',
-      }),
-      context.client.readContract({
-        abi: erc4626Abi,
-        address: thirdPartyPool,
-        functionName: 'totalSupply',
-      }),
-      context.client.readContract({
-        abi: erc20Abi,
-        address: thirdPartyPool,
-        functionName: 'name',
-      }),
-      context.client.readContract({
-        abi: erc20Abi,
-        address: pool,
-        functionName: 'name',
-      }),
-      context.client.readContract({
-        abi: erc20Abi,
-        address: pool,
-        functionName: 'symbol',
-      }),
-    ])
+  // Fetch the name of the third-party yield pool,
+  // and the name and symbol of the relay pool.
+  const [yieldName, poolName, poolSymbol] = await Promise.all([
+    context.client.readContract({
+      abi: erc20Abi,
+      address: thirdPartyPool,
+      functionName: 'name',
+    }),
+    context.client.readContract({
+      abi: erc20Abi,
+      address: pool,
+      functionName: 'name',
+    }),
+    context.client.readContract({
+      abi: erc20Abi,
+      address: pool,
+      functionName: 'symbol',
+    }),
+  ])
 
-  // Use upsert pattern for yield pool
+  // Upsert yield pool using only its name and symbol.
   await context.db
     .insert(yieldPool)
     .values({
       contractAddress: thirdPartyPool as `0x${string}`,
       asset: asset as `0x${string}`,
       name: yieldName,
-      totalAssets: yieldTotalAssets,
-      totalShares: yieldTotalShares,
       lastUpdated: BigInt(event.block.timestamp),
     })
     .onConflictDoUpdate({
-      totalAssets: yieldTotalAssets,
-      totalShares: yieldTotalShares,
+      name: yieldName,
       lastUpdated: BigInt(event.block.timestamp),
     })
 
-  // Create relay pool with its own name and symbol fetched from the relay pool contract
+  // Create relay pool with its own name and symbol fetched from the relay pool contract.
   await context.db.insert(relayPool).values({
     contractAddress: pool as `0x${string}`,
     asset: asset as `0x${string}`,
@@ -75,7 +61,7 @@ export default async function ({
     symbol: poolSymbol,
   })
 
-  // Create origins as well
+  // Create origins as well.
   await Promise.all(
     origins.map(async ({ chainId, bridge, proxyBridge, maxDebt }) => {
       await context.db.insert(poolOrigin).values({
