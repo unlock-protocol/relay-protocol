@@ -8,7 +8,6 @@ export default async function ({
   event: Event<'RelayPool:OriginAdded'>
   context: Context<'RelayPool:OriginAdded'>
 }) {
-  console.log('OriginAdded event:', event)
   const { origin } = event.args
   const poolAddress = event.log.address
 
