@@ -31,7 +31,7 @@ export default async function ({
     }),
   ])
 
-  // Upsert yield pool using only its name and symbol.
+  // Upsert yield pool using only its name.
   await context.db
     .insert(yieldPool)
     .values({
