@@ -1,5 +1,5 @@
 import { task } from 'hardhat/config'
-import { AutoComplete, Input } from 'enquirer'
+import { Select, Input } from 'enquirer'
 import { networks } from '@relay-protocol/networks'
 import {
   GET_POOLS_BY_CURATOR,
@@ -16,6 +16,8 @@ task('pool:add-origin', 'Add origin for a pool')
   .addOptionalParam('pool', 'the pool address')
   .addOptionalParam('maxDebt', 'the maximum debt coming from the origin')
   .addOptionalParam('bridgeFee', 'the fee (basis point) applied to this bridge')
+  .addOptionalParam('curator', "the curator's address for this origin")
+  .addOptionalParam('coolDown', 'the cool down period for this origin')
   .setAction(
     async (
       {
@@ -25,6 +27,8 @@ task('pool:add-origin', 'Add origin for a pool')
         bridge: bridgeAddress,
         maxDebt,
         bridgeFee,
+        curator,
+        coolDown,
       },
       { ethers, run }
     ) => {
@@ -33,7 +37,7 @@ task('pool:add-origin', 'Add origin for a pool')
       const { chainId } = await ethers.provider.getNetwork()
       const network = networks[chainId.toString()]
       const vaultService = new RelayVaultService(
-        'https://relay-protocol-production.up.railway.app/' // TODO: add to config?
+        'http://localhost:42069' // TODO: add to config?
       )
 
       let pool
@@ -42,7 +46,12 @@ task('pool:add-origin', 'Add origin for a pool')
         const { relayPools } = await vaultService.query(GET_POOLS_BY_CURATOR, {
           curatorAddress: userAddress,
         })
-        const poolName = await new AutoComplete({
+        if (relayPools.items.length === 0) {
+          throw new Error(
+            `No pools found curated by ${userAddress} on ${chainId}!`
+          )
+        }
+        const poolName = await new Select({
           message: 'Which pool do you want to add an origin to?',
           choices: relayPools.items.map((pool) => pool.name),
         }).run()
@@ -65,7 +74,7 @@ task('pool:add-origin', 'Add origin for a pool')
         const possibleL2s = Object.values(networks).filter(
           (network) => network.l1ChainId == chainId
         )
-        const l2chainName = await new AutoComplete({
+        const l2chainName = await new Select({
           message: 'On what network is this origin?',
           choices: possibleL2s.map((network) => network.name),
         }).run()
@@ -77,7 +86,7 @@ task('pool:add-origin', 'Add origin for a pool')
 
       const { BridgeProxy } = (await getAddresses())[chainId.toString()]
       if (!proxyBridge) {
-        const bridgeProxyType = await new AutoComplete({
+        const bridgeProxyType = await new Select({
           message:
             'From what type of the bridge the funds will be coming from?',
           choices: Object.keys(network.bridges),
@@ -147,12 +156,32 @@ task('pool:add-origin', 'Add origin for a pool')
         'RelayPool',
         pool.contractAddress
       )
+
+      if (!curator) {
+        const poolCurator = await relayPool.owner()
+        curator = await new Input({
+          message:
+            "Who should be curator for that origin? They can instantly suspend the origin. (default is the pool's curator)",
+          default: poolCurator,
+        }).run()
+      }
+
+      if (!coolDown) {
+        coolDown = await new Input({
+          message:
+            'Who should the the shortest delay between a bridge initiation and the actual transfer from the pool? (in seconds)',
+          default: 60 * 30, // 30 minutes
+        }).run()
+      }
+
       const tx = await relayPool.addOrigin({
         chainId: l2ChainId,
         bridge: bridgeAddress,
         proxyBridge,
         maxDebt,
         bridgeFee,
+        curator,
+        coolDown,
       })
       console.log('Adding origin...')
       await tx.wait()
