@@ -58,6 +58,21 @@ export const GET_RELAY_BRIDGES_BY_NETWORK_AND_ASSET = gql`
   }
 `
 
+export const GET_RELAY_BRIDGES_BY_ASSET = gql`
+  query GetBridgeByAsset($assetAddress: String!) {
+    relayBridges(where: { asset: $assetAddress }) {
+      items {
+        chainId
+        contractAddress
+        asset
+        transferNonce
+        createdAt
+        createdAtBlock
+      }
+    }
+  }
+`
+
 export const GET_USER_BALANCES = gql`
   query GetUserBalances($walletAddress: String!) {
     userBalances(where: { wallet: $walletAddress }) {
@@ -120,21 +135,6 @@ export const GET_POOLS_BY_CURATOR = gql`
             originBridge
           }
         }
-      }
-    }
-  }
-`
-
-export const GET_RELAY_BRIDGES_BY_NETWORK_AND_ASSET = gql`
-  query GetBridgeByAsset($assetAddress: String!) {
-    relayBridges(where: { asset: $assetAddress }) {
-      items {
-        chainId
-        contractAddress
-        asset
-        transferNonce
-        createdAt
-        createdAtBlock
       }
     }
   }
