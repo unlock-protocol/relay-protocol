@@ -11,7 +11,6 @@ export const yieldPool = onchainTable('yield_pool', (t) => ({
   contractAddress: t.hex().primaryKey(),
   asset: t.hex().notNull(),
   name: t.text().notNull(),
-  symbol: t.text().notNull(),
   lastUpdated: t.bigint().notNull(),
 }))
 
