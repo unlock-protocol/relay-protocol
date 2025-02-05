@@ -1,5 +1,4 @@
 import fs from 'fs-extra'
-import semver from 'semver'
 import path from 'path'
 
 import { task } from 'hardhat/config'
@@ -13,12 +12,8 @@ const ignored = [
   'contracts/utils',
 ]
 
-task('export:abis', 'Export ABIs to a node package')
-  .addOptionalParam('previousVersion', 'version of the package to publish')
-  .setAction(async ({ previousVersion }, { artifacts }) => {
-    const version = semver.inc(previousVersion, 'patch')
-    console.log(`Releasing version : ${version}`)
-
+task('export:abis', 'Export ABIs to a node package').setAction(
+  async (_, { artifacts }) => {
     // get only relevant files
     const allContracts = await artifacts.getAllFullyQualifiedNames()
     const startsWith = (name: string) =>
@@ -57,4 +52,5 @@ task('export:abis', 'Export ABIs to a node package')
       path.resolve(packageFolder, 'src'),
       path.resolve(packageFolder, 'src', 'abis')
     )
-  })
+  }
+)
