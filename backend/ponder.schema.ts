@@ -4,17 +4,14 @@ import { index, onchainTable, primaryKey, relations } from 'ponder'
  * Track yield pools
  * - contractAddress: Contract address
  * - asset: Asset (token) address
- * - name: Pool name
- * - totalAssets: Total assets in pool
- * - totalShares: Total shares issued
- * - lastUpdated: Last time the pool was updated
+ * - name: Yield pool name
+ * - lastUpdated: Last time the yield pool was updated
  */
 export const yieldPool = onchainTable('yield_pool', (t) => ({
   contractAddress: t.hex().primaryKey(),
   asset: t.hex().notNull(),
   name: t.text().notNull(),
-  totalAssets: t.bigint().notNull(),
-  totalShares: t.bigint().notNull(),
+  symbol: t.text().notNull(),
   lastUpdated: t.bigint().notNull(),
 }))
 
