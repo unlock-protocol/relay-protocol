@@ -3,7 +3,7 @@ import { Select, Input } from 'enquirer'
 import { networks } from '@relay-protocol/networks'
 import {
   GET_POOLS_BY_CURATOR,
-  GET_RELAY_BRIDGE_BY_ASSET,
+  GET_RELAY_BRIDGES_BY_NETWORK_AND_ASSET,
   GET_RELAY_POOL,
   RelayVaultService,
 } from '@relay-protocol/client'
@@ -37,7 +37,7 @@ task('pool:add-origin', 'Add origin for a pool')
       const { chainId } = await ethers.provider.getNetwork()
       const network = networks[chainId.toString()]
       const vaultService = new RelayVaultService(
-        'http://localhost:42069' // TODO: add to config?
+        'https://relay-protocol-production.up.railway.app/' // TODO: add to config?
       )
 
       let pool
@@ -116,9 +116,10 @@ task('pool:add-origin', 'Add origin for a pool')
         // And now let's get the
         // Ok, let's list all the bridges we have!
         const { relayBridges } = await vaultService.query(
-          GET_RELAY_BRIDGE_BY_ASSET,
+          GET_RELAY_BRIDGES_BY_NETWORK_AND_ASSET,
           {
             assetAddress: l2AssetAddress,
+            chainId: Number(l2ChainId), // This is the origin chain (L2)
           }
         )
         if (relayBridges.items.length === 0) {

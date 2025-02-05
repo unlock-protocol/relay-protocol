@@ -40,6 +40,24 @@ export const GET_RELAY_POOL = gql`
   }
 `
 
+export const GET_RELAY_BRIDGES_BY_NETWORK_AND_ASSET = gql`
+  query GetRelayBridgesByNetworkAndAsset(
+    $chainId: Int!
+    $assetAddress: String!
+  ) {
+    relayBridges(where: { asset: $assetAddress, chainId: $chainId }) {
+      items {
+        contractAddress
+        chainId
+        asset
+        transferNonce
+        createdAt
+        createdAtBlock
+      }
+    }
+  }
+`
+
 export const GET_USER_BALANCES = gql`
   query GetUserBalances($walletAddress: String!) {
     userBalances(where: { wallet: $walletAddress }) {
@@ -107,7 +125,7 @@ export const GET_POOLS_BY_CURATOR = gql`
   }
 `
 
-export const GET_RELAY_BRIDGE_BY_ASSET = gql`
+export const GET_RELAY_BRIDGES_BY_NETWORK_AND_ASSET = gql`
   query GetBridgeByAsset($assetAddress: String!) {
     relayBridges(where: { asset: $assetAddress }) {
       items {
@@ -117,6 +135,28 @@ export const GET_RELAY_BRIDGE_BY_ASSET = gql`
         transferNonce
         createdAt
         createdAtBlock
+      }
+    }
+  }
+`
+
+export const GET_ORIGINS_WITH_BRIDGE = gql`
+  query OriginsWithBridge($originChainId: Int!, $originBridge: String!) {
+    poolOrigins(
+      where: { originChainId: $originChainId, originBridge: $originBridge }
+    ) {
+      items {
+        pool {
+          contractAddress
+          chainId
+          name
+          asset
+          curator
+          totalAssets
+          totalShares
+        }
+        proxyBridge
+        maxDebt
       }
     }
   }
