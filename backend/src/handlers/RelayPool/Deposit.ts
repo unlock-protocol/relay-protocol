@@ -1,6 +1,5 @@
 import { Context, Event } from 'ponder:registry'
-import { poolAction, relayPool, userBalance, yieldPool } from 'ponder:schema'
-import { erc4626Abi } from 'viem'
+import { poolAction, relayPool, userBalance } from 'ponder:schema'
 
 export default async function ({
   event,
@@ -26,13 +25,8 @@ export default async function ({
     throw new Error(`Relay pool ${event.log.address} not found`)
   }
 
-  // Fetch current state from both pools
-  const [
-    relayTotalAssets,
-    relayTotalShares,
-    yieldTotalAssets,
-    yieldTotalShares,
-  ] = await Promise.all([
+  // Fetch current state from relay pool
+  const [relayTotalAssets, relayTotalShares] = await Promise.all([
     context.client.readContract({
       abi: context.contracts.RelayPool.abi,
       address: event.log.address,
@@ -41,33 +35,16 @@ export default async function ({
     context.client.readContract({
       abi: context.contracts.RelayPool.abi,
       address: event.log.address,
-      functionName: 'totalSupply',
-    }),
-    context.client.readContract({
-      abi: erc4626Abi,
-      address: pool.yieldPool,
-      functionName: 'totalAssets',
-    }),
-    context.client.readContract({
-      abi: erc4626Abi,
-      address: pool.yieldPool,
       functionName: 'totalSupply',
     }),
   ])
 
-  // Update both pools atomically
+  // Update states
   await Promise.all([
     // Update relay pool
     context.db.update(relayPool, { contractAddress: event.log.address }).set({
       totalAssets: relayTotalAssets,
       totalShares: relayTotalShares,
-    }),
-
-    // Update yield pool
-    context.db.update(yieldPool, { contractAddress: pool.yieldPool }).set({
-      totalAssets: yieldTotalAssets,
-      totalShares: yieldTotalShares,
-      lastUpdated: BigInt(timestamp),
     }),
 
     // Record pool action

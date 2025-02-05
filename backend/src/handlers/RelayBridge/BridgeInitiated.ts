@@ -13,8 +13,13 @@ export default async function ({
   const { nonce, sender, recipient, asset, amount, poolChainId, pool } =
     event.args
 
-  // Get Hyperlane dispatch event from the same transaction
-  const dispatchEvent = await getEvent(event.transaction, 'Dispatch', Mailbox)
+  // Ensure that the transaction object has a defined logs array
+  const tx = event.transaction || {}
+  tx.logs = tx.logs ?? []
+
+  // Get Hyperlane dispatch event from the same transaction if logs exist.
+  const dispatchEvent =
+    tx.logs.length > 0 ? await getEvent(tx, 'Dispatch', Mailbox) : null
   const hyperlaneMessageId = dispatchEvent ? dispatchEvent.args[0] : null
 
   // Record bridge initiation
