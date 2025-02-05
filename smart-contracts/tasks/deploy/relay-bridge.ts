@@ -13,15 +13,9 @@ task('deploy:relay-bridge', 'Deploy a bridge proxy')
       { ethers }
     ) => {
       const { chainId } = await ethers.provider.getNetwork()
-      const deployedContracts = (await getAddresses())[chainId.toString()]
-
-      if (!deployedContracts) {
-        throw new Error(
-          'This chain does not have any deployed contracts. Please deploy BridgeProxy and RelayBridgeFactory first.'
-        )
-      }
-
-      const { BridgeProxy, RelayBridgeFactory } = deployedContracts
+      const { BridgeProxy, RelayBridgeFactory } = (await getAddresses())[
+        chainId.toString()
+      ]
 
       const { assets, l1ChainId } = networks[chainId.toString()]
 
