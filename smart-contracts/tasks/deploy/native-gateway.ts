@@ -2,7 +2,7 @@ import { task } from 'hardhat/config'
 
 import RelayPoolNativeGatewayModule from '../../ignition/modules/RelayPoolNativeGatewayModule'
 
-task('deploy:native-wrapper', 'Deploy a WETH/Native wrapper for a relay pool')
+task('deploy:native-gateway', 'Deploy a WETH/Native gateway for a relay pool')
   .addParam('pool', 'A realy pool address')
   .setAction(async ({ pool }, { ethers, ignition }) => {
     const { chainId } = await ethers.provider.getNetwork()

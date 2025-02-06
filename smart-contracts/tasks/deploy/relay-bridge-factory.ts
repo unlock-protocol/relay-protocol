@@ -10,11 +10,14 @@ task('deploy:bridge-factory', 'Deploy a relay bridge factory').setAction(
 
     // get args value
     const { chainId } = await ethers.provider.getNetwork()
-    const {
-      hyperlaneMailbox,
-      name: networkName,
-      isZKsync,
-    } = networks[chainId.toString()]
+    const networkConfig = networks[chainId.toString()]
+    if (!networkConfig) {
+      throw new Error(
+        `Unsupported network ${chainId}. Please add it to networks.ts`
+      )
+    }
+    const { hyperlaneMailbox, name: networkName, isZKsync } = networkConfig
+
     console.log(`deploying on ${networkName} (${chainId})...`)
 
     let relayBridgeAddress: string

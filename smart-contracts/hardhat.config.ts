@@ -21,7 +21,8 @@ import './tasks/deploy/relay-pool-factory'
 import './tasks/deploy/relay-bridge-factory'
 
 // Helpers/tests
-import './tasks/deploy/native-wrapper'
+import './tasks/networks'
+import './tasks/deploy/native-gateway'
 import './tasks/deploy/dummy-yield-pool'
 import './tasks/utils/exportAbis'
 
