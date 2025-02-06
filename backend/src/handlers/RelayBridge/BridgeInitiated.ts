@@ -30,7 +30,7 @@ export default async function ({
         topics: log.topics,
       })
 
-      if (event.name === 'DispatchId') {
+      if (event.eventName === 'DispatchId') {
         hyperlaneMessageId = event.args.messageId
       }
     }
