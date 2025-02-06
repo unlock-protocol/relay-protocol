@@ -83,6 +83,6 @@ ponder.on('RelayBridge:BridgeInitiated', BridgeInitiated)
 ponder.on('RelayPool:OriginAdded', OriginAdded)
 
 /**
- * Handles Hyperlan messages when they successfully reached the pool and a new load is emitted
+ * Handles Hyperlan messages when they successfully reached the pool and a new loan is emitted
  */
 ponder.on('RelayPool:LoanEmitted', LoanEmitted)
