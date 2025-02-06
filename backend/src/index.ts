@@ -23,6 +23,7 @@ import PoolDeployed from './handlers/RelayPoolFactory/PoolDeployed'
 import BridgeDeployed from './handlers/RelayBridgeFactory/BridgeDeployed'
 import BridgeInitiated from './handlers/RelayBridge/BridgeInitiated'
 import OriginAdded from './handlers/RelayPool/OriginAdded'
+import LoanEmitted from './handlers/RelayPool/LoanEmitted'
 
 // ============= RelayPool Events =============
 
@@ -80,3 +81,8 @@ ponder.on('RelayBridge:BridgeInitiated', BridgeInitiated)
  * - Sets initial debt limits
  */
 ponder.on('RelayPool:OriginAdded', OriginAdded)
+
+/**
+ * Handles Hyperlan messages when they successfully reached the pool and a new loan is emitted
+ */
+ponder.on('RelayPool:LoanEmitted', LoanEmitted)

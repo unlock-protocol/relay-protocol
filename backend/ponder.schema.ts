@@ -196,7 +196,7 @@ export const bridgeTransaction = onchainTable(
     destinationRecipient: t.hex().notNull(),
     asset: t.hex().notNull(),
     amount: t.bigint().notNull(),
-    hyperlaneMessageId: t.hex(),
+    hyperlaneMessageId: t.hex().notNull(),
     nativeBridgeStatus: t.text().notNull(),
     nativeBridgeProofTxHash: t.hex(),
     nativeBridgeFinalizedTxHash: t.hex(),

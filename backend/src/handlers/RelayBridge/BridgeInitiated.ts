@@ -1,7 +1,8 @@
 import { Context, Event } from 'ponder:registry'
 import { bridgeTransaction } from 'ponder:schema'
-import { getEvent } from '@relay-protocol/helpers'
 import { Mailbox } from '@relay-protocol/helpers/abis'
+import networks from '@relay-protocol/networks'
+import { decodeEventLog } from 'viem'
 
 export default async function ({
   event,
@@ -10,17 +11,30 @@ export default async function ({
   event: Event<'RelayBridge:BridgeInitiated'>
   context: Context<'RelayBridge:BridgeInitiated'>
 }) {
+  const networkConfig = networks[context.network.chainId]
   const { nonce, sender, recipient, asset, amount, poolChainId, pool } =
     event.args
 
-  // Ensure that the transaction object has a defined logs array
-  const tx = event.transaction || {}
-  tx.logs = tx.logs ?? []
+  // Parse logs to find the DispatchId event and extract hyperlaneMessageId
+  let hyperlaneMessageId
+  const receipt = await context.client.getTransactionReceipt({
+    hash: event.transaction.hash,
+  })
+  for (const log of receipt.logs) {
+    if (
+      log.address.toLowerCase() === networkConfig.hyperlaneMailbox.toLowerCase()
+    ) {
+      const event = decodeEventLog({
+        abi: Mailbox,
+        data: log.data,
+        topics: log.topics,
+      })
 
-  // Get Hyperlane dispatch event from the same transaction if logs exist.
-  const dispatchEvent =
-    tx.logs.length > 0 ? await getEvent(tx, 'Dispatch', Mailbox) : null
-  const hyperlaneMessageId = dispatchEvent ? dispatchEvent.args[0] : null
+      if (event.eventName === 'DispatchId') {
+        hyperlaneMessageId = event.args.messageId
+      }
+    }
+  }
 
   // Record bridge initiation
   await context.db.insert(bridgeTransaction).values({
