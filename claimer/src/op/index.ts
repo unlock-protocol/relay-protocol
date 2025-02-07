@@ -10,16 +10,15 @@ export const submitProof = async ({
   originTxHash,
   destinationPoolChainId,
 }) => {
-  const destinationNetwork = networks[destinationPoolChainId]
+  const destinationNetwork = networks[destinationPoolChainId.toString()]
 
-  const signer = await getSignerForNetwork(destinationPoolChainId)
+  const signer = await getSignerForNetwork(destinationNetwork)
 
   const finalizeParams = await buildProveWithdrawal(
     originChainId,
     originTxHash,
     Number(destinationPoolChainId)
   )
-  console.log({ finalizeParams })
 
   const portal = new ethers.Contract(
     destinationNetwork.bridges.op!.portalProxy!,
