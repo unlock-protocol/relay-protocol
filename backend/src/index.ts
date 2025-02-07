@@ -24,6 +24,7 @@ import BridgeDeployed from './handlers/RelayBridgeFactory/BridgeDeployed'
 import BridgeInitiated from './handlers/RelayBridge/BridgeInitiated'
 import OriginAdded from './handlers/RelayPool/OriginAdded'
 import LoanEmitted from './handlers/RelayPool/LoanEmitted'
+import OutstandingDebtChanged from './handlers/RelayPool/OutstandingDebtChanged'
 
 // ============= RelayPool Events =============
 
@@ -83,6 +84,11 @@ ponder.on('RelayBridge:BridgeInitiated', BridgeInitiated)
 ponder.on('RelayPool:OriginAdded', OriginAdded)
 
 /**
- * Handles Hyperlan messages when they successfully reached the pool and a new loan is emitted
+ * Handles Hyperlane messages when they successfully reached the pool and a new loan is emitted
  */
 ponder.on('RelayPool:LoanEmitted', LoanEmitted)
+
+/**
+ * Handles the change of the outstanding debt of a relay pool
+ */
+ponder.on('RelayPool:OutstandingDebtChanged', OutstandingDebtChanged)
