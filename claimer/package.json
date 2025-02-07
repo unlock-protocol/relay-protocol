@@ -1,0 +1,20 @@
+{
+  "name": "claimer",
+  "version": "0.0.0",
+  "scripts": {
+    "start": "tsx main.ts",
+    "lint:fix": "yarn lint --fix",
+    "lint": "eslint"
+  },
+  "devDependencies": {
+    "@relay-protocol/eslint-config": "workspace:^",
+    "@relay-protocol/tsconfig": "workspace:./packages/tsconfig",
+    "@relay-protocol/types": "workspace:./packages/types",
+    "@types/node": "22.13.0",
+    "eslint": "9.19.0",
+    "typescript": "5.7.3"
+  },
+  "dependencies": {
+    "tsx": "4.19.2"
+  }
+}

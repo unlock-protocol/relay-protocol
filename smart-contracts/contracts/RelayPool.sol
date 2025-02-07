@@ -403,6 +403,7 @@ contract RelayPool is ERC4626, Ownable {
   // This function is called externally to claim funds from a bridge.
   // The funds are immediately added to the yieldPool
   // TODO: handle cases where the origin might have been removed/changed (fees, etc.)
+  // TODO: handle cases where someone *else* triggers the settlement. Can we recover by calling this? to make sure things are settled?
   function claim(
     uint32 chainId,
     address bridge,
