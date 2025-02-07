@@ -1,5 +1,5 @@
 {
-  "name": "claimer",
+  "name": "@relay-protocol/claimer",
   "version": "0.0.0",
   "scripts": {
     "start": "tsx main.ts",
