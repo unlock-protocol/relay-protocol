@@ -25,4 +25,5 @@ export const optimism: NetworkConfig = {
   uniswapV3: {
     universalRouterAddress: '0xb555edF5dcF85f42cEeF1f3630a52A108E55A654',
   },
+  rpc: ['https://rpc.unlock-protocol.com/10'],
 }

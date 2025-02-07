@@ -6,7 +6,7 @@ export const opSepolia: NetworkConfig = {
   isTestnet: true,
   l1ChainId: 11155111,
   name: 'OP Sepolia',
-  rpc: 'https://optimism-sepolia.gateway.tenderly.co',
+  rpc: ['https://optimism-sepolia.gateway.tenderly.co'],
   slug: 'op-sepolia',
   bridges: {
     op: {

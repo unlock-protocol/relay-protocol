@@ -33,4 +33,5 @@ export const sepolia: NetworkConfig = {
     usdc: '0x1c7D4B196Cb0C7B01d743Fbc6116a902379C7238',
     weth: '0x7b79995e5f793A07Bc00c21412e50Ecae098E7f9',
   },
+  rpc: ['https://rpc.unlock-protocol.com/11155111'],
 }
