@@ -6,7 +6,7 @@ export const zkSyncSepolia: NetworkConfig = {
   isTestnet: true,
   name: 'ZKsync Sepolia Testnet',
   slug: 'zksync-sepolia',
-  rpc: 'https://sepolia.era.zksync.dev',
+  rpc: ['https://sepolia.era.zksync.dev'],
   bridges: {
     zksync: {
       l1SharedDefaultBridge: '0x3E8b2fe58675126ed30d0d12dea2A9bda72D18Ae',

@@ -3,8 +3,7 @@ import { networks } from '@relay-protocol/networks'
 
 export const getProvider = (chainId: bigint | string | number) => {
   const { rpc } = networks[chainId.toString()]
-  const rpcURL = rpc || `https://rpc.unlock-protocol.com/${chainId}`
-  const provider = new ethers.JsonRpcProvider(rpcURL)
+  const provider = new ethers.JsonRpcProvider(rpc[0]) // pick the first rpc endpoint
   return provider
 }
 
@@ -13,9 +12,7 @@ export const fetchRawBlock = async (
   blockHash: string
 ) => {
   const { rpc } = networks[chainId.toString()]
-  const rpcURL = rpc || `https://rpc.unlock-protocol.com/${chainId}`
-
-  const resp = await fetch(rpcURL, {
+  const resp = await fetch(rpc[0], {
     body: JSON.stringify({
       id: 1,
       jsonrpc: '2.0',
