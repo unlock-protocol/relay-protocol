@@ -15,7 +15,8 @@
   "workspaces": [
     "packages/**",
     "smart-contracts",
-    "backend"
+    "backend",
+    "claimer"
   ],
   "scripts": {
     "test": "yarn packages --parallel run test",
@@ -27,7 +28,9 @@
     "clean": "yarn packages:clean",
     "lint": "yarn packages --parallel run lint",
     "backend:dev": "yarn build && yarn workspace @relay-protocol/backend dev",
-    "backend:start": "yarn workspace @relay-protocol/backend start"
+    "backend:start": "yarn workspace @relay-protocol/claimer start",
+    "claimer:dev": "yarn build && yarn workspace @relay-protocol/claimer dev",
+    "claimer:start": "yarn workspace @relay-protocol/claimer start"
   },
   "engines": {
     "node": "22"
