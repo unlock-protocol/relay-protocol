@@ -2892,6 +2892,20 @@ __metadata:
   languageName: unknown
   linkType: soft
 
+"@relay-protocol/claimer@workspace:claimer":
+  version: 0.0.0-use.local
+  resolution: "@relay-protocol/claimer@workspace:claimer"
+  dependencies:
+    "@relay-protocol/eslint-config": "workspace:^"
+    "@relay-protocol/tsconfig": "workspace:./packages/tsconfig"
+    "@relay-protocol/types": "workspace:./packages/types"
+    "@types/node": "npm:22.13.0"
+    eslint: "npm:9.19.0"
+    tsx: "npm:4.19.2"
+    typescript: "npm:5.7.3"
+  languageName: unknown
+  linkType: soft
+
 "@relay-protocol/client@workspace:*, @relay-protocol/client@workspace:packages/client":
   version: 0.0.0-use.local
   resolution: "@relay-protocol/client@workspace:packages/client"
@@ -5472,20 +5486,6 @@ __metadata:
   checksum: 10/faf232deff2351448ea23d265eb8723e035ebbb454baca45fb60c1bd71056ede8b153bef1b221e067f13e6b9288ebb83bb6ae2d5dd4cec285411f9fc22ec1f5b
   languageName: node
   linkType: hard
-
-"claimer@workspace:claimer":
-  version: 0.0.0-use.local
-  resolution: "claimer@workspace:claimer"
-  dependencies:
-    "@relay-protocol/eslint-config": "workspace:^"
-    "@relay-protocol/tsconfig": "workspace:./packages/tsconfig"
-    "@relay-protocol/types": "workspace:./packages/types"
-    "@types/node": "npm:22.13.0"
-    eslint: "npm:9.19.0"
-    tsx: "npm:4.19.2"
-    typescript: "npm:5.7.3"
-  languageName: unknown
-  linkType: soft
 
 "clean-stack@npm:^2.0.0":
   version: 2.2.0
