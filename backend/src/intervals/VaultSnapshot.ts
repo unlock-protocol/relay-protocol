@@ -7,14 +7,14 @@
  * For each vault (relay pool), it:
  * 1. Queries the current share price by calling convertToAssets(10^vaultDecimals) on the ERC4626 vault
  * 2. Creates a unique snapshot ID by combining the vault address and block number
- * 3. Records the snapshot with block metadata in the vaultsnapshot table
+ * 3. Records the snapshot with block metadata in the vaultSnapshot table
  *
  * The interval between snapshots is configured in ponder.config.ts via the VaultSnapshot block interval.
  * This provides a time series of share prices that can be used to analyze vault returns and performance.
  */
 
 import { ponder } from 'ponder:registry'
-import { vaultsnapshot, relayPool } from 'ponder:schema'
+import { vaultSnapshot, relayPool } from 'ponder:schema'
 
 ponder.on('VaultSnapshot:block', async ({ event, context }) => {
   const vaults = await context.db.sql.select().from(relayPool).execute()
@@ -50,6 +50,6 @@ ponder.on('VaultSnapshot:block', async ({ event, context }) => {
       sharePrice: sharePrice.toString(),
     }
 
-    await context.db.insert(vaultsnapshot).values(snapshot)
+    await context.db.insert(vaultSnapshot).values(snapshot)
   }
 })

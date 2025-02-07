@@ -227,7 +227,7 @@ export const bridgeTransaction = onchainTable(
  * - timestamp: Block timestamp when the snapshot was taken
  * - sharePrice: Share price at snapshot time, computed via convertToAssets(1e18)
  */
-export const vaultsnapshot = onchainTable(
+export const vaultSnapshot = onchainTable(
   'vaultsnapshot',
   (t) => ({
     id: t.text().primaryKey(),
