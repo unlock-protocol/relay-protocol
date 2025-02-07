@@ -1,7 +1,6 @@
 import { http } from 'viem'
 import networks from '@relay-protocol/networks'
 
-console.log(networks)
 /**
  * Get the RPC URL for a given chain ID
  * @param chainId - The chain ID
