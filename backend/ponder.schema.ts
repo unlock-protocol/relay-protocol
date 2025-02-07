@@ -222,6 +222,7 @@ export const bridgeTransaction = onchainTable(
  * Track vault share price snapshots over time
  * - id: Composite primary key in format vault-blockNumber
  * - vault: Vault (pool) contract address
+ * - chainId: Chain ID of the vault
  * - blockNumber: Block number when the snapshot was taken
  * - timestamp: Block timestamp when the snapshot was taken
  * - sharePrice: Share price at snapshot time, computed via convertToAssets(1e18)
@@ -231,12 +232,13 @@ export const vaultsnapshot = onchainTable(
   (t) => ({
     id: t.text().primaryKey(),
     vault: t.hex().notNull(),
+    chainId: t.integer().notNull(),
     blockNumber: t.bigint().notNull(),
     timestamp: t.bigint().notNull(),
     sharePrice: t.numeric().notNull(),
   }),
   (table) => ({
-    vaultIdx: index().on(table.vault), // Index for faster vault lookups
+    vaultChainIdx: index().on(table.vault, table.chainId),
   })
 )
 
@@ -269,10 +271,10 @@ export const bridgeTransactionOrigin = relations(
   })
 )
 
-// Add relation from relay pool to vault snapshots
+// Update the relation to include chainId in the join condition
 export const vaultSnapshotRelations = relations(vaultsnapshot, ({ one }) => ({
   pool: one(relayPool, {
-    fields: [vaultsnapshot.vault],
-    references: [relayPool.contractAddress],
+    fields: [vaultsnapshot.vault, vaultsnapshot.chainId],
+    references: [relayPool.contractAddress, relayPool.chainId],
   }),
 }))

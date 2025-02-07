@@ -38,12 +38,13 @@ ponder.on('VaultSnapshot:block', async ({ event, context }) => {
       args: [shareUnit],
     })
 
-    // Create a unique snapshot ID by combining the vault address and block number.
-    const id = `${vault.contractAddress.toLowerCase()}-${event.block.number}`
+    // Create a unique snapshot ID by combining chainId, vault address and block number
+    const id = `${vault.chainId}-${vault.contractAddress.toLowerCase()}-${event.block.number}`
 
     const snapshot = {
       id,
       vault: vault.contractAddress,
+      chainId: vault.chainId,
       blockNumber: event.block.number,
       timestamp: event.block.timestamp,
       sharePrice: sharePrice.toString(),
