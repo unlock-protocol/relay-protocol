@@ -31,24 +31,7 @@ export const submitProof = async ({
     finalizeParams.outputRootProof,
     finalizeParams.withdrawalProof
   )
-  console.log(tx.hash)
-  console.log('Ready to be claimed in 7 days!')
-  // }
-  // const portal = new ethers.Contract(
-  //   networks[Number(chainId)].op.portalProxy,
-  //   Portal2,
-  //   signer
-  // )
-  // const tx = await portal.proveWithdrawalTransaction(
-  //   finalizeParams.transaction,
-  //   finalizeParams.disputeGameIndex,
-  //   finalizeParams.outputRootProof,
-  //   finalizeParams.withdrawalProof
-  // )
-  // console.log(tx.hash)
-  // console.log('Ready to be claimed in 7 days!')
-
-  // ok and let's now prove every transaction!
+  return tx.hash
 }
 
 export default {
