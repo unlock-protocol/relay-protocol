@@ -1,15 +1,13 @@
 // hardhat ignition is not supported rn
 // https://github.com/NomicFoundation/hardhat-ignition/issues/825
-import { Wallet, Provider } from 'zksync-ethers'
 import { Deployer } from '@matterlabs/hardhat-zksync-deploy/dist/deployer'
 import { type JsonRpcResult } from 'ethers'
-import { getProvider } from '@relay-protocol/helpers'
 import networks from '@relay-protocol/networks'
 import { HardhatRuntimeEnvironment } from 'hardhat/types'
 
 export async function getZkSyncBridgeContracts(chainId: bigint) {
   const { rpc } = networks[chainId!.toString()]
-  const rpcURL = rpc || `https://rpc.unlock-protocol.com/${chainId}`
+  const rpcURL = rpc[0]
   const resp = await fetch(rpcURL, {
     body: JSON.stringify({
       id: 1,

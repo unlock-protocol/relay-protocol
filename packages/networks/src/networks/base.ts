@@ -23,4 +23,5 @@ export const base: NetworkConfig = {
   uniswapV3: {
     universalRouterAddress: '0x198EF79F1F515F02dFE9e3115eD9fC07183f02fC',
   },
+  rpc: ['https://rpc.unlock-protocol.com/8453'],
 }

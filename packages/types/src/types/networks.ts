@@ -23,7 +23,6 @@ export interface NetworkConfig {
       l2SharedDefaultBridge: string
     }
   }
-  rpc?: string
   isZKsync?: boolean
   hyperlaneMailbox: string
   isTestnet: boolean
@@ -31,6 +30,7 @@ export interface NetworkConfig {
   uniswapV3?: {
     universalRouterAddress: string
   }
+  rpc: [string, ...string[]]
 }
 
 interface NetworkAssets {

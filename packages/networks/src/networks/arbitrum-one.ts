@@ -24,4 +24,5 @@ export const arbitrumOne: NetworkConfig = {
   uniswapV3: {
     universalRouterAddress: '0x4C60051384bd2d3C01bfc845Cf5F4b44bcbE9de5',
   },
+  rpc: ['https://rpc.unlock-protocol.com/42161'],
 }

@@ -45,7 +45,7 @@ Object.keys(nets).forEach((id) => {
   let accounts
   let zksync = {}
   const network = {
-    url: rpc || `https://rpc.unlock-protocol.com/${id}`,
+    url: rpc[0],
     chainId: Number(id),
   }
   if (DEPLOYER_PRIVATE_KEY) {
