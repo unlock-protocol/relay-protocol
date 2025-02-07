@@ -12,7 +12,6 @@ const getRpcUrl = (chainId: number): string => {
   if (!url) {
     throw new Error(`Unsupported chain ID: ${chainId}`)
   }
-
   return url
 }
 
