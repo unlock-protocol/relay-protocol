@@ -2896,11 +2896,15 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@relay-protocol/claimer@workspace:claimer"
   dependencies:
+    "@relay-protocol/client": "workspace:*"
     "@relay-protocol/eslint-config": "workspace:^"
+    "@relay-protocol/helpers": "workspace:*"
+    "@relay-protocol/networks": "workspace:*"
     "@relay-protocol/tsconfig": "workspace:./packages/tsconfig"
     "@relay-protocol/types": "workspace:./packages/types"
     "@types/node": "npm:22.13.0"
     eslint: "npm:9.19.0"
+    ethers: "npm:6.13.5"
     tsx: "npm:4.19.2"
     typescript: "npm:5.7.3"
   languageName: unknown
@@ -2971,7 +2975,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@relay-protocol/networks@^workspace:*, @relay-protocol/networks@workspace:^, @relay-protocol/networks@workspace:packages/networks":
+"@relay-protocol/networks@^workspace:*, @relay-protocol/networks@workspace:*, @relay-protocol/networks@workspace:^, @relay-protocol/networks@workspace:packages/networks":
   version: 0.0.0-use.local
   resolution: "@relay-protocol/networks@workspace:packages/networks"
   dependencies:

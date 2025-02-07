@@ -146,3 +146,28 @@ export const GET_ORIGINS_WITH_BRIDGE = gql`
     }
   }
 `
+
+export const GET_ALL_TRANSACTIIONS_BY_TYPE = gql`
+  query TransactionByType($nativeBridgeStatus: String!) {
+    bridgeTransactions(where: { nativeBridgeStatus: $nativeBridgeStatus }) {
+      items {
+        originBridgeAddress
+        nonce
+        originChainId
+        destinationPoolAddress
+        destinationPoolChainId
+        originSender
+        destinationRecipient
+        asset
+        amount
+        hyperlaneMessageId
+        nativeBridgeStatus
+        nativeBridgeProofTxHash
+        nativeBridgeFinalizedTxHash
+        loanEmittedTxHash
+        originTimestamp
+        originTxHash
+      }
+    }
+  }
+`

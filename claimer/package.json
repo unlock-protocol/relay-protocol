@@ -7,7 +7,10 @@
     "lint": "eslint"
   },
   "devDependencies": {
+    "@relay-protocol/client": "workspace:*",
     "@relay-protocol/eslint-config": "workspace:^",
+    "@relay-protocol/helpers": "workspace:*",
+    "@relay-protocol/networks": "workspace:*",
     "@relay-protocol/tsconfig": "workspace:./packages/tsconfig",
     "@relay-protocol/types": "workspace:./packages/types",
     "@types/node": "22.13.0",
@@ -15,6 +18,7 @@
     "typescript": "5.7.3"
   },
   "dependencies": {
+    "ethers": "6.13.5",
     "tsx": "4.19.2"
   }
 }
