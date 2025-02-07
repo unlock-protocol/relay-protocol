@@ -5,7 +5,7 @@
  * The snapshots track vault performance over time by recording share price history.
  *
  * For each vault (relay pool), it:
- * 1. Queries the current share price by calling convertToAssets(1e18) on the ERC4626 vault
+ * 1. Queries the current share price by calling convertToAssets(10^vaultDecimals) on the ERC4626 vault
  * 2. Creates a unique snapshot ID by combining the vault address and block number
  * 3. Records the snapshot with block metadata in the vaultsnapshot table
  *
@@ -17,31 +17,28 @@ import { ponder } from 'ponder:registry'
 import { vaultsnapshot, relayPool } from 'ponder:schema'
 
 ponder.on('VaultSnapshot:block', async ({ event, context }) => {
-  console.log(
-    '[VaultSnapshot] Processing block ' +
-      event.block.number +
-      ' at timestamp ' +
-      event.block.timestamp
-  )
-
   const vaults = await context.db.sql.select().from(relayPool).execute()
-  console.log('[VaultSnapshot] Found ' + vaults.length + ' vaults to process')
 
   for (const vault of vaults) {
-    console.log(
-      '[VaultSnapshot] Processing vault ' + vault.contractAddress + ':'
-    )
+    // retrieve the vault's decimals
+    const vaultDecimals = await context.client.readContract({
+      address: vault.contractAddress,
+      abi: context.contracts.RelayPool.abi,
+      functionName: 'decimals',
+    })
 
+    // calculate the share unit using the vault's decimals
+    const shareUnit = BigInt(10) ** BigInt(vaultDecimals)
+
+    // query the vault's current sharePrice from convertToAssets using the appropriate shareUnit
     const sharePrice = await context.client.readContract({
       address: vault.contractAddress,
       abi: context.contracts.RelayPool.abi,
       functionName: 'convertToAssets',
-      args: [BigInt('1000000000000000000')], // 1e18
+      args: [shareUnit],
     })
 
-    console.log('  - Computed Share Price: ' + sharePrice.toString())
-
-    // unique ID by combining vault address and block number
+    // Create a unique snapshot ID by combining the vault address and block number.
     const id = `${vault.contractAddress.toLowerCase()}-${event.block.number}`
 
     const snapshot = {
@@ -53,10 +50,5 @@ ponder.on('VaultSnapshot:block', async ({ event, context }) => {
     }
 
     await context.db.insert(vaultsnapshot).values(snapshot)
-    console.log('  - Saved new vault snapshot to database')
   }
-
-  console.log(
-    '[VaultSnapshot] Completed processing block ' + event.block.number
-  )
 })
