@@ -5,7 +5,6 @@
  * On receiving the event, it updates the corresponding relay pool record in the database with the new outstanding debt.
  *
  * The event parameters include:
- *   - oldDebt: The previous outstanding debt value.
  *   - newDebt: The updated outstanding debt value.
  *
  * The pool is identified using the contract address found in the event log.
