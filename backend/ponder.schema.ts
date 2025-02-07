@@ -138,6 +138,7 @@ export const userBalanceRelations = relations(userBalance, ({ one }) => ({
  */
 export const relayPoolRelations = relations(relayPool, ({ many }) => ({
   userBalances: many(userBalance),
+  snapshots: many(vaultsnapshot),
 }))
 
 export const relayBridge = onchainTable('relay_bridge', (t) => ({
@@ -217,6 +218,28 @@ export const bridgeTransaction = onchainTable(
   })
 )
 
+/**
+ * Track vault share price snapshots over time
+ * - id: Composite primary key in format vault-blockNumber
+ * - vault: Vault (pool) contract address
+ * - blockNumber: Block number when the snapshot was taken
+ * - timestamp: Block timestamp when the snapshot was taken
+ * - sharePrice: Share price at snapshot time, computed via convertToAssets(1e18)
+ */
+export const vaultsnapshot = onchainTable(
+  'vaultsnapshot',
+  (t) => ({
+    id: t.text().primaryKey(),
+    vault: t.hex().notNull(),
+    blockNumber: t.bigint().notNull(),
+    timestamp: t.bigint().notNull(),
+    sharePrice: t.numeric().notNull(),
+  }),
+  (table) => ({
+    vaultIdx: index().on(table.vault), // Index for faster vault lookups
+  })
+)
+
 // relation between poolOrigin and bridgeTransaction
 export const poolOriginBridgeTransactions = relations(
   poolOrigin,
@@ -245,3 +268,11 @@ export const bridgeTransactionOrigin = relations(
     }),
   })
 )
+
+// Add relation from relay pool to vault snapshots
+export const vaultSnapshotRelations = relations(vaultsnapshot, ({ one }) => ({
+  pool: one(relayPool, {
+    fields: [vaultsnapshot.vault],
+    references: [relayPool.contractAddress],
+  }),
+}))
