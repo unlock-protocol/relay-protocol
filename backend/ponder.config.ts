@@ -95,7 +95,7 @@ export default createConfig({
     VaultSnapshot: {
       network: 'sepolia',
       startBlock: 7609300,
-      interval: 600, // ~2 hours with 12s block time
+      interval: 25, // ~5 minutes with 12s block time
     },
   },
 })
