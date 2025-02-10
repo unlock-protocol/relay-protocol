@@ -39,7 +39,8 @@ contract RelayBridge is IRelayBridge {
     address asset,
     uint256 amount,
     uint32 poolChainId,
-    address indexed pool
+    address indexed pool,
+    address proxyBridge
   );
 
   constructor(address _asset, address _proxyBridge, address _hyperlaneMailbox) {
@@ -108,7 +109,8 @@ contract RelayBridge is IRelayBridge {
       asset,
       amount,
       poolChainId,
-      pool
+      pool,
+      proxyBridge
     );
   }
 }
