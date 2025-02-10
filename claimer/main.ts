@@ -4,6 +4,8 @@ import networks from '@relay-protocol/networks'
 import { start, stop } from './src/runner'
 
 const run = async () => {
+  console.log('deploymentId', process.env.RAILWAY_DEPLOYMENT_ID)
+
   const { vaultService, database } = await start()
 
   const { bridgeTransactions } = await vaultService.query(
