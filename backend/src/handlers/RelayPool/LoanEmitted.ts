@@ -28,7 +28,7 @@ export default async function ({
       .set({ loanEmittedTxHash: event.transaction.hash })
   } catch (error) {
     // If the record doesn't exist, warn and allow indexing to continue.
-    context.log.warn(
+    console.log(
       `LoanEmitted event for (bridge: ${bridge}, nonce: ${nonce}, chain: ${bridgeChainId}) did not find an existing bridge_transaction record: ${error}`
     )
   }
