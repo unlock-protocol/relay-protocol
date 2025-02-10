@@ -1,4 +1,4 @@
-import { GET_ALL_TRANSACTIIONS_BY_TYPE } from '@relay-protocol/client'
+import { GET_ALL_BRIDGE_TRANSACTIONS_BY_TYPE } from '@relay-protocol/client'
 import OPstack from './src/op'
 import networks from '@relay-protocol/networks'
 import { start, stop } from './src/runner'
@@ -7,7 +7,7 @@ const run = async () => {
   const { vaultService, database } = await start()
 
   const { bridgeTransactions } = await vaultService.query(
-    GET_ALL_TRANSACTIIONS_BY_TYPE,
+    GET_ALL_BRIDGE_TRANSACTIONS_BY_TYPE,
     {
       nativeBridgeStatus: 'INITIATED',
     }
