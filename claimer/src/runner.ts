@@ -2,6 +2,8 @@ import { RelayVaultService } from '@relay-protocol/client'
 
 import { Client } from 'pg'
 
+export const DB_SCHEMA = process.env.RAILWAY_DEPLOYMENT_ID
+
 const vaultService = new RelayVaultService(
   'https://relay-protocol-production.up.railway.app/' // TODO: add to config?
 )
