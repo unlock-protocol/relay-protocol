@@ -147,8 +147,8 @@ export const GET_ORIGINS_WITH_BRIDGE = gql`
   }
 `
 
-export const GET_ALL_TRANSACTIIONS_BY_TYPE = gql`
-  query TransactionByType($nativeBridgeStatus: String!) {
+export const GET_ALL_BRIDGE_TRANSACTIONS_BY_TYPE = gql`
+  query GetAllBridgeTransactionsByType($nativeBridgeStatus: String!) {
     bridgeTransactions(where: { nativeBridgeStatus: $nativeBridgeStatus }) {
       items {
         originBridgeAddress
