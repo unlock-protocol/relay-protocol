@@ -3,9 +3,13 @@ import OPstack from './src/op'
 import networks from '@relay-protocol/networks'
 import { start, stop } from './src/runner'
 
-const run = async () => {
-  console.log('deploymentId', process.env.RAILWAY_DEPLOYMENT_ID)
+/**
+ * The database schema name used for all queries.
+ * At runtime, Railway injects this value as RAILWAY_DEPLOYMENT_ID.
+ */
+const schema = process.env.RAILWAY_DEPLOYMENT_ID
 
+const run = async () => {
   const { vaultService, database } = await start()
 
   const { bridgeTransactions } = await vaultService.query(
@@ -31,12 +35,12 @@ const run = async () => {
         await database.query(
           `
           UPDATE 
-            "public"."bridge_transaction"
+            "${schema}"."bridge_transaction"
           SET 
             "native_bridge_status" = 'PROVEN', 
             "native_bridge_proof_tx_hash" = $1
           WHERE 
-          "origin_tx_hash" = $2;`,
+            "origin_tx_hash" = $2;`,
           [hash, bridgeTransaction.originTxHash]
         )
       }
