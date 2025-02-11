@@ -1,6 +1,6 @@
 {
   "name": "@relay-protocol/abis",
-  "version": "0.0.4",
+  "version": "0.0.6",
   "license": "MIT",
   "main": "dist/index.js",
   "module": "dist/index.mjs",
@@ -13,7 +13,8 @@
   },
   "files": [
     "abis",
-    "index.js"
+    "index.js",
+    "dist"
   ],
   "scripts": {
     "release": "npm publish",
