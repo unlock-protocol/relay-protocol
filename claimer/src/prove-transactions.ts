@@ -16,8 +16,6 @@ export const proveTransactions = async ({
   database: Client
   schema: string
 }) => {
-  console.log('using schema', schema)
-
   const { bridgeTransactions } = await vaultService.query(
     GET_ALL_BRIDGE_TRANSACTIONS_BY_TYPE,
     {
