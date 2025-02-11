@@ -7,22 +7,11 @@ WORKDIR /app
 # Enable corepack and set yarn version
 RUN corepack enable && corepack prepare yarn@4.6.0 --activate
 
-# Copy root workspace files first
-COPY package.json yarn.lock .yarnrc.yml ./
-
-# Copy yarn configuration
-COPY .yarn ./.yarn
-
-# Copy all workspace packages and necessary package.json files
-COPY packages ./packages
-COPY backend/package.json ./backend/
-COPY smart-contracts/package.json ./smart-contracts/
-
-# Install dependencie
-RUN yarn install
-
-# Copy all source files
+# Copy the entire repository
 COPY . .
+
+# Install dependencies
+RUN yarn install
 
 # Build all packages
 RUN yarn build
