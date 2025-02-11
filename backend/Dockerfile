@@ -13,18 +13,18 @@ COPY package.json yarn.lock .yarnrc.yml ./
 # Copy yarn configuration
 COPY .yarn ./.yarn
 
-# Copy all workspace packages
+# Copy all workspace packages and necessary package.json files
 COPY packages ./packages
 COPY backend/package.json ./backend/
 COPY smart-contracts/package.json ./smart-contracts/
 
-# Install dependencies
-RUN yarn install --mode=skip-build
+# Install dependencie
+RUN yarn install
 
 # Copy all source files
 COPY . .
 
-# Generate Ponder files and build packages
+# Build all packages
 RUN yarn build
 
 # Production stage
@@ -36,16 +36,16 @@ WORKDIR /app
 # Enable corepack and set yarn version
 RUN corepack enable && corepack prepare yarn@4.6.0 --activate
 
-# Copy all files from builder
+# Copy built files from builder stage
 COPY --from=builder /app .
 
-# Install production dependencies
+# Install production dependencies; skipped build steps as code is already built
 RUN yarn install --mode=skip-build
 
 # Set environment variables
 ENV NODE_ENV=production
 
-# Add Railway specific ARGs
+# Add Railway specific ARGs and persist them into ENV
 ARG RAILWAY_DEPLOYMENT_ID
 ARG DATABASE_URL
 ENV RAILWAY_DEPLOYMENT_ID=$RAILWAY_DEPLOYMENT_ID
