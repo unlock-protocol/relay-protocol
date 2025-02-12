@@ -11,6 +11,10 @@ export const ethereum: NetworkConfig = {
       portalProxy: '0xbEb5Fc579115071764c7423A4f12eDde41f106Ed',
       disputeGame: '0xe5965Ab5962eDc7477C8520243A95517CD252fA9',
     },
+    base: {
+      portalProxy: '0x49048044D57e1C92A77f79988d21Fa8fAF74E97e',
+      disputeGame: '0x43edB88C4B80fDD2AdFF2412A7BebF9dF42cB40e',
+    },
     cctp: {
       domain: 0n,
       messenger: '0xBd3fa81B58Ba92a82136038B25aDec7066af3155',

@@ -11,45 +11,56 @@ import { networks } from '@relay-protocol/networks'
 const outputRootProofVersion =
   '0x0000000000000000000000000000000000000000000000000000000000000000' as const
 
-export const getGame = async (chainId: number, minL2BlockNumber: number) => {
+export const getGame = async (
+  chainId: number,
+  origin: string,
+  minL2BlockNumber: number
+) => {
   const abiCoder = new AbiCoder()
   const provider = await getProvider(chainId)
 
   const network = networks[chainId]
-  const disputeGameAddress = network.bridges.op!.disputeGame
-  const portalAddress = network.bridges.op!.portalProxy
+
+  // @ts-expect-error we know this is a bridge
+  const destinationContracts = network.bridges[origin]
+  if (!destinationContracts) {
+    throw new Error(`No destination contracts found for ${origin}`)
+  }
+  const disputeGameAddress = destinationContracts.disputeGame!
+  const portalAddress = destinationContracts.portalProxy!
 
   const disputeGameContract = new ethers.Contract(
-    disputeGameAddress!,
+    disputeGameAddress,
     DisputeGameFactory,
     provider
   )
-  const portal2Contract = new ethers.Contract(portalAddress!, Portal2, provider)
+  const portal2Contract = new ethers.Contract(portalAddress, Portal2, provider)
 
   const [gameCount, gameType] = await Promise.all([
     disputeGameContract.gameCount(),
     portal2Contract.respectedGameType(),
   ])
 
-  return (
-    await disputeGameContract.findLatestGames(
-      gameType,
-      BigInt(Math.max(0, Number(gameCount - 1n))),
-      BigInt(Math.min(100, Number(gameCount)))
-    )
-  ).filter((game: any) => {
+  const allGames = await disputeGameContract.findLatestGames(
+    gameType,
+    BigInt(Math.max(0, Number(gameCount - 1n))),
+    BigInt(Math.min(100, Number(gameCount)))
+  )
+
+  return allGames.find((game: any) => {
     const l2Block = abiCoder.decode(['uint256'], game[4])[0] as bigint
     return l2Block >= minL2BlockNumber
-  })[0]
+  })
 }
 
 export const buildProveWithdrawal = async (
-  network: number,
+  chainId: number,
   withdrawalTx: string,
   l1ChainId: number
 ) => {
   const abiCoder = new AbiCoder()
-  const provider = await getProvider(network)
+  const provider = await getProvider(chainId)
+  const network = networks[chainId]
 
   // Get receipt
   const receipt = await provider.getTransactionReceipt(withdrawalTx)
@@ -73,7 +84,7 @@ export const buildProveWithdrawal = async (
   const slot = ethers.keccak256(
     abiCoder.encode(['bytes32', 'uint256'], [withdrawalHash, 0n])
   )
-  const game = await getGame(l1ChainId, receipt!.blockNumber)
+  const game = await getGame(l1ChainId, network.slug, receipt!.blockNumber)
 
   // Get the block
   const gameBlockNumber = abiCoder.decode(['uint256'], game[4])[0] as bigint

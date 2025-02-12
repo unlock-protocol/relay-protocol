@@ -16,7 +16,7 @@ export const arbitrumOne: NetworkConfig = {
   isTestnet: false,
   l1ChainId: 1,
   name: 'Arbitrum',
-  slug: 'arbitrum',
+  slug: 'arb',
   assets: {
     udt: '0xd5d3aA404D7562d09a848F96a8a8d5D65977bF90',
     usdc: '0xaf88d065e77c8cC2239327C5EDb3A432268e5831',

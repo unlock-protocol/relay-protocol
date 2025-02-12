@@ -6,7 +6,7 @@ export const optimism: NetworkConfig = {
   hyperlaneMailbox: '0xd4C1905BB1D26BC93DAC913e13CaCC278CdCC80D',
   isTestnet: false,
   name: 'OP Mainnet',
-  slug: 'optimism',
+  slug: 'op',
   bridges: {
     op: {
       // All settings are hardcoded in the contract because they are shared between all networks!

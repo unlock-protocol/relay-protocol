@@ -11,6 +11,10 @@ export const sepolia: NetworkConfig = {
       portalProxy: '0x16Fc5058F25648194471939df75CF27A2fdC48BC',
       disputeGame: '0x05F9613aDB30026FFd634f38e5C4dFd30a197Fa1',
     },
+    base: {
+      portalProxy: '0x49f53e41452C74589E85cA1677426Ba426459e85',
+      disputeGame: '0xd6E6dBf4F7EA0ac412fD8b65ED297e64BB7a06E1',
+    },
     cctp: {
       domain: 0n,
       messenger: '0x9f3B8679c73C2Fef8b59B4f3444d4e156fb70AA5',
