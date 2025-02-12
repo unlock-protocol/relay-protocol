@@ -37,7 +37,7 @@ export default async function ({
     )
   }
 
-  // Update the RelayPool's totalFees field with the fee amount calculated.
+  // Update the RelayPool's totalBridgeFees field with the fee amount calculated.
   try {
     // Retrieve the RelayPool record based on the contract address that emitted the event
     const poolRecord = await context.db.findOne(relayPool, {
@@ -67,13 +67,13 @@ export default async function ({
     // Compute fee amount: fee = (amount * bridgeFee) / 10000
     const fee = (BigInt(amount) * BigInt(originRecord.bridgeFee)) / 10000n
 
-    // Update totalFees pool's total fees
-    const updatedTotalFees = BigInt(poolRecord.totalFees) + fee
+    // Update totalBridgeFees pool's total bridge fees
+    const updatedTotalBridgeFees = BigInt(poolRecord.totalBridgeFees) + fee
 
     await context.db
       .update(relayPool, { contractAddress: event.address })
-      .set({ totalFees: updatedTotalFees.toString() })
+      .set({ totalBridgeFees: updatedTotalBridgeFees.toString() })
   } catch (error) {
-    console.error(`Error updating RelayPool totalFees: ${error}`)
+    console.error(`Error updating RelayPool totalBridgeFees: ${error}`)
   }
 }
