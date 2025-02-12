@@ -13,7 +13,9 @@ const client = new Client({
 
 export const start = async () => {
   await client.connect()
-  const schema = await getLatestDatabaseSchema()
+  const schema = process.env.RAILWAY_PROJECT_ID
+    ? await getLatestDatabaseSchema()
+    : 'public' // local development
 
   return {
     database: client,
