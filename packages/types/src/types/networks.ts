@@ -19,6 +19,11 @@ export interface NetworkConfig {
       disputeGame?: string
       messagePasser?: string
     }
+    base?: {
+      portalProxy?: string
+      disputeGame?: string
+      messagePasser?: string
+    }
     zksync?: {
       l1SharedDefaultBridge: string
       l2SharedDefaultBridge: string
