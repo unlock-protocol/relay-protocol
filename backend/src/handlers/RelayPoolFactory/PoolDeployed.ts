@@ -1,5 +1,5 @@
 import { Context, Event } from 'ponder:registry'
-import { poolOrigin, relayPool, yieldPool } from 'ponder:schema'
+import { relayPool, yieldPool } from 'ponder:schema'
 import { erc20Abi } from 'viem'
 
 export default async function ({
@@ -54,6 +54,7 @@ export default async function ({
     outstandingDebt: BigInt(0),
     totalAssets: BigInt(0),
     totalShares: BigInt(0),
+    totalBridgeFees: BigInt(0),
     chainId: context.network.chainId,
     createdAt: BigInt(new Date().getTime()),
     createdAtBlock: event.block.number,
