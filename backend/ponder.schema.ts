@@ -236,6 +236,7 @@ export const vaultSnapshot = onchainTable(
     blockNumber: t.bigint().notNull(),
     timestamp: t.bigint().notNull(),
     sharePrice: t.numeric().notNull(),
+    yieldPoolSharePrice: t.numeric().notNull(),
   }),
   (table) => ({
     vaultChainIdx: index().on(table.vault, table.chainId),
