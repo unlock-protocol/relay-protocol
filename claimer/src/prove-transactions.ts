@@ -1,7 +1,5 @@
-import {
-  GET_ALL_BRIDGE_TRANSACTIONS_BY_TYPE,
-  RelayVaultService,
-} from '@relay-protocol/client'
+import { gql } from 'graphql-request'
+import { RelayVaultService } from '@relay-protocol/client'
 import { Client } from 'pg'
 import networks from '@relay-protocol/networks'
 import OPstack from './op'
@@ -17,9 +15,40 @@ export const proveTransactions = async ({
   schema: string
 }) => {
   const { bridgeTransactions } = await vaultService.query(
-    GET_ALL_BRIDGE_TRANSACTIONS_BY_TYPE,
+    gql`
+      query GetAllBridgeTransactionsToProve($nativeBridgeStatus: String!) {
+        bridgeTransactions(
+          where: {
+            nativeBridgeStatus: $nativeBridgeStatus
+            originChainId_in: $originChainIds
+            originTimestamp_gt: $originTimestamp
+          }
+        ) {
+          items {
+            originBridgeAddress
+            nonce
+            originChainId
+            destinationPoolAddress
+            destinationPoolChainId
+            originSender
+            destinationRecipient
+            asset
+            amount
+            hyperlaneMessageId
+            nativeBridgeStatus
+            nativeBridgeProofTxHash
+            nativeBridgeFinalizedTxHash
+            loanEmittedTxHash
+            originTimestamp
+            originTxHash
+          }
+        }
+      }
+    `,
     {
       nativeBridgeStatus: 'INITIATED',
+      originChainId_in: [], // Only the OP chains!
+      originTimestamp: new Date().getTime() - 1000 * 60 * 60 * 24 * 7,
     }
   )
   for (let i = 0; i < bridgeTransactions.items.length; i++) {
