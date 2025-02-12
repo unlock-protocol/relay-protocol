@@ -203,7 +203,7 @@ describe('OPStackNativeBridgeProxy:Base', function () {
       })
     })
 
-    it.only('should work for the base sequence using ERC20', async () => {
+    it('should work for the base sequence using ERC20', async () => {
       // We use ethereumAssets.udt for example as it has already been bridged to OP
       const [user] = await ethers.getSigners()
 
