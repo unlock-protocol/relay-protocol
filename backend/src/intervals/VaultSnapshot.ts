@@ -1,44 +1,54 @@
 /**
  * Vault Snapshot Handler
  *
- * This interval handler captures periodic snapshots of vault share prices at configured block intervals.
- * The snapshots track vault performance over time by recording share price history.
- *
- * For each vault (relay pool), it:
- * 1. Queries the current share price by calling convertToAssets(10^vaultDecimals) on the ERC4626 vault
- * 2. Creates a unique snapshot ID by combining the vault address and block number
- * 3. Records the snapshot with block metadata in the vaultSnapshot table
- *
- * The interval between snapshots is configured in ponder.config.ts via the VaultSnapshot block interval.
- * This provides a time series of share prices that can be used to analyze vault returns and performance.
+ * This interval handler captures periodic snapshots of both the vault's share price and the
+ * associated base yield pool's share price. For each vault (relay pool), it:
+ * 1. Retrieves the vault's share price by reading the decimals and computing the share unit
+ *    from the vault's contract.
+ * 2. Retrieves the yield pool's share price via its contract address stored in the vault record.
+ * 3. Creates a unique snapshot ID by combining the vault address, chain ID, and block number.
+ * 4. Stores the snapshot with block metadata in the vaultSnapshot table.
  */
 
 import { ponder } from 'ponder:registry'
 import { vaultSnapshot, relayPool } from 'ponder:schema'
+import { erc4626Abi, erc20Abi } from 'viem'
 
 ponder.on('VaultSnapshot:block', async ({ event, context }) => {
-  const vaults = await context.db.sql.select().from(relayPool).execute()
-
-  for (const vault of vaults) {
-    // retrieve the vault's decimals
-    const vaultDecimals = await context.client.readContract({
-      address: vault.contractAddress,
-      abi: context.contracts.RelayPool.abi,
+  // Helper function to fetch share price using a contract's address
+  async function fetchSharePrice(contractAddress: string) {
+    // Retrieve the contract's decimals
+    const decimals = await context.client.readContract({
+      address: contractAddress,
+      abi: erc20Abi,
       functionName: 'decimals',
     })
 
-    // calculate the share unit using the vault's decimals
-    const shareUnit = BigInt(10) ** BigInt(vaultDecimals)
+    // Calculate the share unit using the contract's decimals
+    const shareUnit = BigInt(10) ** BigInt(decimals)
 
-    // query the vault's current sharePrice from convertToAssets using the appropriate shareUnit
+    // Query the current share price from convertToAssets with the calculated share unit
     const sharePrice = await context.client.readContract({
-      address: vault.contractAddress,
-      abi: context.contracts.RelayPool.abi,
+      address: contractAddress,
+      abi: erc4626Abi,
       functionName: 'convertToAssets',
       args: [shareUnit],
     })
 
-    // Create a unique snapshot ID by combining chainId, vault address and block number
+    return sharePrice
+  }
+
+  // Retrieve all vaults from the relayPool table
+  const vaults = await context.db.sql.select().from(relayPool).execute()
+
+  for (const vault of vaults) {
+    // Fetch vault and yield pool share prices concurrently (they are independent)
+    const [vaultSharePrice, yieldPoolSharePrice] = await Promise.all([
+      fetchSharePrice(vault.contractAddress), // vault's own share price
+      fetchSharePrice(vault.yieldPool), // yield pool's share price
+    ])
+
+    // Create a unique snapshot ID by combining chainId, vault address (in lowercase), and block number
     const id = `${vault.chainId}-${vault.contractAddress.toLowerCase()}-${event.block.number}`
 
     const snapshot = {
@@ -47,7 +57,8 @@ ponder.on('VaultSnapshot:block', async ({ event, context }) => {
       chainId: vault.chainId,
       blockNumber: event.block.number,
       timestamp: event.block.timestamp,
-      sharePrice: sharePrice.toString(),
+      sharePrice: vaultSharePrice.toString(),
+      yieldPoolSharePrice: yieldPoolSharePrice.toString(),
     }
 
     await context.db.insert(vaultSnapshot).values(snapshot)
