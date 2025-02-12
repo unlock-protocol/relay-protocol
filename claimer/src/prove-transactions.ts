@@ -5,15 +5,16 @@ import {
 import { Client } from 'pg'
 import networks from '@relay-protocol/networks'
 import OPstack from './op'
-import { DB_SCHEMA } from './runner'
 
 // Take all transactions that are initiated and attempts to prove them!
 export const proveTransactions = async ({
   vaultService,
   database,
+  schema,
 }: {
   vaultService: RelayVaultService
   database: Client
+  schema: string
 }) => {
   const { bridgeTransactions } = await vaultService.query(
     GET_ALL_BRIDGE_TRANSACTIONS_BY_TYPE,
@@ -35,7 +36,7 @@ export const proveTransactions = async ({
         await database.query(
           `
           UPDATE 
-            "${DB_SCHEMA}"."bridge_transaction"
+            "${schema}"."bridge_transaction"
           SET 
             "native_bridge_status" = 'PROVEN', 
             "native_bridge_proof_tx_hash" = $1
