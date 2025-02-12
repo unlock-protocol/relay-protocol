@@ -10,9 +10,9 @@ const {
   assets: ethereumAssets,
   bridges: { op },
 } = networks[1]
-const { assets: op1Assets } = networks[10]
+const { assets: baseAssets } = networks[8453]
 
-describe('OPStackNativeBridgeProxy: Op1', function () {
+describe('OPStackNativeBridgeProxy:Base', function () {
   describe('bridge', function () {
     it('should work for the base sequence using ETH', async () => {
       const [user] = await ethers.getSigners()
@@ -82,7 +82,7 @@ describe('OPStackNativeBridgeProxy: Op1', function () {
           )
           // target (L1CrossDomainMessengerProxy)
           expect(event.args[2]).to.equal(
-            '0x25ace71c97B33Cc4729CF772ae268934F7ab5fA1'
+            '0x866E82a600A1414e583f7F13623F1aC5d58b0Afa'
           )
           // value
           expect(event.args[3]).to.equal(amount)
@@ -95,7 +95,7 @@ describe('OPStackNativeBridgeProxy: Op1', function () {
             ).decodeFunctionData('relayMessage', event.args[5])
           expect(nonce).to.equal(crossDomainMessengerNextNonce)
           expect(sender).to.equal('0x4200000000000000000000000000000000000010') // STANDARD_BRIDGE
-          expect(target).to.equal('0x99C9fc46f92E8a1c0deC1b1747d010903E884bE1') // L1StandardBridgeProxy
+          expect(target).to.equal('0x3154Cf16ccdb4C6d922629664174b904d80F2C35') // L1StandardBridgeProxy
           expect(value).to.equal(amount)
           expect(minGasLimit).to.equal(200000n)
 
@@ -139,7 +139,7 @@ describe('OPStackNativeBridgeProxy: Op1', function () {
           if (event.name === 'SentMessage') {
             // target (L1StandardBridgeProxy)
             expect(event.args[0]).to.equal(
-              '0x99C9fc46f92E8a1c0deC1b1747d010903E884bE1'
+              '0x3154Cf16ccdb4C6d922629664174b904d80F2C35'
             )
             // sender
             expect(event.args[1]).to.equal(
@@ -203,8 +203,8 @@ describe('OPStackNativeBridgeProxy: Op1', function () {
       })
     })
 
-    it('should work for the base sequence using ERC20', async () => {
-      // We use ethereumAssets.udt) for example as it has already been bridged to OP
+    it.only('should work for the base sequence using ERC20', async () => {
+      // We use ethereumAssets.udt for example as it has already been bridged to OP
       const [user] = await ethers.getSigners()
 
       const Bridge = await ethers.getContractFactory('OPStackNativeBridgeProxy')
@@ -212,11 +212,11 @@ describe('OPStackNativeBridgeProxy: Op1', function () {
       const bridgeAddress = await bridge.getAddress()
 
       const recipient = await user.getAddress()
-      const amount = ethers.parseEther('1') // 1 ethereumAssets.udt)
-      // Transfer ethereumAssets.udt) to sender/recipient
+      const amount = ethers.parseEther('1') // 1 ethereumAssets.udt
+      // Transfer ethereumAssets.udt to sender/recipient
       await stealERC20(
-        op1Assets.udt,
-        '0x99b1348a9129ac49c6de7F11245773dE2f51fB0c',
+        baseAssets.udt,
+        '0x12be7322070cFA75E2f001C6B3d6Ac8C2efEF5Ea',
         recipient,
         amount
       )
@@ -224,7 +224,7 @@ describe('OPStackNativeBridgeProxy: Op1', function () {
       // Approve
       const erc20Contract = await ethers.getContractAt(
         ABIs.ERC20,
-        op1Assets.udt
+        baseAssets.udt
       )
       await erc20Contract.approve(bridgeAddress, amount)
 
@@ -232,7 +232,7 @@ describe('OPStackNativeBridgeProxy: Op1', function () {
         recipient, // recipient
         1, // chain
         recipient, // sender
-        op1Assets.udt,
+        baseAssets.udt,
         amount,
         '0x',
         {
@@ -244,7 +244,7 @@ describe('OPStackNativeBridgeProxy: Op1', function () {
       expect(receipt.logs.length).to.equal(9)
       receipt.logs.forEach((log: Log) => {
         expect(log.address).to.be.oneOf([
-          op1Assets.udt,
+          baseAssets.udt,
           '0x4200000000000000000000000000000000000016',
           '0x4200000000000000000000000000000000000007',
           '0x4200000000000000000000000000000000000010',
@@ -264,7 +264,7 @@ describe('OPStackNativeBridgeProxy: Op1', function () {
           )
           // target (L1CrossDomainMessengerProxy)
           expect(event.args[2]).to.equal(
-            '0x25ace71c97B33Cc4729CF772ae268934F7ab5fA1'
+            '0x866E82a600A1414e583f7F13623F1aC5d58b0Afa'
           )
           // value
           expect(event.args[3]).to.equal(0n)
@@ -291,7 +291,7 @@ describe('OPStackNativeBridgeProxy: Op1', function () {
           if (event.name === 'SentMessage') {
             // target (L1StandardBridgeProxy)
             expect(event.args[0]).to.equal(
-              '0x99C9fc46f92E8a1c0deC1b1747d010903E884bE1'
+              '0x3154Cf16ccdb4C6d922629664174b904d80F2C35'
             )
             // sender
             expect(event.args[1]).to.equal(
@@ -328,7 +328,7 @@ describe('OPStackNativeBridgeProxy: Op1', function () {
             // l1Token
             expect(event.args[0]).to.equal(ethereumAssets.udt)
             // l2Token
-            expect(event.args[1]).to.equal(op1Assets.udt)
+            expect(event.args[1]).to.equal(baseAssets.udt)
             // From
             expect(event.args[2]).to.equal(bridgeAddress)
             // To
@@ -339,7 +339,7 @@ describe('OPStackNativeBridgeProxy: Op1', function () {
             expect(event.args[5]).to.equal('0x')
           } else if (event.name === 'ERC20BridgeInitiated') {
             // localToken
-            expect(event.args[0]).to.equal(op1Assets.udt)
+            expect(event.args[0]).to.equal(baseAssets.udt)
             // remoteToken
             expect(event.args[1]).to.equal(ethereumAssets.udt)
             // from

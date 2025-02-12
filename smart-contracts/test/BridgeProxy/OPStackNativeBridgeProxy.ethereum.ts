@@ -13,7 +13,7 @@ const {
   assets: { weth },
 } = networks[1]
 
-describe('OPStackNativeBridgeProxy', function () {
+describe('OPStackNativeBridgeProxy: Ethereum', function () {
   describe('claim', function () {
     it('should work for the base sequence using ETH', async () => {
       const parameters = {
