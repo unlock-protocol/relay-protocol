@@ -8,7 +8,8 @@
   "scripts": {
     "build": "yarn hardhat compile",
     "build:abis": "yarn hardhat export:abis",
-    "test": "yarn run test:optimism && yarn run test:hardhat && yarn run test:ethereum && yarn test:sepolia",
+    "test": "yarn run test:optimism && yarn run test:base && yarn run test:hardhat && yarn run test:ethereum && yarn test:sepolia",
+    "test:base": "RPC_URL=https://rpc.unlock-protocol.com/8453 yarn hardhat test test/**/*.base.ts",
     "test:hardhat": "yarn hardhat test test/**/*.hardhat.ts",
     "test:ethereum": "RPC_URL=https://rpc.unlock-protocol.com/1 yarn hardhat test test/**/*.ethereum.ts",
     "test:optimism": "RPC_URL=https://rpc.unlock-protocol.com/10 yarn hardhat test test/**/*.optimism.ts",
