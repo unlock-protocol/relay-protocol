@@ -37,6 +37,7 @@ export const relayPool = onchainTable(
     outstandingDebt: t.bigint().notNull(),
     totalAssets: t.bigint().notNull(),
     totalShares: t.bigint().notNull(),
+    totalFees: t.bigint().notNull(),
     chainId: t.integer().notNull(),
     createdAt: t.bigint().notNull(),
     createdAtBlock: t.bigint().notNull(),
