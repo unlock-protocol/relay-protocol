@@ -37,29 +37,29 @@ export default async function ({
     )
   }
 
-  // Update the RelayPool's totalBridgeFees field with the fee amount calculated.
+  // Update the RelayPool's totalBridgeFees field with the fee amount calculated
   try {
     // Retrieve the RelayPool record based on the contract address that emitted the event
-    const poolRecord = await context.db.findOne(relayPool, {
-      where: { contractAddress: event.address },
+    const poolRecord = await context.db.find(relayPool, {
+      contractAddress: event.log.address,
     })
     if (!poolRecord) {
-      console.warn(`RelayPool record not found for address ${event.address}.`)
+      console.warn(
+        `RelayPool record not found for address ${event.log.address}.`
+      )
       return
     }
 
     // Retrieve the corresponding poolOrigin record to obtain the bridgeFee
-    const originRecord = await context.db.findOne(poolOrigin, {
-      where: {
-        chainId: poolRecord.chainId,
-        pool: event.address,
-        originChainId: bridgeChainId,
-        originBridge: bridge,
-      },
+    const originRecord = await context.db.find(poolOrigin, {
+      chainId: poolRecord.chainId,
+      pool: event.log.address,
+      originChainId: bridgeChainId,
+      originBridge: bridge,
     })
     if (!originRecord) {
       console.warn(
-        `PoolOrigin record not found for pool ${event.address} with originChainId ${bridgeChainId} and originBridge ${bridge}.`
+        `PoolOrigin record not found for pool ${event.log.address} with originChainId ${bridgeChainId} and originBridge ${bridge}.`
       )
       return
     }
@@ -71,7 +71,7 @@ export default async function ({
     const updatedTotalBridgeFees = BigInt(poolRecord.totalBridgeFees) + fee
 
     await context.db
-      .update(relayPool, { contractAddress: event.address })
+      .update(relayPool, { contractAddress: event.log.address })
       .set({ totalBridgeFees: updatedTotalBridgeFees.toString() })
   } catch (error) {
     console.error(`Error updating RelayPool totalBridgeFees: ${error}`)
