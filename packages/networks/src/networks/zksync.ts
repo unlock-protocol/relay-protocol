@@ -1,6 +1,7 @@
-import { NetworkConfig } from '@relay-protocol/types'
+import { L2NetworkConfig } from '@relay-protocol/types'
 
-export const zksync: NetworkConfig = {
+export const zksync: L2NetworkConfig = {
+  stack: 'zksync',
   l1ChainId: 1,
   chainId: 324,
   isTestnet: false,

@@ -1,6 +1,8 @@
-import { NetworkConfig } from '@relay-protocol/types'
+import { L2NetworkConfig } from '@relay-protocol/types'
 
-export const zkSyncSepolia: NetworkConfig = {
+export const zkSyncSepolia: L2NetworkConfig = {
+  l1ChainId: 11155111,
+  stack: 'zksync',
   chainId: 300,
   hyperlaneMailbox: '0x1E45f767d51FA1Ec326d35e3BD4904fF0f30fCDa',
   isTestnet: true,
