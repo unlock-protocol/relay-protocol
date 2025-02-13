@@ -15,5 +15,5 @@ export default async function ({
       nativeBridgeStatus: 'PROVEN',
       nativeBridgeProofTxHash: event.transaction.hash,
     })
-    .where(eq(bridgeTransaction.originTxHash, event.args.withdrawalHash))
+    .where(eq(bridgeTransaction.opWithdrawalHash, event.args.withdrawalHash))
 }

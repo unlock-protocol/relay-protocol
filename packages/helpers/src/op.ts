@@ -54,6 +54,25 @@ export const getGame = async (
   })
 }
 
+export const getWithdrawalHash = async (
+  chainId: number,
+  withdrawalTx: string
+) => {
+  const provider = await getProvider(chainId)
+
+  // Get receipt
+  const receipt = await provider.getTransactionReceipt(withdrawalTx)
+
+  // Extract event
+  const event = await getEvent(
+    receipt!,
+    'MessagePassed',
+    new ethers.Interface(L2ToL1MessagePasserAbi)
+  )
+
+  return event.args.withdrawalHash
+}
+
 export const buildProveWithdrawal = async (
   chainId: number,
   withdrawalTx: string,

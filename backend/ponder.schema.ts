@@ -186,6 +186,9 @@ export const relayBridge = onchainTable('relay_bridge', (t) => ({
  * Origin transaction:
  * - originTimestamp: Block timestamp when bridge was initiated
  * - originTxHash: Transaction hash of the bridge initiation
+ *
+ * OP Specifics:
+ * - opWithdrawalHash: Withdrawal hash
  */
 export const bridgeTransaction = onchainTable(
   'bridge_transaction',
@@ -206,6 +209,7 @@ export const bridgeTransaction = onchainTable(
     loanEmittedTxHash: t.hex(),
     originTimestamp: t.bigint().notNull(),
     originTxHash: t.hex().notNull(),
+    opWithdrawalHash: t.hex(),
   }),
   (table) => ({
     pk: primaryKey({
@@ -218,6 +222,7 @@ export const bridgeTransaction = onchainTable(
     senderIdx: index().on(table.originSender),
     assetIdx: index().on(table.asset),
     originTxHashIdx: index().on(table.originTxHash),
+    opWithdrawalHashIdx: index().on(table.opWithdrawalHash),
   })
 )
 

@@ -10,7 +10,7 @@ export const optimism: L2NetworkConfig = {
   slug: 'op',
   bridges: {
     op: {
-      // All settings are hardcoded in the contract because they are shared between all networks!
+      messagePasser: '0x4200000000000000000000000000000000000016',
     },
     cctp: {
       domain: 2n,

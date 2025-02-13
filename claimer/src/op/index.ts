@@ -1,4 +1,7 @@
-import { buildProveWithdrawal } from '@relay-protocol/helpers'
+import {
+  buildProveWithdrawal,
+  getWithdrawalHash,
+} from '@relay-protocol/helpers'
 import { Portal2 } from '@relay-protocol/helpers/abis'
 
 import networks from '@relay-protocol/networks'
@@ -13,12 +16,12 @@ export const submitProof = async ({
   const destinationNetwork = networks[destinationPoolChainId.toString()]
 
   const signer = await getSignerForNetwork(destinationNetwork)
-
   const finalizeParams = await buildProveWithdrawal(
     originChainId,
     originTxHash,
     Number(destinationPoolChainId)
   )
+  console.log(finalizeParams)
 
   const portal = new ethers.Contract(
     destinationNetwork.bridges.op!.portalProxy!,
