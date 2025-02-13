@@ -1,6 +1,6 @@
 import { Context, Event } from 'ponder:registry'
 import { bridgeTransaction } from 'ponder:schema'
-import { Mailbox, L2ToL1MessagePasserAbi } from '@relay-protocol/helpers/abis'
+import * as ABIs from '@relay-protocol/helpers/abis'
 import networks from '@relay-protocol/networks'
 import { decodeEventLog } from 'viem'
 import { L2NetworkConfig } from '@relay-protocol/types'
@@ -27,7 +27,7 @@ export default async function ({
       log.address.toLowerCase() === networkConfig.hyperlaneMailbox.toLowerCase()
     ) {
       const event = decodeEventLog({
-        abi: Mailbox,
+        abi: ABIs.Mailbox,
         data: log.data,
         topics: log.topics,
       })
@@ -41,7 +41,7 @@ export default async function ({
         networkConfig.bridges.op?.messagePasser.toLowerCase()
     ) {
       const event = decodeEventLog({
-        abi: L2ToL1MessagePasserAbi,
+        abi: ABIs.L2ToL1MessagePasser,
         data: log.data,
         topics: log.topics,
       })
@@ -51,25 +51,6 @@ export default async function ({
       }
     }
   }
-
-  // if (networkConfig.stack === 'op') {
-  //   //
-
-  //   // Extract event
-  //   const event = await getEvent(
-  //     receipt!,
-  //     'MessagePassed',
-  //     new ethers.Interface(L2ToL1MessagePasserAbi)
-  //   )
-
-  //   return event.args.withdrawalHash
-
-  //   console.log(context.network.chainId, event.transaction.hash)
-  //   opWithdrawalHash = await getWithdrawalHash(
-  //     context.network.chainId,
-  //     event.transaction.hash
-  //   )
-  // }
 
   // Record bridge initiation
   await context.db.insert(bridgeTransaction).values({
