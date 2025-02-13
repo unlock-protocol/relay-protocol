@@ -21,6 +21,7 @@ export default async function ({
       originChainId: origin.chainId,
       originBridge: origin.bridge as `0x${string}`,
       maxDebt: origin.maxDebt,
+      currentOutstandingDebt: BigInt(0),
       curator: origin.curator,
       bridgeFee: origin.bridgeFee,
       coolDown: origin.coolDown,
