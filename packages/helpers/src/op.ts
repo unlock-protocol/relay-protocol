@@ -84,6 +84,9 @@ export const buildProveWithdrawal = async (
 
   // Get receipt
   const receipt = await provider.getTransactionReceipt(withdrawalTx)
+  if (!receipt) {
+    throw new Error('No receipt found for withdrawal transaction')
+  }
 
   // Extract event
   const event = await getEvent(
@@ -91,6 +94,9 @@ export const buildProveWithdrawal = async (
     'MessagePassed',
     new ethers.Interface(L2ToL1MessagePasserAbi)
   )
+  if (!event) {
+    throw new Error('No MessagePassed event found')
+  }
 
   const nonce = event.args.nonce // '1766847064778384329583297500742918515827483896875618958121606201292642338' // Get it from `MessagePassed` event's first arg
   const sender = event.args.sender //'0x4200000000000000000000000000000000000007' // Get it from `MessagePassed` event's second arg
@@ -105,10 +111,18 @@ export const buildProveWithdrawal = async (
     abiCoder.encode(['bytes32', 'uint256'], [withdrawalHash, 0n])
   )
   const game = await getGame(l1ChainId, network.stack, receipt!.blockNumber)
+  if (!game) {
+    throw new Error(
+      'No game found for withdrawal transaction. Is it too early?'
+    )
+  }
 
   // Get the block
   const gameBlockNumber = abiCoder.decode(['uint256'], game[4])[0] as bigint
   const block = await provider.getBlock(gameBlockNumber)
+  if (!block) {
+    throw new Error('No block found for withdrawal transaction game.')
+  }
 
   // Get the storage proof
   const proof = await provider.send('eth_getProof', [
@@ -161,6 +175,9 @@ export const buildFinalizeWithdrawal = async (
 
   // Get receipt
   const receipt = await provider.getTransactionReceipt(withdrawalTx)
+  if (!receipt) {
+    throw new Error('No receipt found for withdrawal transaction')
+  }
 
   // Extract event
   const event = await getEvent(
@@ -168,6 +185,9 @@ export const buildFinalizeWithdrawal = async (
     'MessagePassed',
     new ethers.Interface(L2ToL1MessagePasserAbi)
   )
+  if (!event) {
+    throw new Error('No MessagePassed event found')
+  }
 
   const nonce = event.args.nonce // '1766847064778384329583297500742918515827483896875618958121606201292642338' // Get it from `MessagePassed` event's first arg
   const sender = event.args.sender //'0x4200000000000000000000000000000000000007' // Get it from `MessagePassed` event's second arg
