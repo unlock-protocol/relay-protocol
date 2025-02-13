@@ -45,7 +45,6 @@ export default createConfig({
         ) as AbiEvent,
         parameter: 'pool',
       }),
-      startBlock: 7609300, // TODO: add to `getAddress` ?
     },
     RelayBridgeFactory: {
       abi: RelayBridgeFactory as Abi,
@@ -72,7 +71,6 @@ export default createConfig({
             ) as AbiEvent,
             parameter: 'bridge',
           }),
-          startBlock: 23446570,
         },
         baseSepolia: {
           address: factory({
@@ -82,7 +80,6 @@ export default createConfig({
             ) as AbiEvent,
             parameter: 'bridge',
           }),
-          startBlock: 21463700,
         },
         arbSepolia: {
           address: factory({
@@ -92,7 +89,6 @@ export default createConfig({
             ) as AbiEvent,
             parameter: 'bridge',
           }),
-          startBlock: 121036190,
         },
       },
     },
@@ -106,7 +102,6 @@ export default createConfig({
             networks['11155111']!.bridges!.op!.portalProxy! as `0x${string}`,
             networks['11155111']!.bridges!.base!.portalProxy! as `0x${string}`,
           ],
-          startBlock: 7600000,
         },
       },
     },
@@ -114,7 +109,6 @@ export default createConfig({
   blocks: {
     VaultSnapshot: {
       network: 'sepolia',
-      startBlock: 7609300,
       interval: 25, // ~5 minutes with 12s block time
     },
   },
