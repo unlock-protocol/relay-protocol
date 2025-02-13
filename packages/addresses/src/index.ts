@@ -37,6 +37,5 @@ export const getAddresses = () => {
       }
     }
   })
-  console.log(addresses)
   return addresses
 }
