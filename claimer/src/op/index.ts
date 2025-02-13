@@ -1,4 +1,7 @@
-import { buildProveWithdrawal } from '@relay-protocol/helpers'
+import {
+  buildProveWithdrawal,
+  getWithdrawalHash,
+} from '@relay-protocol/helpers'
 import { Portal2 } from '@relay-protocol/helpers/abis'
 
 import networks from '@relay-protocol/networks'
@@ -13,7 +16,6 @@ export const submitProof = async ({
   const destinationNetwork = networks[destinationPoolChainId.toString()]
 
   const signer = await getSignerForNetwork(destinationNetwork)
-
   const finalizeParams = await buildProveWithdrawal(
     originChainId,
     originTxHash,
@@ -31,6 +33,7 @@ export const submitProof = async ({
     finalizeParams.outputRootProof,
     finalizeParams.withdrawalProof
   )
+  await tx.wait()
   return tx.hash
 }
 

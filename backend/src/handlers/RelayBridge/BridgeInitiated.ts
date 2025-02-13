@@ -1,8 +1,9 @@
 import { Context, Event } from 'ponder:registry'
 import { bridgeTransaction } from 'ponder:schema'
-import { Mailbox } from '@relay-protocol/helpers/abis'
+import * as ABIs from '@relay-protocol/helpers/abis'
 import networks from '@relay-protocol/networks'
 import { decodeEventLog } from 'viem'
+import { L2NetworkConfig } from '@relay-protocol/types'
 
 export default async function ({
   event,
@@ -11,12 +12,13 @@ export default async function ({
   event: Event<'RelayBridge:BridgeInitiated'>
   context: Context<'RelayBridge:BridgeInitiated'>
 }) {
-  const networkConfig = networks[context.network.chainId]
+  const networkConfig = networks[context.network.chainId] as L2NetworkConfig
   const { nonce, sender, recipient, asset, amount, poolChainId, pool } =
     event.args
 
   // Parse logs to find the DispatchId event and extract hyperlaneMessageId
   let hyperlaneMessageId
+  let opWithdrawalHash
   const receipt = await context.client.getTransactionReceipt({
     hash: event.transaction.hash,
   })
@@ -25,13 +27,27 @@ export default async function ({
       log.address.toLowerCase() === networkConfig.hyperlaneMailbox.toLowerCase()
     ) {
       const event = decodeEventLog({
-        abi: Mailbox,
+        abi: ABIs.Mailbox,
         data: log.data,
         topics: log.topics,
       })
 
       if (event.eventName === 'DispatchId') {
         hyperlaneMessageId = event.args.messageId
+      }
+    } else if (
+      networkConfig.bridges.op?.messagePasser &&
+      log.address.toLowerCase() ===
+        networkConfig.bridges.op?.messagePasser.toLowerCase()
+    ) {
+      const event = decodeEventLog({
+        abi: ABIs.L2ToL1MessagePasser,
+        data: log.data,
+        topics: log.topics,
+      })
+
+      if (event.eventName === 'MessagePassed') {
+        opWithdrawalHash = event.args.withdrawalHash
       }
     }
   }
@@ -69,5 +85,8 @@ export default async function ({
     // Origin transaction details
     originTimestamp: event.block.timestamp,
     originTxHash: event.transaction.hash,
+
+    // OP Specifics
+    opWithdrawalHash,
   })
 }

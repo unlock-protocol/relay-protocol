@@ -1,6 +1,7 @@
-import { NetworkConfig } from '@relay-protocol/types'
+import { L2NetworkConfig } from '@relay-protocol/types'
 
-export const base: NetworkConfig = {
+export const base: L2NetworkConfig = {
+  stack: 'op',
   l1ChainId: 1,
   chainId: 8453,
   isTestnet: false,
@@ -9,7 +10,7 @@ export const base: NetworkConfig = {
   hyperlaneMailbox: '0xeA87ae93Fa0019a82A727bfd3eBd1cFCa8f64f1D',
   bridges: {
     op: {
-      // All settings are hardcoded in the contract because they are shared between all networks!
+      messagePasser: '0x4200000000000000000000000000000000000016',
     },
     cctp: {
       domain: 6n,
@@ -20,9 +21,6 @@ export const base: NetworkConfig = {
   assets: {
     usdc: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913',
     udt: '0xD7eA82D19f1f59FF1aE95F1945Ee6E6d86A25B96',
-  },
-  uniswapV3: {
-    universalRouterAddress: '0x198EF79F1F515F02dFE9e3115eD9fC07183f02fC',
   },
   rpc: ['https://rpc.unlock-protocol.com/8453'],
 }

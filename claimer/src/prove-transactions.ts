@@ -1,23 +1,19 @@
 import { gql } from 'graphql-request'
 import { RelayVaultService } from '@relay-protocol/client'
-import { Client } from 'pg'
 import networks from '@relay-protocol/networks'
 import OPstack from './op'
+import { L2NetworkConfig } from '@relay-protocol/types'
 
 // Take all transactions that are initiated and attempts to prove them!
 export const proveTransactions = async ({
   vaultService,
-  database,
-  schema,
 }: {
   vaultService: RelayVaultService
-  database: Client
-  schema: string
 }) => {
   const { bridgeTransactions } = await vaultService.query(
     gql`
-      query GetAllBridgeTransactionsToProve($nativeBridgeStatus: String!) {
-        bridgeTransactions(
+    query GetAllBridgeTransactionsToProve($nativeBridgeStatus: String!, $originChainIds: [Int], $originTimestamp: BigInt!) {
+      bridgeTransactions(
           where: {
             nativeBridgeStatus: $nativeBridgeStatus
             originChainId_in: $originChainIds
@@ -47,8 +43,10 @@ export const proveTransactions = async ({
     `,
     {
       nativeBridgeStatus: 'INITIATED',
-      originChainId_in: [], // Only the OP chains!
-      originTimestamp: new Date().getTime() - 1000 * 60 * 60 * 24 * 7,
+      originChainIds: Object.values(networks)
+        .filter((n as L2NetworkConfig) => n.stack === 'op')
+        .map((n) => n.chainId), // Only the OP chains!
+      originTimestamp: 10, // 30 minutes required for OP proofs
     }
   )
   for (let i = 0; i < bridgeTransactions.items.length; i++) {
@@ -60,19 +58,7 @@ export const proveTransactions = async ({
       const destinationNetwork =
         networks[bridgeTransaction.destinationPoolChainId.toString()]
       if (destinationNetwork.bridges.op?.portalProxy) {
-        const hash = await OPstack.submitProof(bridgeTransaction)
-        // Update the bridge transaction status!
-        await database.query(
-          `
-          UPDATE 
-            "${schema}"."bridge_transaction"
-          SET 
-            "native_bridge_status" = 'PROVEN', 
-            "native_bridge_proof_tx_hash" = $1
-          WHERE 
-            "origin_tx_hash" = $2;`,
-          [hash, bridgeTransaction.originTxHash]
-        )
+        await OPstack.submitProof(bridgeTransaction)
       }
     } catch (error) {
       console.error(error)

@@ -1,6 +1,16 @@
+export interface L1NetworkConfig extends NetworkConfig {
+  uniswapV3: {
+    universalRouterAddress: string
+  }
+}
+
+export interface L2NetworkConfig extends NetworkConfig {
+  l1ChainId: number | bigint
+  stack: 'op' | 'arb' | 'zksync'
+}
+
 export interface NetworkConfig {
   chainId: number | bigint
-  l1ChainId?: number | bigint
   name: string
   slug: string
   bridges: {
@@ -33,9 +43,6 @@ export interface NetworkConfig {
   hyperlaneMailbox: string
   isTestnet: boolean
   assets: NetworkAssets
-  uniswapV3?: {
-    universalRouterAddress: string
-  }
   rpc: [string, ...string[]]
 }
 

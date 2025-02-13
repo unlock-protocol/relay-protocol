@@ -1,6 +1,7 @@
-import { NetworkConfig } from '@relay-protocol/types'
+import { L2NetworkConfig } from '@relay-protocol/types'
 
-export const baseSepolia: NetworkConfig = {
+export const baseSepolia: L2NetworkConfig = {
+  stack: 'op',
   l1ChainId: 11155111,
   chainId: 84532,
   hyperlaneMailbox: '0x6966b0E55883d49BFB24539356a2f8A673E02039',
@@ -9,7 +10,7 @@ export const baseSepolia: NetworkConfig = {
   slug: 'base-sepolia',
   bridges: {
     op: {
-      // All settings are hardcoded in the contract because they are shared between all networks!
+      messagePasser: '0x4200000000000000000000000000000000000016',
     },
     cctp: {
       domain: 6n,
