@@ -21,7 +21,6 @@ export const submitProof = async ({
     originTxHash,
     Number(destinationPoolChainId)
   )
-  console.log(finalizeParams)
 
   const portal = new ethers.Contract(
     destinationNetwork.bridges.op!.portalProxy!,
