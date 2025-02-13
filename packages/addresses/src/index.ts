@@ -1,8 +1,12 @@
 import fs from 'fs'
 
-const addresses: { [string]: any } = {}
+interface Addresses {
+  [address: string]: any
+}
 
-const basePath = __dirname + '/../../ignition/deployments/'
+const addresses: Addresses = {}
+
+const basePath = __dirname + '/../../../smart-contracts/ignition/deployments/'
 export const getAddressForFile = (file: string) => {
   const deployments = JSON.parse(fs.readFileSync(basePath + file, 'utf-8'))
   return Object.values(deployments)[0]
@@ -33,5 +37,6 @@ export const getAddresses = () => {
       }
     }
   })
+  console.log(addresses)
   return addresses
 }

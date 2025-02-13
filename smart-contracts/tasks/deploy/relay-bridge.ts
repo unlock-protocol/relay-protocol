@@ -1,7 +1,7 @@
 import { task } from 'hardhat/config'
 import { networks } from '@relay-protocol/networks'
 import { AutoComplete } from 'enquirer'
-import { getAddresses } from '../../lib/utils/deployed'
+import { getAddresses } from '@relay-protocol/addresses'
 import { getEvent } from '@relay-protocol/helpers'
 
 task('deploy:relay-bridge', 'Deploy a bridge proxy')
