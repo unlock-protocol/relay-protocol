@@ -1,7 +1,4 @@
-import {
-  buildProveWithdrawal,
-  getWithdrawalHash,
-} from '@relay-protocol/helpers'
+import { buildProveWithdrawal } from '@relay-protocol/helpers'
 import { Portal2 } from '@relay-protocol/helpers/abis'
 
 import networks from '@relay-protocol/networks'
@@ -37,6 +34,15 @@ export const submitProof = async ({
   return tx.hash
 }
 
+export const claimWithdrawal = async (bridgeTransaction) => {
+  console.log('OP Claim me!')
+  console.log(bridgeTransaction)
+  const originNetwork = networks[bridgeTransaction.originChainId]
+  const destinationNetwork = networks[bridgeTransaction.destinationPoolChainId]
+  // const pool = new ethers.Contract()
+}
+
 export default {
   submitProof,
+  claimWithdrawal,
 }
