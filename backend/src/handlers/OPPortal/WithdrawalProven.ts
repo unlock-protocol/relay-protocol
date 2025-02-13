@@ -9,16 +9,11 @@ export default async function ({
   event: Event<'RelayBridge:WithdrawalProven'>
   context: Context<'RelayBridge:WithdrawalProven'>
 }) {
-  const transactions = await context.db.sql
-    .select()
-    .from(bridgeTransaction)
+  await context.db.sql
+    .update(bridgeTransaction)
+    .set({
+      nativeBridgeStatus: 'PROVEN',
+      nativeBridgeProofTxHash: event.transaction.hash,
+    })
     .where(eq(bridgeTransaction.originTxHash, event.args.withdrawalHash))
-  if (transactions.length > 0) {
-    await context.db
-      .update(bridgeTransaction, { originTxHash: event.args.withdrawalHash })
-      .set({
-        nativeBridgeStatus: 'PROVEN',
-        nativeBridgeProofTxHash: event.transaction.hash,
-      })
-  }
 }
