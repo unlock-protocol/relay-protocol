@@ -55,7 +55,7 @@ export const proveTransactions = async ({
     GET_ALL_TRANSACTIONS_TO_PROVE,
     {
       nativeBridgeStatus: 'INITIATED',
-      originTimestamp: Math.floor(new Date().getTime() / 1000) - 60 * 30, // 30 minutes required for OP proofs
+      originTimestamp: Math.floor(new Date().getTime() / 1000) - 60 * 30, // 30 minutes required for OP proofs: TODO:  move to config since some networks may have different rules?
       originChainIds: OpChains,
     }
   )
