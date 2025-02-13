@@ -1,6 +1,6 @@
-import { NetworkConfig } from '@relay-protocol/types'
+import { L1NetworkConfig } from '@relay-protocol/types'
 
-export const ethereum: NetworkConfig = {
+export const ethereum: L1NetworkConfig = {
   bridges: {
     arb: {
       outbox: '0x0B9857ae2D4A3DBe74ffE1d7DF045bb7F96E4840',

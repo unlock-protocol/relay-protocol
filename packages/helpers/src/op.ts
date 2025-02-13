@@ -7,6 +7,7 @@ import DisputeGameFactory from './abis/op/DisputeGameFactory.json'
 import { getProvider } from './provider'
 
 import { networks } from '@relay-protocol/networks'
+import { L2NetworkConfig } from '@relay-protocol/types'
 
 const outputRootProofVersion =
   '0x0000000000000000000000000000000000000000000000000000000000000000' as const
@@ -60,7 +61,7 @@ export const buildProveWithdrawal = async (
 ) => {
   const abiCoder = new AbiCoder()
   const provider = await getProvider(chainId)
-  const network = networks[chainId]
+  const network = networks[chainId] as L2NetworkConfig
 
   // Get receipt
   const receipt = await provider.getTransactionReceipt(withdrawalTx)
@@ -84,7 +85,7 @@ export const buildProveWithdrawal = async (
   const slot = ethers.keccak256(
     abiCoder.encode(['bytes32', 'uint256'], [withdrawalHash, 0n])
   )
-  const game = await getGame(l1ChainId, network.slug, receipt!.blockNumber)
+  const game = await getGame(l1ChainId, network.stack, receipt!.blockNumber)
 
   // Get the block
   const gameBlockNumber = abiCoder.decode(['uint256'], game[4])[0] as bigint

@@ -1,4 +1,5 @@
 import { createConfig, factory } from 'ponder'
+import { Portal2 } from '@relay-protocol/helpers/abis'
 
 import {
   RelayPool,
@@ -21,6 +22,7 @@ export default createConfig({
     arbSepolia: createNetworkConfig(421614),
   },
   contracts: {
+    // Relay contracts
     RelayPoolFactory: {
       abi: RelayPoolFactory as Abi,
       network: {
@@ -87,6 +89,20 @@ export default createConfig({
             parameter: 'bridge',
           }),
           startBlock: 121036190,
+        },
+      },
+    },
+
+    // Third-party contracts
+    OPPortal: {
+      abi: Portal2,
+      network: {
+        sepolia: {
+          address: [
+            '0x16Fc5058F25648194471939df75CF27A2fdC48BC',
+            '0x49f53e41452C74589E85cA1677426Ba426459e85',
+          ],
+          startBlock: 7600000,
         },
       },
     },

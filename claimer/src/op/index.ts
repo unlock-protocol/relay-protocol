@@ -31,6 +31,7 @@ export const submitProof = async ({
     finalizeParams.outputRootProof,
     finalizeParams.withdrawalProof
   )
+  await tx.wait()
   return tx.hash
 }
 

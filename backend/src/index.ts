@@ -25,6 +25,7 @@ import BridgeInitiated from './handlers/RelayBridge/BridgeInitiated'
 import OriginAdded from './handlers/RelayPool/OriginAdded'
 import LoanEmitted from './handlers/RelayPool/LoanEmitted'
 import OutstandingDebtChanged from './handlers/RelayPool/OutstandingDebtChanged'
+import WithdrawalProven from './handlers/OPPortal/WithdrawalProven'
 
 // ============= RelayPool Events =============
 
@@ -92,3 +93,8 @@ ponder.on('RelayPool:LoanEmitted', LoanEmitted)
  * Handles the change of the outstanding debt of a relay pool
  */
 ponder.on('RelayPool:OutstandingDebtChanged', OutstandingDebtChanged)
+
+/**
+ * Handles proven withdrawals from the OP portal
+ */
+ponder.on('OPPortal:WithdrawalProven', WithdrawalProven)

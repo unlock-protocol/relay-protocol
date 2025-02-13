@@ -1,6 +1,7 @@
-import { NetworkConfig } from '@relay-protocol/types'
+import { L2NetworkConfig } from '@relay-protocol/types'
 
-export const optimism: NetworkConfig = {
+export const optimism: L2NetworkConfig = {
+  stack: 'op',
   l1ChainId: 1,
   chainId: 10,
   hyperlaneMailbox: '0xd4C1905BB1D26BC93DAC913e13CaCC278CdCC80D',
@@ -21,9 +22,6 @@ export const optimism: NetworkConfig = {
     udt: '0xc709c9116dBf29Da9c25041b13a07A0e68aC5d2D',
     usdc: '0x0b2C639c533813f4Aa9D7837CAf62653d097Ff85',
     weth: '0x4200000000000000000000000000000000000006',
-  },
-  uniswapV3: {
-    universalRouterAddress: '0xb555edF5dcF85f42cEeF1f3630a52A108E55A654',
   },
   rpc: ['https://rpc.unlock-protocol.com/10'],
 }

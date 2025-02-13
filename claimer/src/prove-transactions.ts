@@ -2,19 +2,14 @@ import {
   GET_ALL_BRIDGE_TRANSACTIONS_BY_TYPE,
   RelayVaultService,
 } from '@relay-protocol/client'
-import { Client } from 'pg'
 import networks from '@relay-protocol/networks'
 import OPstack from './op'
 
 // Take all transactions that are initiated and attempts to prove them!
 export const proveTransactions = async ({
   vaultService,
-  database,
-  schema,
 }: {
   vaultService: RelayVaultService
-  database: Client
-  schema: string
 }) => {
   const { bridgeTransactions } = await vaultService.query(
     GET_ALL_BRIDGE_TRANSACTIONS_BY_TYPE,
@@ -31,19 +26,7 @@ export const proveTransactions = async ({
       const destinationNetwork =
         networks[bridgeTransaction.destinationPoolChainId.toString()]
       if (destinationNetwork.bridges.op?.portalProxy) {
-        const hash = await OPstack.submitProof(bridgeTransaction)
-        // Update the bridge transaction status!
-        await database.query(
-          `
-          UPDATE 
-            "${schema}"."bridge_transaction"
-          SET 
-            "native_bridge_status" = 'PROVEN', 
-            "native_bridge_proof_tx_hash" = $1
-          WHERE 
-            "origin_tx_hash" = $2;`,
-          [hash, bridgeTransaction.originTxHash]
-        )
+        await OPstack.submitProof(bridgeTransaction)
       }
     } catch (error) {
       console.error(error)

@@ -1,6 +1,6 @@
-import { NetworkConfig } from '@relay-protocol/types'
+import { L1NetworkConfig } from '@relay-protocol/types'
 
-export const sepolia: NetworkConfig = {
+export const sepolia: L1NetworkConfig = {
   bridges: {
     arb: {
       outbox: '0x65f07C7D521164a4d5DaC6eB8Fac8DA067A3B78F',
@@ -38,4 +38,7 @@ export const sepolia: NetworkConfig = {
     weth: '0x7b79995e5f793A07Bc00c21412e50Ecae098E7f9',
   },
   rpc: ['https://rpc.unlock-protocol.com/11155111'],
+  uniswapV3: {
+    universalRouterAddress: '0x3fC91A3afd70395Cd496C647d5a6CC9D4B2b7FAD',
+  },
 }

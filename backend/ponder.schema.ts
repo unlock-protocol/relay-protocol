@@ -217,6 +217,7 @@ export const bridgeTransaction = onchainTable(
     ),
     senderIdx: index().on(table.originSender),
     assetIdx: index().on(table.asset),
+    originTxHashIdx: index().on(table.originTxHash),
   })
 )
 
