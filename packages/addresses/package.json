@@ -11,15 +11,19 @@
     }
   },
   "scripts": {
+    "generate": "tsx bin/generateAddressFile.ts",
     "build": "tsup src/index.ts --dts --format esm,cjs",
     "clean": "rm -rf dist",
     "lint:fix": "yarn lint --fix",
     "lint": "eslint"
   },
   "dependencies": {
+    "@relay-protocol/helpers": "workspace:*",
+    "ethers": "6.13.5",
     "graphql": "16.10.0",
     "graphql-request": "7.1.2",
-    "graphql-tag": "2.12.6"
+    "graphql-tag": "2.12.6",
+    "tsx": "4.19.2"
   },
   "devDependencies": {
     "@relay-protocol/eslint-config": "workspace:^",

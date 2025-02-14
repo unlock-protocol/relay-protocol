@@ -2880,14 +2880,17 @@ __metadata:
   resolution: "@relay-protocol/addresses@workspace:packages/addresses"
   dependencies:
     "@relay-protocol/eslint-config": "workspace:^"
+    "@relay-protocol/helpers": "workspace:*"
     "@relay-protocol/tsconfig": "workspace:./packages/tsconfig"
     "@relay-protocol/types": "workspace:./packages/types"
     "@types/node": "npm:22.13.0"
     eslint: "npm:9.19.0"
+    ethers: "npm:6.13.5"
     graphql: "npm:16.10.0"
     graphql-request: "npm:7.1.2"
     graphql-tag: "npm:2.12.6"
     tsup: "npm:8.3.6"
+    tsx: "npm:4.19.2"
     typescript: "npm:5.7.3"
   languageName: unknown
   linkType: soft
