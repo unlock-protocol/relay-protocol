@@ -41,15 +41,9 @@ export const claimTransactions = async ({
       originTimestamp: Math.floor(new Date().getTime() / 1000) - 60 * 60 * 24, // TODO:  move to config since some networks may have different rules?
     }
   )
-  for (let i = 1; i < bridgeTransactions.items.length; i++) {
+  for (let i = 0; i < bridgeTransactions.items.length; i++) {
+    const bridgeTransaction = bridgeTransactions.items[i]
     try {
-      const bridgeTransaction = bridgeTransactions.items[i]
-      console.log('')
-      console.log('')
-      console.log('____')
-      console.log(bridgeTransaction)
-      // console.log(bridgeTransaction.originChainId)
-
       // TODO: use `proxyBridge` to identify which underlying bridge was actually used and
       // how to process it.
 
@@ -68,6 +62,7 @@ export const claimTransactions = async ({
       }
     } catch (error) {
       console.error(error)
+      console.log(bridgeTransaction)
     }
   }
 }
