@@ -13,7 +13,7 @@ export default async function ({
     .update(bridgeTransaction)
     .set({
       nativeBridgeStatus: 'PROVEN',
-      nativeBridgeProofTxHash: event.transaction.hash,
+      opProofTxHash: event.transaction.hash,
     })
     .where(
       and(

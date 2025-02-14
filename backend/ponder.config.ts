@@ -114,10 +114,10 @@ export default createConfig({
       },
     },
   },
-  // blocks: {
-  //   VaultSnapshot: {
-  //     network: 'sepolia',
-  //     interval: 25, // ~5 minutes with 12s block time
-  //   },
-  // },
+  blocks: {
+    VaultSnapshot: {
+      network: 'sepolia',
+      interval: 25, // ~5 minutes with 12s block time
+    },
+  },
 })

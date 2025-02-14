@@ -9,13 +9,12 @@ export default async function ({
   event: Event<'RelayBridge:OutBoxTransactionExecuted'>
   context: Context<'RelayBridge:OutBoxTransactionExecuted'>
 }) {
-  // 0x22e9C539f31f403C81119De9e630D8fB18BC5964
-  // console.log('OutBoxTransactionExecuted', event.args)
-  if (
-    event.args.l2Sender.toLowerCase() ===
-    '0x22e9c539f31f403c81119de9e630d8fb18bc5964'.toLocaleLowerCase()
-  ) {
-    console.log('OutBoxTransactionExecuted', event.args)
-    // process.exit()
-  }
+  await context.db.sql
+    .update(bridgeTransaction)
+    .set({
+      nativeBridgeStatus: 'FINALIZED',
+    })
+    .where(
+      eq(bridgeTransaction.arbTransactionIndex, event.args.transactionIndex)
+    )
 }

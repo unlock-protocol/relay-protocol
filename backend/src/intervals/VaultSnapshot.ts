@@ -14,53 +14,53 @@ import { ponder } from 'ponder:registry'
 import { vaultSnapshot, relayPool } from 'ponder:schema'
 import { erc4626Abi, erc20Abi } from 'viem'
 
-// ponder.on('VaultSnapshot:block', async ({ event, context }) => {
-//   // Helper function to fetch share price using a contract's address
-//   async function fetchSharePrice(contractAddress: string) {
-//     // Retrieve the contract's decimals
-//     const decimals = await context.client.readContract({
-//       address: contractAddress,
-//       abi: erc20Abi,
-//       functionName: 'decimals',
-//     })
+ponder.on('VaultSnapshot:block', async ({ event, context }) => {
+  // Helper function to fetch share price using a contract's address
+  async function fetchSharePrice(contractAddress: string) {
+    // Retrieve the contract's decimals
+    const decimals = await context.client.readContract({
+      address: contractAddress,
+      abi: erc20Abi,
+      functionName: 'decimals',
+    })
 
-//     // Calculate the share unit using the contract's decimals
-//     const shareUnit = BigInt(10) ** BigInt(decimals)
+    // Calculate the share unit using the contract's decimals
+    const shareUnit = BigInt(10) ** BigInt(decimals)
 
-//     // Query the current share price from convertToAssets with the calculated share unit
-//     const sharePrice = await context.client.readContract({
-//       address: contractAddress,
-//       abi: erc4626Abi,
-//       functionName: 'convertToAssets',
-//       args: [shareUnit],
-//     })
+    // Query the current share price from convertToAssets with the calculated share unit
+    const sharePrice = await context.client.readContract({
+      address: contractAddress,
+      abi: erc4626Abi,
+      functionName: 'convertToAssets',
+      args: [shareUnit],
+    })
 
-//     return sharePrice
-//   }
+    return sharePrice
+  }
 
-//   // Retrieve all vaults from the relayPool table
-//   const vaults = await context.db.sql.select().from(relayPool).execute()
+  // Retrieve all vaults from the relayPool table
+  const vaults = await context.db.sql.select().from(relayPool).execute()
 
-//   for (const vault of vaults) {
-//     // Fetch vault and yield pool share prices concurrently (they are independent)
-//     const [vaultSharePrice, yieldPoolSharePrice] = await Promise.all([
-//       fetchSharePrice(vault.contractAddress), // vault's own share price
-//       fetchSharePrice(vault.yieldPool), // yield pool's share price
-//     ])
+  for (const vault of vaults) {
+    // Fetch vault and yield pool share prices concurrently (they are independent)
+    const [vaultSharePrice, yieldPoolSharePrice] = await Promise.all([
+      fetchSharePrice(vault.contractAddress), // vault's own share price
+      fetchSharePrice(vault.yieldPool), // yield pool's share price
+    ])
 
-//     // Create a unique snapshot ID by combining chainId, vault address (in lowercase), and block number
-//     const id = `${vault.chainId}-${vault.contractAddress.toLowerCase()}-${event.block.number}`
+    // Create a unique snapshot ID by combining chainId, vault address (in lowercase), and block number
+    const id = `${vault.chainId}-${vault.contractAddress.toLowerCase()}-${event.block.number}`
 
-//     const snapshot = {
-//       id,
-//       vault: vault.contractAddress,
-//       chainId: vault.chainId,
-//       blockNumber: event.block.number,
-//       timestamp: event.block.timestamp,
-//       sharePrice: vaultSharePrice.toString(),
-//       yieldPoolSharePrice: yieldPoolSharePrice.toString(),
-//     }
+    const snapshot = {
+      id,
+      vault: vault.contractAddress,
+      chainId: vault.chainId,
+      blockNumber: event.block.number,
+      timestamp: event.block.timestamp,
+      sharePrice: vaultSharePrice.toString(),
+      yieldPoolSharePrice: yieldPoolSharePrice.toString(),
+    }
 
-//     await context.db.insert(vaultSnapshot).values(snapshot)
-//   }
-// })
+    await context.db.insert(vaultSnapshot).values(snapshot)
+  }
+})
