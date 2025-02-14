@@ -4,7 +4,7 @@ import { claimTransactions } from './src/claim-withdrawals'
 
 const run = async () => {
   const { vaultService } = await start()
-  await proveTransactions({ vaultService })
+  // await proveTransactions({ vaultService })
   await claimTransactions({ vaultService })
   await stop()
   console.log('Done!')

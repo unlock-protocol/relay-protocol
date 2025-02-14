@@ -17,31 +17,26 @@ export const submitProof = async ({
   const destinationNetwork = networks[destinationPoolChainId.toString()]
 
   const signer = await getSignerForNetwork(destinationNetwork)
-  const finalizeParams = await buildProveWithdrawal(
+  const proveParams = await buildProveWithdrawal(
     originChainId,
     originTxHash,
     Number(destinationPoolChainId)
   )
 
-  const portal = new ethers.Contract(
-    finalizeParams.portalAddress,
-    Portal2,
-    signer
-  )
+  const portal = new ethers.Contract(proveParams.portalAddress, Portal2, signer)
   const tx = await portal.proveWithdrawalTransaction(
-    finalizeParams.transaction,
-    finalizeParams.disputeGameIndex,
-    finalizeParams.outputRootProof,
-    finalizeParams.withdrawalProof
+    proveParams.transaction,
+    proveParams.disputeGameIndex,
+    proveParams.outputRootProof,
+    proveParams.withdrawalProof
   )
   await tx.wait()
   return tx.hash
 }
 
 export const claimWithdrawal = async (bridgeTransaction) => {
-  // console.log('OP Claim me!')
   const destinationNetwork = networks[bridgeTransaction.destinationPoolChainId]
-  // Get the relaypool contract
+
   const signer = await getSignerForNetwork(destinationNetwork)
   const relayPool = new ethers.Contract(
     bridgeTransaction.destinationPoolAddress,
@@ -49,32 +44,45 @@ export const claimWithdrawal = async (bridgeTransaction) => {
     signer
   )
 
-  const finalizeParams = await buildFinalizeWithdrawal(
+  const proveParams = await buildProveWithdrawal(
     bridgeTransaction.originChainId,
-    bridgeTransaction.originTxHash
+    bridgeTransaction.originTxHash,
+    Number(bridgeTransaction.destinationPoolChainId)
   )
-  // Let's get the submitter by looking at the proof tx!
+  const portal = new ethers.Contract(proveParams.portalAddress, Portal2, signer)
 
-  console.log(bridgeTransaction.nativeBridgeProofTxHash)
+  // Let's get the submitter by looking at the proof tx!
   const receipt = await signer.provider!.getTransactionReceipt(
     bridgeTransaction.nativeBridgeProofTxHash
   )
   if (!receipt) {
     throw new Error('Proof tx not found')
   }
-  const claimParams = new AbiCoder().encode(
-    ['bytes', 'address'],
-    [finalizeParams, receipt.from] // Hum, we need to the submitted address (it should be us though)
-  )
+  console.log(receipt)
 
-  const tx = await relayPool.claim(
-    bridgeTransaction.originChainId,
-    bridgeTransaction.originBridgeAddress,
-    claimParams
+  // Check status of withdrawal!
+  const status = await portal.checkWithdrawal(
+    proveParams.withdrawalHash,
+    receipt.from
   )
-  console.log('Claim tx:', tx.hash)
-  // Send `claim` transaction!
-  // And that's it~
+  console.log({ status })
+
+  // const finalizeParams = await buildFinalizeWithdrawal(
+  //   bridgeTransaction.originChainId,
+  //   bridgeTransaction.originTxHash
+  // )
+
+  // const claimParams = new AbiCoder().encode(
+  //   ['bytes', 'address'],
+  //   [finalizeParams, receipt.from] // Hum, we need to the submitted address (it should be us though)
+  // )
+
+  // const tx = await relayPool.claim(
+  //   bridgeTransaction.originChainId,
+  //   bridgeTransaction.originBridgeAddress,
+  //   claimParams
+  // )
+  // console.log('Claim tx:', tx.hash)
 }
 
 export default {
