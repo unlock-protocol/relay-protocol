@@ -7,12 +7,23 @@ import { index, onchainTable, primaryKey, relations } from 'ponder'
  * - name: Yield pool name
  * - lastUpdated: Last time the yield pool was updated
  */
-export const yieldPool = onchainTable('yield_pool', (t) => ({
-  contractAddress: t.hex().primaryKey(),
-  asset: t.hex().notNull(),
-  name: t.text().notNull(),
-  lastUpdated: t.bigint().notNull(),
-}))
+export const yieldPool = onchainTable(
+  'yield_pool',
+  (t) => ({
+    contractAddress: t.hex().notNull(),
+    asset: t.hex().notNull(),
+    name: t.text().notNull(),
+    lastUpdated: t.bigint().notNull(),
+    chainId: t.integer().notNull(),
+  }),
+  (table) => ({
+    pk: primaryKey({
+      columns: [table.chainId, table.contractAddress],
+    }),
+    assetIdx: index().on(table.asset),
+    chainIdIdx: index().on(table.chainId),
+  })
+)
 
 /**
  * Track relay pools
@@ -31,7 +42,7 @@ export const yieldPool = onchainTable('yield_pool', (t) => ({
 export const relayPool = onchainTable(
   'relay_pool',
   (t) => ({
-    contractAddress: t.hex().primaryKey(),
+    contractAddress: t.hex().notNull(),
     curator: t.hex().notNull(),
     asset: t.hex().notNull(),
     yieldPool: t.hex().notNull(),
@@ -46,7 +57,12 @@ export const relayPool = onchainTable(
     symbol: t.text().notNull(),
   }),
   (table) => ({
+    pk: primaryKey({
+      columns: [table.chainId, table.contractAddress],
+    }),
     yieldPoolIdx: index().on(table.yieldPool),
+    assetIdx: index().on(table.asset),
+    curatorIdx: index().on(table.curator),
   })
 )
 
@@ -120,6 +136,7 @@ export const userBalance = onchainTable('user_balance', (t) => ({
   id: t.text().primaryKey(), // Composite ID: wallet-pool
   wallet: t.hex().notNull(),
   relayPool: t.hex().notNull(),
+  chainId: t.integer().notNull(),
   shareBalance: t.bigint().notNull(),
   totalDeposited: t.bigint().notNull(),
   totalWithdrawn: t.bigint().notNull(),
@@ -131,8 +148,8 @@ export const userBalance = onchainTable('user_balance', (t) => ({
  */
 export const userBalanceRelations = relations(userBalance, ({ one }) => ({
   pool: one(relayPool, {
-    fields: [userBalance.relayPool],
-    references: [relayPool.contractAddress],
+    fields: [userBalance.relayPool, userBalance.chainId],
+    references: [relayPool.contractAddress, relayPool.chainId], // TODO: Add chainId!
   }),
 }))
 
@@ -144,14 +161,23 @@ export const relayPoolRelations = relations(relayPool, ({ many }) => ({
   snapshots: many(vaultSnapshot),
 }))
 
-export const relayBridge = onchainTable('relay_bridge', (t) => ({
-  chainId: t.integer().notNull(),
-  contractAddress: t.hex().primaryKey(),
-  asset: t.hex().notNull(),
-  transferNonce: t.bigint().notNull(),
-  createdAt: t.bigint().notNull(),
-  createdAtBlock: t.bigint().notNull(),
-}))
+export const relayBridge = onchainTable(
+  'relay_bridge',
+  (t) => ({
+    chainId: t.integer().notNull(),
+    contractAddress: t.hex().notNull(),
+    asset: t.hex().notNull(),
+    transferNonce: t.bigint().notNull(),
+    createdAt: t.bigint().notNull(),
+    createdAtBlock: t.bigint().notNull(),
+  }),
+  (table) => ({
+    pk: primaryKey({
+      columns: [table.chainId, table.contractAddress],
+    }),
+    assetIdx: index().on(table.asset),
+  })
+)
 
 /**
  * Track bridge transactions across chains
