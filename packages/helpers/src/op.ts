@@ -7,7 +7,7 @@ import DisputeGameFactory from './abis/op/DisputeGameFactory.json'
 import { getProvider } from './provider'
 
 import { networks } from '@relay-protocol/networks'
-import { L2NetworkConfig } from '@relay-protocol/types'
+import { L1NetworkConfig, L2NetworkConfig } from '@relay-protocol/types'
 
 const outputRootProofVersion =
   '0x0000000000000000000000000000000000000000000000000000000000000000' as const
@@ -81,7 +81,7 @@ export const buildProveWithdrawal = async (
   const abiCoder = new AbiCoder()
   const provider = await getProvider(chainId)
   const network = networks[chainId] as L2NetworkConfig
-
+  const l1 = networks[l1ChainId] as L1NetworkConfig
   // Get receipt
   const receipt = await provider.getTransactionReceipt(withdrawalTx)
   if (!receipt) {
@@ -94,7 +94,8 @@ export const buildProveWithdrawal = async (
     'MessagePassed',
     new ethers.Interface(L2ToL1MessagePasserAbi)
   )
-  if (!event) {
+
+  if (!event || !event.args) {
     throw new Error('No MessagePassed event found')
   }
 
@@ -111,8 +112,12 @@ export const buildProveWithdrawal = async (
     abiCoder.encode(['bytes32', 'uint256'], [withdrawalHash, 0n])
   )
 
-  // TODO: how do we determine bridge type?
-  const game = await getGame(l1ChainId, network.slug, receipt!.blockNumber)
+  let slug = network.slug
+  if (l1.isTestnet) {
+    // We have to remove the -[testnet name] from the slug
+    slug = slug.split('-')[0]
+  }
+  const game = await getGame(l1ChainId, slug, receipt!.blockNumber)
   if (!game) {
     throw new Error(
       'No game found for withdrawal transaction. Is it too early?'
