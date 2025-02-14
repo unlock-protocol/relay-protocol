@@ -23,6 +23,9 @@ export const submitProof = async ({
     Number(destinationPoolChainId)
   )
 
+  // TODO: check if already proven!
+  // This will avoid wasting gas (and resetting the counter?)
+
   const portal = new ethers.Contract(proveParams.portalAddress, Portal2, signer)
   const tx = await portal.proveWithdrawalTransaction(
     proveParams.transaction,
@@ -82,22 +85,22 @@ export const claimWithdrawal = async (bridgeTransaction) => {
   }
   console.log({ ready })
 
-  // const finalizeParams = await buildFinalizeWithdrawal(
-  //   bridgeTransaction.originChainId,
-  //   bridgeTransaction.originTxHash
-  // )
+  const finalizeParams = await buildFinalizeWithdrawal(
+    bridgeTransaction.originChainId,
+    bridgeTransaction.originTxHash
+  )
 
-  // const claimParams = new AbiCoder().encode(
-  //   ['bytes', 'address'],
-  //   [finalizeParams, receipt.from] // Hum, we need to the submitted address (it should be us though)
-  // )
+  const claimParams = new AbiCoder().encode(
+    ['bytes', 'address'],
+    [finalizeParams, receipt.from] // Hum, we need to the submitted address (it should be us though)
+  )
 
-  // const tx = await relayPool.claim(
-  //   bridgeTransaction.originChainId,
-  //   bridgeTransaction.originBridgeAddress,
-  //   claimParams
-  // )
-  // console.log('Claim tx:', tx.hash)
+  const tx = await relayPool.claim(
+    bridgeTransaction.originChainId,
+    bridgeTransaction.originBridgeAddress,
+    claimParams
+  )
+  console.log('Claim tx:', tx.hash)
 }
 
 export default {
