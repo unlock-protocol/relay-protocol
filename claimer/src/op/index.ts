@@ -40,7 +40,6 @@ export const submitProof = async ({
 
 export const claimWithdrawal = async (bridgeTransaction) => {
   // console.log('OP Claim me!')
-  // console.log(bridgeTransaction)
   const destinationNetwork = networks[bridgeTransaction.destinationPoolChainId]
   // Get the relaypool contract
   const signer = await getSignerForNetwork(destinationNetwork)
@@ -51,15 +50,29 @@ export const claimWithdrawal = async (bridgeTransaction) => {
   )
 
   const finalizeParams = await buildFinalizeWithdrawal(
-    10,
-    '0x8a8ed32ec52267ba5c5656dc68f459a8be3cdd23d8a1128ed321a2c6df2e8ee3'
+    bridgeTransaction.originChainId,
+    bridgeTransaction.originTxHash
   )
+  // Let's get the submitter by looking at the proof tx!
+
+  console.log(bridgeTransaction.nativeBridgeProofTxHash)
+  const receipt = await signer.provider!.getTransactionReceipt(
+    bridgeTransaction.nativeBridgeProofTxHash
+  )
+  if (!receipt) {
+    throw new Error('Proof tx not found')
+  }
   const claimParams = new AbiCoder().encode(
     ['bytes', 'address'],
-    [finalizeParams, submitter] // Hum, we need to the submitted address (it should be us though)
+    [finalizeParams, receipt.from] // Hum, we need to the submitted address (it should be us though)
   )
 
-  await relayPool.claim(bridgeTransaction.originTxHash)
+  const tx = await relayPool.claim(
+    bridgeTransaction.originChainId,
+    bridgeTransaction.originBridgeAddress,
+    claimParams
+  )
+  console.log('Claim tx:', tx.hash)
   // Send `claim` transaction!
   // And that's it~
 }
