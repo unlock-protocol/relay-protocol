@@ -64,8 +64,6 @@ export default async function ({
         topics: log.topics,
       })
 
-      console.log(event)
-
       if (event.eventName === 'L2ToL1Tx') {
         arbTransactionIndex = event.args.position
       }

@@ -16,6 +16,6 @@ export default async function ({
     '0x22e9c539f31f403c81119de9e630d8fb18bc5964'.toLocaleLowerCase()
   ) {
     console.log('OutBoxTransactionExecuted', event.args)
-    process.exit()
+    // process.exit()
   }
 }
