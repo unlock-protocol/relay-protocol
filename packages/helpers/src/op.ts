@@ -7,28 +7,19 @@ import DisputeGameFactory from './abis/op/DisputeGameFactory.json'
 import { getProvider } from './provider'
 
 import { networks } from '@relay-protocol/networks'
-import { L2NetworkConfig } from '@relay-protocol/types'
+import { L1NetworkConfig, L2NetworkConfig } from '@relay-protocol/types'
 
 const outputRootProofVersion =
   '0x0000000000000000000000000000000000000000000000000000000000000000' as const
 
 export const getGame = async (
   chainId: number,
-  originSlug: string,
-  minL2BlockNumber: number
+  minL2BlockNumber: number,
+  disputeGameAddress: string,
+  portalAddress: string
 ) => {
   const abiCoder = new AbiCoder()
   const provider = await getProvider(chainId)
-
-  const network = networks[chainId]
-
-  // @ts-expect-error we know this is a bridge
-  const destinationContracts = network.bridges[originSlug]
-  if (!destinationContracts) {
-    throw new Error(`No destination contracts found for ${originSlug}`)
-  }
-  const disputeGameAddress = destinationContracts.disputeGame!
-  const portalAddress = destinationContracts.portalProxy!
 
   const disputeGameContract = new ethers.Contract(
     disputeGameAddress,
@@ -81,7 +72,7 @@ export const buildProveWithdrawal = async (
   const abiCoder = new AbiCoder()
   const provider = await getProvider(chainId)
   const network = networks[chainId] as L2NetworkConfig
-
+  const l1 = networks[l1ChainId] as L1NetworkConfig
   // Get receipt
   const receipt = await provider.getTransactionReceipt(withdrawalTx)
   if (!receipt) {
@@ -94,7 +85,8 @@ export const buildProveWithdrawal = async (
     'MessagePassed',
     new ethers.Interface(L2ToL1MessagePasserAbi)
   )
-  if (!event) {
+
+  if (!event || !event.args) {
     throw new Error('No MessagePassed event found')
   }
 
@@ -111,8 +103,26 @@ export const buildProveWithdrawal = async (
     abiCoder.encode(['bytes32', 'uint256'], [withdrawalHash, 0n])
   )
 
-  // TODO: how do we determine bridge type?
-  const game = await getGame(l1ChainId, network.slug, receipt!.blockNumber)
+  let slug = network.slug
+  if (l1.isTestnet) {
+    // We have to remove the -[testnet name] from the slug
+    slug = slug.split('-')[0]
+  }
+
+  // @ts-expect-error we know this is a bridge
+  const destinationContracts = l1.bridges[slug]
+  if (!destinationContracts) {
+    throw new Error(`No destination contracts found for ${slug}`)
+  }
+  const disputeGameAddress = destinationContracts.disputeGame!
+  const portalAddress = destinationContracts.portalProxy!
+
+  const game = await getGame(
+    l1ChainId,
+    receipt!.blockNumber,
+    disputeGameAddress,
+    portalAddress
+  )
   if (!game) {
     throw new Error(
       'No game found for withdrawal transaction. Is it too early?'
@@ -156,6 +166,7 @@ export const buildProveWithdrawal = async (
       stateRoot: block?.stateRoot,
       version: outputRootProofVersion,
     },
+    portalAddress,
     transaction: {
       data,
       gasLimit,
