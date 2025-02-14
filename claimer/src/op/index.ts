@@ -24,7 +24,7 @@ export const submitProof = async ({
   )
 
   const portal = new ethers.Contract(
-    destinationNetwork.bridges.op!.portalProxy!,
+    finalizeParams.portalAddress,
     Portal2,
     signer
   )

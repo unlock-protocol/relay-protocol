@@ -24,7 +24,7 @@ describe('RelayBridge: prove', () => {
       )
 
       const portal = new ethers.Contract(
-        destinationNetwork.bridges.op!.portalProxy!,
+        proveParams.portalAddress,
         Portal2,
         signer
       )
@@ -54,7 +54,7 @@ describe('RelayBridge: prove', () => {
       )
 
       const portal = new ethers.Contract(
-        destinationNetwork.bridges.base!.portalProxy!,
+        proveParams.portalAddress,
         Portal2,
         signer
       )

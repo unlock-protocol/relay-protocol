@@ -47,7 +47,7 @@ task('claim:native:prove', 'Prooves ETH was deposited on native bridge')
       Number(chainId)
     )
     const portal = new ethers.Contract(
-      networks[Number(chainId)].op.portalProxy,
+      finalizeParams.portalAddress,
       Portal2,
       signer
     )
