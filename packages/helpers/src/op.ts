@@ -14,7 +14,7 @@ const outputRootProofVersion =
 
 export const getGame = async (
   chainId: number,
-  origin: string,
+  originSlug: string,
   minL2BlockNumber: number
 ) => {
   const abiCoder = new AbiCoder()
@@ -23,9 +23,9 @@ export const getGame = async (
   const network = networks[chainId]
 
   // @ts-expect-error we know this is a bridge
-  const destinationContracts = network.bridges[origin]
+  const destinationContracts = network.bridges[originSlug]
   if (!destinationContracts) {
-    throw new Error(`No destination contracts found for ${origin}`)
+    throw new Error(`No destination contracts found for ${originSlug}`)
   }
   const disputeGameAddress = destinationContracts.disputeGame!
   const portalAddress = destinationContracts.portalProxy!
@@ -110,7 +110,9 @@ export const buildProveWithdrawal = async (
   const slot = ethers.keccak256(
     abiCoder.encode(['bytes32', 'uint256'], [withdrawalHash, 0n])
   )
-  const game = await getGame(l1ChainId, network.stack, receipt!.blockNumber)
+
+  // TODO: how do we determine bridge type?
+  const game = await getGame(l1ChainId, network.slug, receipt!.blockNumber)
   if (!game) {
     throw new Error(
       'No game found for withdrawal transaction. Is it too early?'
