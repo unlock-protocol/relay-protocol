@@ -2,7 +2,7 @@ import { task } from 'hardhat/config'
 import { AutoComplete, Input } from 'enquirer'
 import { networks } from '@relay-protocol/networks'
 import { getStataToken, getEvent, getProvider } from '@relay-protocol/helpers'
-import { getAddresses } from '../../lib/utils/deployed'
+import { getAddresses } from '@relay-protocol/addresses'
 
 task('deploy:pool', 'Deploy a relay pool')
   .addOptionalParam('name', 'name of the pool')

@@ -7,7 +7,7 @@ import {
   GET_RELAY_POOL,
   RelayVaultService,
 } from '@relay-protocol/client'
-import { getAddresses } from '../../lib/utils/deployed'
+import { getAddresses } from '@relay-protocol/addresses'
 
 task('pool:add-origin', 'Add origin for a pool')
   .addOptionalParam('l2ChainId', 'the chain id of the L2 network')

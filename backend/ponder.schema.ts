@@ -59,6 +59,7 @@ export const poolOrigin = onchainTable(
     originChainId: t.integer().notNull(),
     originBridge: t.hex().notNull(),
     maxDebt: t.bigint().notNull(),
+    currentOutstandingDebt: t.bigint().notNull(),
     curator: t.hex().notNull(),
     bridgeFee: t.integer().notNull(),
     coolDown: t.integer().notNull(),
