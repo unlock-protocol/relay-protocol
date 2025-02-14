@@ -9,6 +9,10 @@ import {
 } from '@relay-protocol/abis'
 import { createNetworkConfig } from './src/utils/rpc'
 import { Abi, AbiEvent } from 'viem'
+import { getAddresses } from '@relay-protocol/addresses'
+import networks from '@relay-protocol/networks'
+
+const deployedAddresses = getAddresses()
 
 export default createConfig({
   database: {
@@ -27,7 +31,7 @@ export default createConfig({
       abi: RelayPoolFactory as Abi,
       network: {
         sepolia: {
-          address: '0x1c1601077b3eeF14E5825a5fB0b87926Ad23cB90',
+          address: deployedAddresses['11155111'].RelayPoolFactory,
         },
       },
     },
@@ -35,25 +39,24 @@ export default createConfig({
       abi: RelayPool as Abi,
       network: 'sepolia',
       address: factory({
-        address: '0x1c1601077b3eeF14E5825a5fB0b87926Ad23cB90',
+        address: deployedAddresses['11155111'].RelayPoolFactory,
         event: RelayPoolFactory.find(
           (e) => e.name === 'PoolDeployed'
         ) as AbiEvent,
         parameter: 'pool',
       }),
-      startBlock: 7609300,
     },
     RelayBridgeFactory: {
       abi: RelayBridgeFactory as Abi,
       network: {
         opSepolia: {
-          address: '0x5765883E120F707A528F3e476636304De9280b6c',
+          address: deployedAddresses['11155420'].RelayBridgeFactory,
         },
         baseSepolia: {
-          address: '0x5e30883816434C8C92534241729b80309B520A30',
+          address: deployedAddresses['84532'].RelayBridgeFactory,
         },
         arbSepolia: {
-          address: '0x1402D55BF0D6566ca8F569041000a8015b608632',
+          address: deployedAddresses['421614'].RelayBridgeFactory,
         },
       },
     },
@@ -62,33 +65,30 @@ export default createConfig({
       network: {
         opSepolia: {
           address: factory({
-            address: '0x5765883E120F707A528F3e476636304De9280b6c',
+            address: deployedAddresses['11155420'].RelayBridgeFactory,
             event: RelayBridgeFactory.find(
               (e) => e.name === 'BridgeDeployed'
             ) as AbiEvent,
             parameter: 'bridge',
           }),
-          startBlock: 23446570,
         },
         baseSepolia: {
           address: factory({
-            address: '0x5e30883816434C8C92534241729b80309B520A30',
+            address: deployedAddresses['84532'].RelayBridgeFactory,
             event: RelayBridgeFactory.find(
               (e) => e.name === 'BridgeDeployed'
             ) as AbiEvent,
             parameter: 'bridge',
           }),
-          startBlock: 21463700,
         },
         arbSepolia: {
           address: factory({
-            address: '0x1402D55BF0D6566ca8F569041000a8015b608632',
+            address: deployedAddresses['421614'].RelayBridgeFactory,
             event: RelayBridgeFactory.find(
               (e) => e.name === 'BridgeDeployed'
             ) as AbiEvent,
             parameter: 'bridge',
           }),
-          startBlock: 121036190,
         },
       },
     },
@@ -99,10 +99,9 @@ export default createConfig({
       network: {
         sepolia: {
           address: [
-            '0x16Fc5058F25648194471939df75CF27A2fdC48BC',
-            '0x49f53e41452C74589E85cA1677426Ba426459e85',
+            networks['11155111']!.bridges!.op!.portalProxy! as `0x${string}`,
+            networks['11155111']!.bridges!.base!.portalProxy! as `0x${string}`,
           ],
-          startBlock: 7600000,
         },
       },
     },
@@ -110,7 +109,6 @@ export default createConfig({
   blocks: {
     VaultSnapshot: {
       network: 'sepolia',
-      startBlock: 7609300,
       interval: 25, // ~5 minutes with 12s block time
     },
   },
