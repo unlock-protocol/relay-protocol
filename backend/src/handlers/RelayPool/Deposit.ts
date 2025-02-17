@@ -69,6 +69,7 @@ export default async function ({
   await context.db
     .insert(userBalance)
     .values({
+      chainId: context.network.chainId,
       wallet: owner,
       relayPool: event.log.address,
       shareBalance: shares,
