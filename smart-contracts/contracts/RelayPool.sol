@@ -203,16 +203,38 @@ contract RelayPool is ERC4626, Ownable {
     );
   }
 
-  function increaseOutStandingDebt(uint256 amount) internal {
+  function increaseOutStandingDebt(
+    uint256 amount,
+    OriginSettings origin
+  ) internal {
+    uint256 currentOriginOutstandingDebt = origin.outstandingDebt;
+    origin.outstandingDebt += amount;
     uint256 currentOutstandingDebt = outstandingDebt;
     outstandingDebt += amount;
-    emit OutstandingDebtChanged(currentOutstandingDebt, outstandingDebt);
+    emit OutstandingDebtChanged(
+      currentOutstandingDebt,
+      outstandingDebt,
+      origin,
+      currentOriginOutstandingDebt,
+      origin.outstandingDebt
+    );
   }
 
-  function decreaseOutStandingDebt(uint256 amount) internal {
+  function decreaseOutStandingDebt(
+    uint256 amount,
+    OriginSettings origin
+  ) internal {
+    uint256 currentOriginOutstandingDebt = origin.outstandingDebt;
+    origin.outstandingDebt -= amount;
     uint256 currentOutstandingDebt = outstandingDebt;
     outstandingDebt -= amount;
-    emit OutstandingDebtChanged(currentOutstandingDebt, outstandingDebt);
+    emit OutstandingDebtChanged(
+      currentOutstandingDebt,
+      outstandingDebt,
+      origin,
+      currentOriginOutstandingDebt,
+      origin.outstandingDebt
+    );
   }
 
   // We cap the maxDeposit of any receiver to the maxDeposit of the yield pool for us
@@ -356,8 +378,7 @@ contract RelayPool is ERC4626, Ownable {
         message.amount
       );
     }
-    origin.outstandingDebt += message.amount;
-    increaseOutStandingDebt(message.amount);
+    increaseOutStandingDebt(message.amount, origin);
 
     // We only send the amount net of fees
     sendFunds(message.amount - feeAmount, message.recipient);
@@ -426,9 +447,7 @@ contract RelayPool is ERC4626, Ownable {
     uint256 amount = abi.decode(result, (uint256));
 
     // We should have received funds
-    // Update the outstanding debts (both for the origin and the pool total)
-    origin.outstandingDebt -= amount;
-    decreaseOutStandingDebt(amount);
+    decreaseOutStandingDebt(amount, origin);
     // and we should deposit these funds into the yield pool
     depositAssetsInYieldPool(amount);
 
