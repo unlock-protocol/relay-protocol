@@ -4,6 +4,8 @@ pragma solidity ^0.8.28;
 import {ERC20} from "solmate/src/tokens/ERC20.sol";
 import {RelayPool, OriginParam} from "./RelayPool.sol";
 
+// import {TimelockController} from "@openzeppelin/contracts/governance/TimelockController.sol";
+
 contract RelayPoolFactory {
   address public hyperlaneMailbox;
   address public wrappedEth;
@@ -15,7 +17,8 @@ contract RelayPoolFactory {
     string name,
     string symbol,
     OriginParam[] origins,
-    address thirdPartyPool
+    address thirdPartyPool,
+    address timelock
   );
 
   constructor(address hMailbox, address weth) {
@@ -28,8 +31,20 @@ contract RelayPoolFactory {
     string memory name,
     string memory symbol,
     OriginParam[] memory origins,
-    address thirdPartyPool
+    address thirdPartyPool,
+    uint timelockDelay
   ) public returns (address) {
+    // Deploy a timelock!
+    address[] memory curator = new address[](1);
+    curator[0] = msg.sender;
+
+    TimelockController timelock = new TimelockController(
+      timelockDelay,
+      curator,
+      curator,
+      address(0) // No admin
+    );
+
     RelayPool pool = new RelayPool(
       hyperlaneMailbox,
       asset,
@@ -38,7 +53,7 @@ contract RelayPoolFactory {
       origins,
       thirdPartyPool,
       wrappedEth,
-      msg.sender
+      address(timelock)
     );
 
     emit PoolDeployed(
@@ -48,7 +63,8 @@ contract RelayPoolFactory {
       name,
       symbol,
       origins,
-      thirdPartyPool
+      thirdPartyPool,
+      address(timelock)
     );
 
     return address(pool);
