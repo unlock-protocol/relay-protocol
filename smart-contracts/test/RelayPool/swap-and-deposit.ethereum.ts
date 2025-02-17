@@ -176,7 +176,7 @@ describe('RelayPool / Swap and Deposit', () => {
 
       // get some WETH
       const weth = await ethers.getContractAt('IWETH', WETH)
-      await weth.deposit({ value: amount })
+      await weth.connect(user).deposit({ value: amount })
       await weth.connect(user).transfer(relayPoolAddress, amount)
     })
 
