@@ -211,7 +211,7 @@ contract RelayPool is ERC4626, Ownable {
 
   function increaseOutStandingDebt(
     uint256 amount,
-    OriginSettings memory origin
+    OriginSettings storage origin
   ) internal {
     uint256 currentOriginOutstandingDebt = origin.outstandingDebt;
     origin.outstandingDebt += amount;
@@ -228,7 +228,7 @@ contract RelayPool is ERC4626, Ownable {
 
   function decreaseOutStandingDebt(
     uint256 amount,
-    OriginSettings memory origin
+    OriginSettings storage origin
   ) internal {
     uint256 currentOriginOutstandingDebt = origin.outstandingDebt;
     origin.outstandingDebt -= amount;
