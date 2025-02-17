@@ -43,10 +43,15 @@ export default async function ({
   // Update states
   await Promise.all([
     // Update relay pool
-    context.db.update(relayPool, { contractAddress: event.log.address }).set({
-      totalAssets: relayTotalAssets,
-      totalShares: relayTotalShares,
-    }),
+    context.db
+      .update(relayPool, {
+        contractAddress: event.log.address,
+        chainId: context.network.chainId,
+      })
+      .set({
+        totalAssets: relayTotalAssets,
+        totalShares: relayTotalShares,
+      }),
 
     // Record pool action
     context.db.insert(poolAction).values({
