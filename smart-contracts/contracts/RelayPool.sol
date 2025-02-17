@@ -8,6 +8,7 @@ import {IWETH} from "./interfaces/IWETH.sol";
 import {ITokenSwap} from "./interfaces/ITokenSwap.sol";
 import {TypeCasts} from "./utils/TypeCasts.sol";
 import {HyperlaneMessage} from "./Types.sol";
+import "@openzeppelin/contracts/utils/math/Math.sol";
 
 struct OriginSettings {
   address curator;
@@ -85,6 +86,7 @@ contract RelayPool is ERC4626, Ownable {
   // All incoming assets are streamed (even though they are instantly deposited in the yield pool)
   uint256 public totalAssetsToStream = 0;
   uint256 public lastAssetsCollectedAt = 0;
+  uint256 public endOfStream = block.timestamp;
   uint256 public streamingPeriod = 7 days;
 
   event LoanEmitted(
@@ -103,7 +105,13 @@ contract RelayPool is ERC4626, Ownable {
     bytes claimParams
   );
 
-  event OutstandingDebtChanged(uint256 oldDebt, uint256 newDebt);
+  event OutstandingDebtChanged(
+    uint256 oldDebt,
+    uint256 newDebt,
+    OriginSettings origin,
+    uint256 oldOriginDebt,
+    uint256 newOriginDebt
+  );
 
   event AssetsDepositedIntoYieldPool(uint256 amount, address yieldPool);
   event AssetsWithdrawnFromYieldPool(uint256 amount, address yieldPool);
@@ -203,16 +211,38 @@ contract RelayPool is ERC4626, Ownable {
     );
   }
 
-  function increaseOutStandingDebt(uint256 amount) internal {
+  function increaseOutStandingDebt(
+    uint256 amount,
+    OriginSettings storage origin
+  ) internal {
+    uint256 currentOriginOutstandingDebt = origin.outstandingDebt;
+    origin.outstandingDebt += amount;
     uint256 currentOutstandingDebt = outstandingDebt;
     outstandingDebt += amount;
-    emit OutstandingDebtChanged(currentOutstandingDebt, outstandingDebt);
+    emit OutstandingDebtChanged(
+      currentOutstandingDebt,
+      outstandingDebt,
+      origin,
+      currentOriginOutstandingDebt,
+      origin.outstandingDebt
+    );
   }
 
-  function decreaseOutStandingDebt(uint256 amount) internal {
+  function decreaseOutStandingDebt(
+    uint256 amount,
+    OriginSettings storage origin
+  ) internal {
+    uint256 currentOriginOutstandingDebt = origin.outstandingDebt;
+    origin.outstandingDebt -= amount;
     uint256 currentOutstandingDebt = outstandingDebt;
     outstandingDebt -= amount;
-    emit OutstandingDebtChanged(currentOutstandingDebt, outstandingDebt);
+    emit OutstandingDebtChanged(
+      currentOutstandingDebt,
+      outstandingDebt,
+      origin,
+      currentOriginOutstandingDebt,
+      origin.outstandingDebt
+    );
   }
 
   // We cap the maxDeposit of any receiver to the maxDeposit of the yield pool for us
@@ -356,8 +386,7 @@ contract RelayPool is ERC4626, Ownable {
         message.amount
       );
     }
-    origin.outstandingDebt += message.amount;
-    increaseOutStandingDebt(message.amount);
+    increaseOutStandingDebt(message.amount, origin);
 
     // We only send the amount net of fees
     sendFunds(message.amount - feeAmount, message.recipient);
@@ -377,13 +406,13 @@ contract RelayPool is ERC4626, Ownable {
   // If the last fee collection was more than 7 days ago, we have nothing left to stream
   // Otherwise, we return the time-based pro-rata of what remains to stream.
   function remainsToStream() internal view returns (uint256) {
-    if (block.timestamp - lastAssetsCollectedAt > streamingPeriod) {
+    if (block.timestamp > endOfStream) {
       return 0; // Nothing left to stream
     } else {
       return
-        totalAssetsToStream -
+        totalAssetsToStream - // total assets to stream
         (totalAssetsToStream * (block.timestamp - lastAssetsCollectedAt)) /
-        streamingPeriod;
+        (endOfStream - lastAssetsCollectedAt); // already streamed
     }
   }
 
@@ -397,6 +426,14 @@ contract RelayPool is ERC4626, Ownable {
   // Internal function to add assets to be accounted in a streaming fashgion
   function addToStreamingAssets(uint256 amount) internal returns (uint256) {
     updateStreamedAssets();
+    // We ajdust the end of the stream based on the new amount
+    uint amountLeft = remainsToStream();
+    uint timeLeft = Math.max(endOfStream, block.timestamp) - block.timestamp;
+    uint weightedStreamingPeriod = (amountLeft *
+      timeLeft +
+      amount *
+      streamingPeriod) / (amountLeft + amount);
+    endOfStream = block.timestamp + weightedStreamingPeriod;
     return totalAssetsToStream += amount;
   }
 
@@ -426,9 +463,7 @@ contract RelayPool is ERC4626, Ownable {
     uint256 amount = abi.decode(result, (uint256));
 
     // We should have received funds
-    // Update the outstanding debts (both for the origin and the pool total)
-    origin.outstandingDebt -= amount;
-    decreaseOutStandingDebt(amount);
+    decreaseOutStandingDebt(amount, origin);
     // and we should deposit these funds into the yield pool
     depositAssetsInYieldPool(amount);
 
