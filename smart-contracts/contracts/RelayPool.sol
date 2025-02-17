@@ -103,7 +103,13 @@ contract RelayPool is ERC4626, Ownable {
     bytes claimParams
   );
 
-  event OutstandingDebtChanged(uint256 oldDebt, uint256 newDebt);
+  event OutstandingDebtChanged(
+    uint256 oldDebt,
+    uint256 newDebt,
+    OriginSettings origin,
+    uint256 oldOriginDebt,
+    uint256 newOriginDebt
+  );
 
   event AssetsDepositedIntoYieldPool(uint256 amount, address yieldPool);
   event AssetsWithdrawnFromYieldPool(uint256 amount, address yieldPool);
@@ -205,7 +211,7 @@ contract RelayPool is ERC4626, Ownable {
 
   function increaseOutStandingDebt(
     uint256 amount,
-    OriginSettings origin
+    OriginSettings memory origin
   ) internal {
     uint256 currentOriginOutstandingDebt = origin.outstandingDebt;
     origin.outstandingDebt += amount;
@@ -222,7 +228,7 @@ contract RelayPool is ERC4626, Ownable {
 
   function decreaseOutStandingDebt(
     uint256 amount,
-    OriginSettings origin
+    OriginSettings memory origin
   ) internal {
     uint256 currentOriginOutstandingDebt = origin.outstandingDebt;
     origin.outstandingDebt -= amount;

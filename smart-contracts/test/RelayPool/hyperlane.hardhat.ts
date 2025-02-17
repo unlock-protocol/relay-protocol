@@ -167,7 +167,7 @@ describe('ERC20 RelayBridge: when receiving a message from the Hyperlane Mailbox
       )
   })
 
-  it('should keep track of the outstanding debt', async () => {
+  it.only('should keep track of the outstanding debt', async () => {
     const [user] = await ethers.getSigners()
     const userAddress = await user.getAddress()
     const amount = ethers.parseUnits('1')
