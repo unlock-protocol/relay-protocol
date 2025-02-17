@@ -85,6 +85,7 @@ contract RelayPool is ERC4626, Ownable {
   // All incoming assets are streamed (even though they are instantly deposited in the yield pool)
   uint256 public totalAssetsToStream = 0;
   uint256 public lastAssetsCollectedAt = 0;
+  uint256 public endOfStream = block.timestamp;
   uint256 public streamingPeriod = 7 days;
 
   event LoanEmitted(
@@ -377,13 +378,13 @@ contract RelayPool is ERC4626, Ownable {
   // If the last fee collection was more than 7 days ago, we have nothing left to stream
   // Otherwise, we return the time-based pro-rata of what remains to stream.
   function remainsToStream() internal view returns (uint256) {
-    if (block.timestamp - lastAssetsCollectedAt > streamingPeriod) {
+    if (block.timestamp > endOfStream) {
       return 0; // Nothing left to stream
     } else {
       return
-        totalAssetsToStream -
+        totalAssetsToStream - // total assets to stream
         (totalAssetsToStream * (block.timestamp - lastAssetsCollectedAt)) /
-        streamingPeriod;
+        (endOfStream - lastAssetsCollectedAt); // already streamed
     }
   }
 
@@ -397,6 +398,7 @@ contract RelayPool is ERC4626, Ownable {
   // Internal function to add assets to be accounted in a streaming fashgion
   function addToStreamingAssets(uint256 amount) internal returns (uint256) {
     updateStreamedAssets();
+    endOfStream = block.timestamp + streamingPeriod;
     return totalAssetsToStream += amount;
   }
 
