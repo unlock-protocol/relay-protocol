@@ -107,7 +107,6 @@ export const originPoolRelation = relations(poolOrigin, ({ one }) => ({
 
 /**
  * Track pool deposits/withdrawals
- * - id: Unique ID (tx hash + log index)
  * - type: DEPOSIT or WITHDRAW
  * - user: User address
  * - relayPool: Pool address
@@ -117,31 +116,51 @@ export const originPoolRelation = relations(poolOrigin, ({ one }) => ({
  * - blockNumber: Block number
  * - transactionHash: Transaction hash
  */
-export const poolAction = onchainTable('pool_action', (t) => ({
-  id: t.text().primaryKey(),
-  type: t.text().notNull(),
-  user: t.hex().notNull(),
-  relayPool: t.hex().notNull(),
-  assets: t.bigint().notNull(),
-  shares: t.bigint().notNull(),
-  timestamp: t.bigint().notNull(),
-  blockNumber: t.bigint().notNull(),
-  transactionHash: t.hex().notNull(),
-}))
+export const poolAction = onchainTable(
+  'pool_action',
+  (t) => ({
+    type: t.text().notNull(),
+    user: t.hex().notNull(),
+    relayPool: t.hex().notNull(),
+    assets: t.bigint().notNull(),
+    shares: t.bigint().notNull(),
+    timestamp: t.bigint().notNull(),
+    blockNumber: t.bigint().notNull(),
+    transactionHash: t.hex().notNull(),
+    chainId: t.integer().notNull(),
+  }),
+  (table) => ({
+    pk: primaryKey({
+      columns: [table.chainId, table.transactionHash],
+    }),
+    userIdx: index().on(table.user),
+    poolIdx: index().on(table.chainId, table.relayPool),
+    assetsIdx: index().on(table.chainId, table.assets),
+  })
+)
 
 /**
  * Track user balances across all pools
  */
-export const userBalance = onchainTable('user_balance', (t) => ({
-  id: t.text().primaryKey(), // Composite ID: wallet-pool
-  wallet: t.hex().notNull(),
-  relayPool: t.hex().notNull(),
-  chainId: t.integer().notNull(),
-  shareBalance: t.bigint().notNull(),
-  totalDeposited: t.bigint().notNull(),
-  totalWithdrawn: t.bigint().notNull(),
-  lastUpdated: t.bigint().notNull(),
-}))
+export const userBalance = onchainTable(
+  'user_balance',
+  (t) => ({
+    wallet: t.hex().notNull(),
+    relayPool: t.hex().notNull(),
+    chainId: t.integer().notNull(),
+    shareBalance: t.bigint().notNull(),
+    totalDeposited: t.bigint().notNull(),
+    totalWithdrawn: t.bigint().notNull(),
+    lastUpdated: t.bigint().notNull(),
+  }),
+  (table) => ({
+    pk: primaryKey({
+      columns: [table.chainId, table.wallet, table.relayPool],
+    }),
+    walletIdx: index().on(table.wallet),
+    relayPoolIdx: index().on(table.chainId, table.relayPool),
+  })
+)
 
 /**
  * Relations for user balance
@@ -260,7 +279,6 @@ export const bridgeTransaction = onchainTable(
 
 /**
  * Track vault share price snapshots over time
- * - id: Composite primary key in format vault-blockNumber
  * - vault: Vault (pool) contract address
  * - chainId: Chain ID of the vault
  * - blockNumber: Block number when the snapshot was taken
@@ -270,7 +288,6 @@ export const bridgeTransaction = onchainTable(
 export const vaultSnapshot = onchainTable(
   'vaultSnapshot',
   (t) => ({
-    id: t.text().primaryKey(),
     vault: t.hex().notNull(),
     chainId: t.integer().notNull(),
     blockNumber: t.bigint().notNull(),
@@ -279,6 +296,9 @@ export const vaultSnapshot = onchainTable(
     yieldPoolSharePrice: t.numeric().notNull(),
   }),
   (table) => ({
+    pk: primaryKey({
+      columns: [table.chainId, table.blockNumber, table.vault],
+    }),
     vaultChainIdx: index().on(table.vault, table.chainId),
   })
 )

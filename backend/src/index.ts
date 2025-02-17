@@ -7,7 +7,6 @@
  * Performance Considerations:
  * - Uses efficient upsert patterns for balance updates
  * - Maintains normalized data structure for quick queries
- * - Implements proper indexing via composite keys where needed
  *
  * Database Schema Design:
  * - Pool transactions are tracked in real-time
