@@ -16,6 +16,7 @@ export default async function ({
   // Get the relay pool to find its yield pool
   const pool = await context.db.find(relayPool, {
     contractAddress: event.log.address,
+    chainId: context.network.chainId,
   })
 
   if (!pool) {
@@ -60,6 +61,7 @@ export default async function ({
     }),
   ])
 
+  // TODO: do NOT build this ourself.
   // Get user balance
   const balanceId = `${owner}-${event.log.address}` // wallet-pool format
   const user = await context.db.find(userBalance, { id: balanceId })

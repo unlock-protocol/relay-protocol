@@ -19,6 +19,7 @@ export default async function ({
   // Get the relay pool to find its yield pool
   const pool = await context.db.find(relayPool, {
     contractAddress: event.log.address,
+    chainId: context.network.chainId,
   })
 
   if (!pool) {

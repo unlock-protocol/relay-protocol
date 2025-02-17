@@ -42,6 +42,7 @@ export default async function ({
     // Retrieve the RelayPool record based on the contract address that emitted the event
     const poolRecord = await context.db.find(relayPool, {
       contractAddress: event.log.address,
+      chainId: context.network.chainId,
     })
     if (!poolRecord) {
       console.warn(
