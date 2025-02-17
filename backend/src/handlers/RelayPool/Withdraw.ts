@@ -66,21 +66,23 @@ export default async function ({
     }),
   ])
 
-  // TODO: do NOT build this ourself.
   // Get user balance
-  const balanceId = `${owner}-${event.log.address}` // wallet-pool format
-  const user = await context.db.find(userBalance, { id: balanceId })
-
-  if (!user) {
-    throw new Error(
-      `User ${owner} attempting to withdraw without existing balance record`
-    )
-  }
+  const user = await context.db.find(userBalance, {
+    wallet: owner,
+    relayPool: event.log.address,
+    chainId: context.network.chainId,
+  })
 
   // Update user balance
-  await context.db.update(userBalance, { id: balanceId }).set({
-    shareBalance: user.shareBalance - shares,
-    totalWithdrawn: user.totalWithdrawn + assets,
-    lastUpdated: timestamp,
-  })
+  await context.db
+    .update(userBalance, {
+      wallet: owner,
+      relayPool: event.log.address,
+      chainId: context.network.chainId,
+    })
+    .set({
+      shareBalance: user.shareBalance - shares,
+      totalWithdrawn: user.totalWithdrawn + assets,
+      lastUpdated: timestamp,
+    })
 }

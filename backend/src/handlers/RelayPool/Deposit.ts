@@ -69,13 +69,9 @@ export default async function ({
     }),
   ])
 
-  // Update user balance - using owner for the balance tracking
-  const balanceId = `${owner}-${event.log.address}` // wallet-pool format
-
   await context.db
     .insert(userBalance)
     .values({
-      id: balanceId,
       wallet: owner,
       relayPool: event.log.address,
       shareBalance: shares,
