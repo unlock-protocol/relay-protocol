@@ -65,6 +65,7 @@ describe('RelayBridge: prove', () => {
         proveParams.outputRootProof,
         proveParams.withdrawalProof
       )
+      await tx.wait()
       // TODO: add more checks on the tx, but for now the fact that it does not revert is enough!
       expect(tx.to).to.equal(destinationNetwork.bridges.base!.portalProxy)
     })
