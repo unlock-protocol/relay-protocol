@@ -88,7 +88,7 @@ describe('RelayPoolNativeGateway', () => {
       // Deposit tokens to the RelayPool via the gateway
       await nativeGateway
         .connect(user)
-        .deposit(userAddress, relayPoolAddress, { value: amount })
+        .deposit(relayPoolAddress, userAddress, { value: amount })
 
       // Total assets should have increased
       expect(await relayPool.totalAssets()).to.equal(totalAssets + amount)
@@ -120,7 +120,7 @@ describe('RelayPoolNativeGateway', () => {
       // Mint shares
       await nativeGateway
         .connect(user)
-        .mint(userAddress, relayPoolAddress, { value: amount })
+        .mint(relayPoolAddress, userAddress, { value: amount })
 
       // Total assets should have increased
       expect(await relayPool.totalAssets()).to.equal(totalAssets + amount)
@@ -151,7 +151,7 @@ describe('RelayPoolNativeGateway', () => {
       // Deposit tokens to the RelayPool
       await nativeGateway
         .connect(secondUser)
-        .deposit(userAddress, relayPoolAddress, { value: amount })
+        .deposit(relayPoolAddress, userAddress, { value: amount })
 
       // Total assets should have increased
       expect(await relayPool.totalAssets()).to.equal(totalAssets + amount)
@@ -210,7 +210,7 @@ describe('RelayPoolNativeGateway', () => {
       // Deposit tokens to the RelayPool
       await nativeGateway
         .connect(secondUser)
-        .mint(userAddress, relayPoolAddress, { value: amount })
+        .mint(relayPoolAddress, userAddress, { value: amount })
 
       // Total assets should have increased
       expect(await relayPool.totalAssets()).to.equal(totalAssets + amount)
@@ -237,7 +237,7 @@ describe('RelayPoolNativeGateway', () => {
 
       await nativeGateway
         .connect(secondUser)
-        .redeem(sharesToBurn, relayPoolAddress, userAddress)
+        .redeem(relayPoolAddress, sharesToBurn, userAddress)
 
       // Total assets should have increased
       expect(await relayPool.totalAssets()).to.equal(
@@ -268,7 +268,7 @@ describe('RelayPoolNativeGateway', () => {
       // Deposit tokens to the RelayPool
       await nativeGateway
         .connect(secondUser)
-        .deposit(userAddress, relayPoolAddress, { value: amount })
+        .deposit(relayPoolAddress, userAddress, { value: amount })
 
       // Total assets should have increased
       expect(await relayPool.totalAssets()).to.equal(totalAssets + amount)
@@ -294,7 +294,7 @@ describe('RelayPoolNativeGateway', () => {
 
       await nativeGateway
         .connect(secondUser)
-        .withdraw(assetsToReceive, relayPoolAddress, userAddress)
+        .withdraw(relayPoolAddress, assetsToReceive, userAddress)
 
       expect(await relayPool.totalAssets()).to.equal(
         totalAssets + amount - assetsToReceive
@@ -324,7 +324,7 @@ describe('RelayPoolNativeGateway', () => {
       // Deposit tokens to the RelayPool
       await nativeGateway
         .connect(secondUser)
-        .mint(userAddress, relayPoolAddress, { value: amount })
+        .mint(relayPoolAddress, userAddress, { value: amount })
 
       // Total assets should have increased
       expect(await relayPool.totalAssets()).to.equal(totalAssets + amount)
@@ -351,7 +351,7 @@ describe('RelayPoolNativeGateway', () => {
 
       await nativeGateway
         .connect(secondUser)
-        .withdraw(assetsToReceive, relayPoolAddress, userAddress)
+        .withdraw(relayPoolAddress, assetsToReceive, userAddress)
 
       expect(await relayPool.totalAssets()).to.equal(
         totalAssets + amount - assetsToReceive
