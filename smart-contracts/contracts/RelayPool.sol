@@ -8,6 +8,7 @@ import {IWETH} from "./interfaces/IWETH.sol";
 import {ITokenSwap} from "./interfaces/ITokenSwap.sol";
 import {TypeCasts} from "./utils/TypeCasts.sol";
 import {HyperlaneMessage} from "./Types.sol";
+import "@openzeppelin/contracts/utils/math/Math.sol";
 
 struct OriginSettings {
   address curator;
@@ -398,7 +399,14 @@ contract RelayPool is ERC4626, Ownable {
   // Internal function to add assets to be accounted in a streaming fashgion
   function addToStreamingAssets(uint256 amount) internal returns (uint256) {
     updateStreamedAssets();
-    endOfStream = block.timestamp + streamingPeriod;
+    // We ajdust the end of the stream based on the new amount
+    uint amountLeft = remainsToStream();
+    uint timeLeft = Math.max(endOfStream, block.timestamp) - block.timestamp;
+    uint weightedStreamingPeriod = (amountLeft *
+      timeLeft +
+      amount *
+      streamingPeriod) / (amountLeft + amount);
+    endOfStream = block.timestamp + weightedStreamingPeriod;
     return totalAssetsToStream += amount;
   }
 
