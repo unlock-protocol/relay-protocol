@@ -27,13 +27,12 @@ contract RelayPoolNativeGateway {
     address pool,
     address receiver
   ) external payable returns (uint256) {
-    IERC4626 poolContract = IERC4626(pool);
     // wrap tokens
     WETH.deposit{value: msg.value}();
     WETH.approve(pool, msg.value);
 
     // do the deposit
-    uint256 shares = poolContract.deposit(msg.value, receiver);
+    uint256 shares = IERC4626(pool).deposit(msg.value, receiver);
     return shares;
   }
 
@@ -45,13 +44,12 @@ contract RelayPoolNativeGateway {
     address pool,
     address receiver
   ) external payable returns (uint256) {
-    IERC4626 poolContract = IERC4626(pool);
     // wrap tokens
     WETH.deposit{value: msg.value}();
     WETH.approve(pool, msg.value);
 
     // do the deposit
-    uint256 shares = poolContract.mint(msg.value, receiver);
+    uint256 shares = IERC4626(pool).mint(msg.value, receiver);
     return shares;
   }
 
@@ -66,8 +64,7 @@ contract RelayPoolNativeGateway {
     address receiver
   ) external virtual returns (uint256) {
     // withdraw from pool
-    IERC4626 poolContract = IERC4626(pool);
-    uint256 shares = poolContract.withdraw(assets, address(this), msg.sender);
+    uint256 shares = IERC4626(pool).withdraw(assets, address(this), msg.sender);
 
     // withdraw native tokens and send them back
     WETH.withdraw(assets);
@@ -88,8 +85,7 @@ contract RelayPoolNativeGateway {
     address receiver
   ) external virtual returns (uint256) {
     // withdraw from pool
-    IERC4626 poolContract = IERC4626(pool);
-    uint256 shares = poolContract.redeem(assets, address(this), msg.sender);
+    uint256 shares = IERC4626(pool).redeem(assets, address(this), msg.sender);
 
     // withdraw native tokens and send them back
     WETH.withdraw(assets);
