@@ -40,8 +40,7 @@ export default async function ({
   })
 
   // Fetch all poolOrigin records associated with this pool using the SQL-based API.
-  let origins
-  origins = await context.db.sql
+  const origins = await context.db.sql
     .select()
     .from(poolOrigin)
     .where(eq(poolOrigin.pool, poolAddress))
