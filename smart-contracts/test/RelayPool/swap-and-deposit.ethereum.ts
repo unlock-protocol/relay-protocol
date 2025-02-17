@@ -197,8 +197,6 @@ describe('RelayPool / Swap and Deposit', () => {
     let relayPoolAddress: string
 
     before(async () => {
-      const [user] = await ethers.getSigners()
-      const userAddress = await user.getAddress()
       relayPoolAddress = await relayPool.getAddress()
 
       // get some USDC
