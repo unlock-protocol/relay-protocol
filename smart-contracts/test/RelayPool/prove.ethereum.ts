@@ -38,7 +38,7 @@ describe('RelayBridge: prove', () => {
       expect(tx.to).to.equal(destinationNetwork.bridges.op!.portalProxy)
     })
 
-    it.only('should succeed at submitting a proof for an Base withdrawal', async () => {
+    it('should succeed at submitting a proof for an Base withdrawal', async () => {
       const [signer] = await ethers.getSigners()
 
       const originChainId = 8453
