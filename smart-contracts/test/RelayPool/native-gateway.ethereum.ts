@@ -178,7 +178,7 @@ describe('RelayPoolNativeGateway', () => {
       // redeem
       await nativeGateway
         .connect(secondUser)
-        .redeem(sharesToBurn, relayPoolAddress, userAddress)
+        .redeem(relayPoolAddress, sharesToBurn, userAddress)
 
       // Total assets should have decreased
       expect(await relayPool.totalAssets()).to.equal(
