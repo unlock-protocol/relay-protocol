@@ -93,7 +93,8 @@ contract RelayPool is ERC4626, Ownable {
     ERC20 asset,
     uint256 amount,
     uint32 bridgeChainId,
-    address indexed bridge
+    address indexed bridge,
+    uint256 fees,
   );
 
   event BridgeCompleted(
@@ -369,7 +370,8 @@ contract RelayPool is ERC4626, Ownable {
       asset,
       message.amount,
       chainId,
-      bridge
+      bridge,
+      feeAmount
     );
   }
 
