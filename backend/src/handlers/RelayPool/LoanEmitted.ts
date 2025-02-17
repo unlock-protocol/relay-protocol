@@ -62,6 +62,9 @@ export default async function ({
   const updatedTotalBridgeFees = BigInt(poolRecord.totalBridgeFees) + fee
 
   await context.db
-    .update(relayPool, { contractAddress: event.log.address })
+    .update(relayPool, {
+      contractAddress: event.log.address,
+      chainId: context.network.chainId,
+    })
     .set({ totalBridgeFees: updatedTotalBridgeFees.toString() })
 }
