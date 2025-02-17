@@ -35,9 +35,14 @@ export default async function ({
   const poolAddress = event.log.address
 
   // Update the relay pool record with the new outstanding debt.
-  await context.db.update(relayPool, { contractAddress: poolAddress }).set({
-    outstandingDebt: newDebt,
-  })
+  await context.db
+    .update(relayPool, {
+      contractAddress: poolAddress,
+      chainId: context.network.chainId,
+    })
+    .set({
+      outstandingDebt: newDebt,
+    })
 
   // Fetch all poolOrigin records associated with this pool using the SQL-based API.
   const origins = await context.db.sql
