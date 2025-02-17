@@ -54,17 +54,21 @@ export const claimWithdrawal = async (bridgeTransaction) => {
   )
   const portal = new ethers.Contract(proveParams.portalAddress, Portal2, signer)
 
-  if (!bridgeTransaction.nativeBridgeProofTxHash) {
+  if (!bridgeTransaction.opProofTxHash) {
     // Transaction not yet proven!
-    return false
+    throw new Error(
+      `Transaction ${bridgeTransaction.originTxHash} on ${bridgeTransaction.originChainId} not yet proven`
+    )
   }
 
   // Let's get the submitter by looking at the proof tx!
   const receipt = await signer.provider!.getTransactionReceipt(
-    bridgeTransaction.nativeBridgeProofTxHash
+    bridgeTransaction.opProofTxHash
   )
   if (!receipt) {
-    throw new Error('Proof tx not found')
+    throw new Error(
+      `Proof transaction ${bridgeTransaction.opProofTxHash} for ${bridgeTransaction.originTxHash} on ${bridgeTransaction.originChainId} not found`
+    )
   }
   // Check status of withdrawal!
   const ready = await portal
@@ -75,6 +79,9 @@ export const claimWithdrawal = async (bridgeTransaction) => {
           'OptimismPortal: proven withdrawal has not matured yet'
         )
       ) {
+        console.log(
+          `Transaction ${bridgeTransaction.originTxHash} on ${bridgeTransaction.originChainId} not ready yet (proof: ${bridgeTransaction.opProofTxHash})`
+        )
         return false
       } else {
         throw e

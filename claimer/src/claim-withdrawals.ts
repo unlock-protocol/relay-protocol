@@ -6,7 +6,12 @@ import networks from '@relay-protocol/networks'
 
 const GET_ALL_TRANSACTIONS_TO_CLAIM = gql`
   query GetAllBridgeTransactionsToClaim($originTimestamp: BigInt!) {
-    bridgeTransactions(where: { originTimestamp_lt: $originTimestamp }) {
+    bridgeTransactions(
+      where: {
+        originTimestamp_lt: $originTimestamp
+        nativeBridgeStatus_not: "FINALIZED"
+      }
+    ) {
       items {
         originBridgeAddress
         nonce
@@ -19,7 +24,7 @@ const GET_ALL_TRANSACTIONS_TO_CLAIM = gql`
         amount
         hyperlaneMessageId
         nativeBridgeStatus
-        nativeBridgeProofTxHash
+        opProofTxHash
         nativeBridgeFinalizedTxHash
         loanEmittedTxHash
         originTimestamp
@@ -54,11 +59,13 @@ export const claimTransactions = async ({
         )
         continue
       } else if (originNetwork.stack === 'op') {
-        await OPstack.claimWithdrawal(bridgeTransaction)
+        if (bridgeTransaction.nativeBridgeStatus === 'PROVEN') {
+          await OPstack.claimWithdrawal(bridgeTransaction)
+        }
       } else if (originNetwork.stack === 'arb') {
         await Orbit.claimWithdrawal(bridgeTransaction)
       } else {
-        console.log(originNetwork.stack)
+        throw new Error(`Unknown stack ${originNetwork.stack}`)
       }
     } catch (error) {
       console.error(error)
