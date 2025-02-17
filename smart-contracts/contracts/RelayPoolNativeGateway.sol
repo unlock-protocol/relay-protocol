@@ -11,29 +11,29 @@ error onlyWethCanSendEth();
 
 contract RelayPoolNativeGateway {
   IWETH public immutable WETH;
-  IERC4626 public immutable POOL;
 
   /**
    * @param wethAddress address on Wrapped Native contract
    */
-  constructor(address wethAddress, address poolAddress) {
-    // TODO: add some wrapped asset verification
-    // cast as IWETH
+  constructor(address wethAddress) {
     WETH = IWETH(wethAddress);
-    POOL = IERC4626(poolAddress);
   }
 
   /**
    * @dev deposit native tokens to the WETH _reserves of msg.sender
    * @param receiver the reserve account to be credited
    */
-  function depositNative(address receiver) external payable returns (uint256) {
+  function deposit(
+    address pool,
+    address receiver
+  ) external payable returns (uint256) {
+    IERC4626 poolContract = IERC4626(pool);
     // wrap tokens
     WETH.deposit{value: msg.value}();
-    WETH.approve(address(POOL), msg.value);
+    WETH.approve(pool, msg.value);
 
     // do the deposit
-    uint256 shares = POOL.deposit(msg.value, receiver);
+    uint256 shares = poolContract.deposit(msg.value, receiver);
     return shares;
   }
 
@@ -41,13 +41,17 @@ contract RelayPoolNativeGateway {
    * @dev deposit native tokens to the WETH _reserves of msg.sender
    * @param receiver the reserve account to be credited
    */
-  function mintNative(address receiver) external payable returns (uint256) {
+  function mint(
+    address pool,
+    address receiver
+  ) external payable returns (uint256) {
+    IERC4626 poolContract = IERC4626(pool);
     // wrap tokens
     WETH.deposit{value: msg.value}();
-    WETH.approve(address(POOL), msg.value);
+    WETH.approve(pool, msg.value);
 
     // do the deposit
-    uint256 shares = POOL.mint(msg.value, receiver);
+    uint256 shares = poolContract.mint(msg.value, receiver);
     return shares;
   }
 
@@ -56,12 +60,14 @@ contract RelayPoolNativeGateway {
    * @param assets amout of native tokens
    * @param receiver the reserve account to be credited
    */
-  function withdrawNative(
+  function withdraw(
+    address pool,
     uint256 assets,
     address receiver
   ) external virtual returns (uint256) {
     // withdraw from pool
-    uint256 shares = POOL.withdraw(assets, address(this), msg.sender);
+    IERC4626 poolContract = IERC4626(pool);
+    uint256 shares = poolContract.withdraw(assets, address(this), msg.sender);
 
     // withdraw native tokens and send them back
     WETH.withdraw(assets);
@@ -76,12 +82,14 @@ contract RelayPoolNativeGateway {
    * @param assets amout of native tokens
    * @param receiver the reserve account to be credited
    */
-  function redeemNative(
+  function redeem(
+    address pool,
     uint256 assets,
     address receiver
   ) external virtual returns (uint256) {
     // withdraw from pool
-    uint256 shares = POOL.redeem(assets, address(this), msg.sender);
+    IERC4626 poolContract = IERC4626(pool);
+    uint256 shares = poolContract.redeem(assets, address(this), msg.sender);
 
     // withdraw native tokens and send them back
     WETH.withdraw(assets);
