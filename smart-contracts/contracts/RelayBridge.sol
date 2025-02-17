@@ -112,5 +112,10 @@ contract RelayBridge is IRelayBridge {
       pool,
       proxyBridge
     );
+
+    // refund extra value to msg sender
+    if (msg.value > hyperlaneFee) {
+      payable(msg.sender).transfer(msg.value - hyperlaneFee);
+    }
   }
 }
