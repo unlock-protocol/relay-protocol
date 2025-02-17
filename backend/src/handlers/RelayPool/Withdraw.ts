@@ -63,6 +63,7 @@ export default async function ({
       timestamp,
       blockNumber,
       transactionHash,
+      chainId: context.network.chainId,
     }),
   ])
 

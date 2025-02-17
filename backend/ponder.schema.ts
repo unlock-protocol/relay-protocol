@@ -107,7 +107,6 @@ export const originPoolRelation = relations(poolOrigin, ({ one }) => ({
 
 /**
  * Track pool deposits/withdrawals
- * - id: Unique ID (tx hash + log index)
  * - type: DEPOSIT or WITHDRAW
  * - user: User address
  * - relayPool: Pool address
@@ -117,17 +116,28 @@ export const originPoolRelation = relations(poolOrigin, ({ one }) => ({
  * - blockNumber: Block number
  * - transactionHash: Transaction hash
  */
-export const poolAction = onchainTable('pool_action', (t) => ({
-  id: t.text().primaryKey(),
-  type: t.text().notNull(),
-  user: t.hex().notNull(),
-  relayPool: t.hex().notNull(),
-  assets: t.bigint().notNull(),
-  shares: t.bigint().notNull(),
-  timestamp: t.bigint().notNull(),
-  blockNumber: t.bigint().notNull(),
-  transactionHash: t.hex().notNull(),
-}))
+export const poolAction = onchainTable(
+  'pool_action',
+  (t) => ({
+    type: t.text().notNull(),
+    user: t.hex().notNull(),
+    relayPool: t.hex().notNull(),
+    assets: t.bigint().notNull(),
+    shares: t.bigint().notNull(),
+    timestamp: t.bigint().notNull(),
+    blockNumber: t.bigint().notNull(),
+    transactionHash: t.hex().notNull(),
+    chainId: t.integer().notNull(),
+  }),
+  (table) => ({
+    pk: primaryKey({
+      columns: [table.chainId, table.transactionHash],
+    }),
+    userIdx: index().on(table.user),
+    poolIdx: index().on(table.chainId, table.relayPool),
+    assetsIdx: index().on(table.chainId, table.assets),
+  })
+)
 
 /**
  * Track user balances across all pools

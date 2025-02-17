@@ -13,9 +13,6 @@ export default async function ({
   const transactionHash = event.transaction.hash
   const timestamp = event.block.timestamp
 
-  // Generate unique ID using transaction hash and log index
-  const eventId = `${transactionHash}-${event.log.logIndex}`
-
   // Get the relay pool to find its yield pool
   const pool = await context.db.find(relayPool, {
     contractAddress: event.log.address,
@@ -55,7 +52,6 @@ export default async function ({
 
     // Record pool action
     context.db.insert(poolAction).values({
-      id: eventId,
       type: 'DEPOSIT',
       user: owner,
       receiver: event.log.address,
@@ -66,6 +62,7 @@ export default async function ({
       timestamp,
       blockNumber,
       transactionHash,
+      chainId: context.network.chainId,
     }),
   ])
 
