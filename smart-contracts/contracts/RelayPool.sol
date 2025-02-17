@@ -8,6 +8,7 @@ import {IWETH} from "./interfaces/IWETH.sol";
 import {ITokenSwap} from "./interfaces/ITokenSwap.sol";
 import {TypeCasts} from "./utils/TypeCasts.sol";
 import {HyperlaneMessage} from "./Types.sol";
+import "@openzeppelin/contracts/utils/math/Math.sol";
 
 struct OriginSettings {
   address curator;
@@ -85,6 +86,7 @@ contract RelayPool is ERC4626, Ownable {
   // All incoming assets are streamed (even though they are instantly deposited in the yield pool)
   uint256 public totalAssetsToStream = 0;
   uint256 public lastAssetsCollectedAt = 0;
+  uint256 public endOfStream = block.timestamp;
   uint256 public streamingPeriod = 7 days;
 
   event LoanEmitted(
@@ -377,13 +379,13 @@ contract RelayPool is ERC4626, Ownable {
   // If the last fee collection was more than 7 days ago, we have nothing left to stream
   // Otherwise, we return the time-based pro-rata of what remains to stream.
   function remainsToStream() internal view returns (uint256) {
-    if (block.timestamp - lastAssetsCollectedAt > streamingPeriod) {
+    if (block.timestamp > endOfStream) {
       return 0; // Nothing left to stream
     } else {
       return
-        totalAssetsToStream -
+        totalAssetsToStream - // total assets to stream
         (totalAssetsToStream * (block.timestamp - lastAssetsCollectedAt)) /
-        streamingPeriod;
+        (endOfStream - lastAssetsCollectedAt); // already streamed
     }
   }
 
@@ -397,6 +399,14 @@ contract RelayPool is ERC4626, Ownable {
   // Internal function to add assets to be accounted in a streaming fashgion
   function addToStreamingAssets(uint256 amount) internal returns (uint256) {
     updateStreamedAssets();
+    // We ajdust the end of the stream based on the new amount
+    uint amountLeft = remainsToStream();
+    uint timeLeft = Math.max(endOfStream, block.timestamp) - block.timestamp;
+    uint weightedStreamingPeriod = (amountLeft *
+      timeLeft +
+      amount *
+      streamingPeriod) / (amountLeft + amount);
+    endOfStream = block.timestamp + weightedStreamingPeriod;
     return totalAssetsToStream += amount;
   }
 
