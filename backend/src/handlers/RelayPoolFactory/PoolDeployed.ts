@@ -9,7 +9,7 @@ export default async function ({
   event: Event<'RelayPoolFactory:PoolDeployed'>
   context: Context<'RelayPoolFactory:PoolDeployed'>
 }) {
-  const { pool, asset, creator, thirdPartyPool, origins } = event.args
+  const { pool, asset, creator, thirdPartyPool } = event.args
 
   // Fetch the name of the third-party yield pool,
   // and the name and symbol of the relay pool.
@@ -39,6 +39,7 @@ export default async function ({
       asset: asset as `0x${string}`,
       name: yieldName,
       lastUpdated: BigInt(event.block.timestamp),
+      chainId: context.network.chainId,
     })
     .onConflictDoUpdate({
       name: yieldName,

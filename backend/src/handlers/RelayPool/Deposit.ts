@@ -13,12 +13,10 @@ export default async function ({
   const transactionHash = event.transaction.hash
   const timestamp = event.block.timestamp
 
-  // Generate unique ID using transaction hash and log index
-  const eventId = `${transactionHash}-${event.log.logIndex}`
-
   // Get the relay pool to find its yield pool
   const pool = await context.db.find(relayPool, {
     contractAddress: event.log.address,
+    chainId: context.network.chainId,
   })
 
   if (!pool) {
@@ -42,14 +40,18 @@ export default async function ({
   // Update states
   await Promise.all([
     // Update relay pool
-    context.db.update(relayPool, { contractAddress: event.log.address }).set({
-      totalAssets: relayTotalAssets,
-      totalShares: relayTotalShares,
-    }),
+    context.db
+      .update(relayPool, {
+        contractAddress: event.log.address,
+        chainId: context.network.chainId,
+      })
+      .set({
+        totalAssets: relayTotalAssets,
+        totalShares: relayTotalShares,
+      }),
 
     // Record pool action
     context.db.insert(poolAction).values({
-      id: eventId,
       type: 'DEPOSIT',
       user: owner,
       receiver: event.log.address,
@@ -60,16 +62,14 @@ export default async function ({
       timestamp,
       blockNumber,
       transactionHash,
+      chainId: context.network.chainId,
     }),
   ])
-
-  // Update user balance - using owner for the balance tracking
-  const balanceId = `${owner}-${event.log.address}` // wallet-pool format
 
   await context.db
     .insert(userBalance)
     .values({
-      id: balanceId,
+      chainId: context.network.chainId,
       wallet: owner,
       relayPool: event.log.address,
       shareBalance: shares,

@@ -35,68 +35,51 @@ export default async function ({
   const poolAddress = event.log.address
 
   // Update the relay pool record with the new outstanding debt.
-  try {
-    await context.db.update(relayPool, { contractAddress: poolAddress }).set({
+  await context.db
+    .update(relayPool, {
+      contractAddress: poolAddress,
+      chainId: context.network.chainId,
+    })
+    .set({
       outstandingDebt: newDebt,
     })
-  } catch (error) {
-    console.error(
-      `Failed to update relay pool ${poolAddress} outstanding debt:`,
-      error
-    )
-    throw error
-  }
 
   // Fetch all poolOrigin records associated with this pool using the SQL-based API.
-  let origins
-  try {
-    origins = await context.db.sql
-      .select()
-      .from(poolOrigin)
-      .where(eq(poolOrigin.pool, poolAddress))
-      .execute()
-  } catch (error) {
-    console.error(`Failed to fetch pool origins for ${poolAddress}:`, error)
-    throw error
-  }
+  const origins = await context.db.sql
+    .select()
+    .from(poolOrigin)
+    .where(eq(poolOrigin.pool, poolAddress))
+    .execute()
 
   // For each origin record, we query the pool contract's authorizedOrigins mapping.
   // Note that the authorizedOrigins mapping is keyed by (originChainId, originBridge).
   for (const origin of origins) {
-    try {
-      // Read the origin's settings from the on-chain RelayPool contract.
-      const originSettings = await context.client.readContract({
-        address: poolAddress,
-        abi: context.contracts.RelayPool.abi,
-        functionName: 'authorizedOrigins',
-        args: [origin.originChainId, origin.originBridge],
+    // Read the origin's settings from the on-chain RelayPool contract.
+    const originSettings = await context.client.readContract({
+      address: poolAddress,
+      abi: context.contracts.RelayPool.abi,
+      functionName: 'authorizedOrigins',
+      args: [origin.originChainId, origin.originBridge],
+    })
+
+    // Extract the outstandingDebt from the returned struct.
+    // Sometimes named keys are not included in the returned struct,
+    // so fall back to accessing via array index (2).
+    const updatedOriginDebt =
+      originSettings.outstandingDebt !== undefined
+        ? originSettings.outstandingDebt
+        : originSettings[2]
+
+    // Update the poolOrigin record with this per-origin outstanding debt.
+    await context.db
+      .update(poolOrigin, {
+        chainId: origin.chainId,
+        pool: origin.pool,
+        originChainId: origin.originChainId,
+        originBridge: origin.originBridge,
       })
-
-      // Extract the outstandingDebt from the returned struct.
-      // Sometimes named keys are not included in the returned struct,
-      // so fall back to accessing via array index (2).
-      const updatedOriginDebt =
-        originSettings.outstandingDebt !== undefined
-          ? originSettings.outstandingDebt
-          : originSettings[2]
-
-      // Update the poolOrigin record with this per-origin outstanding debt.
-      await context.db
-        .update(poolOrigin, {
-          chainId: origin.chainId,
-          pool: origin.pool,
-          originChainId: origin.originChainId,
-          originBridge: origin.originBridge,
-        })
-        .set({
-          currentOutstandingDebt: updatedOriginDebt.toString(),
-        })
-    } catch (error) {
-      console.error(
-        `Failed to process origin (Chain: ${origin.originChainId}, Bridge: ${origin.originBridge}):`,
-        error
-      )
-      throw error
-    }
+      .set({
+        currentOutstandingDebt: updatedOriginDebt.toString(),
+      })
   }
 }

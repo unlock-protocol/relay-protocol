@@ -126,6 +126,7 @@ export default createConfig({
       network: {
         sepolia: {
           address: networks['11155111']!.bridges!.arb!.outbox! as `0x${string}`,
+          startBlock: earliestBlocks.sepolia,
         },
       },
     },

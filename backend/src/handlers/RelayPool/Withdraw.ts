@@ -16,6 +16,7 @@ export default async function ({
   // Get the relay pool to find its yield pool
   const pool = await context.db.find(relayPool, {
     contractAddress: event.log.address,
+    chainId: context.network.chainId,
   })
 
   if (!pool) {
@@ -39,10 +40,15 @@ export default async function ({
   // Update states
   await Promise.all([
     // Update relay pool
-    context.db.update(relayPool, { contractAddress: event.log.address }).set({
-      totalAssets: relayTotalAssets,
-      totalShares: relayTotalShares,
-    }),
+    context.db
+      .update(relayPool, {
+        contractAddress: event.log.address,
+        chainId: context.network.chainId,
+      })
+      .set({
+        totalAssets: relayTotalAssets,
+        totalShares: relayTotalShares,
+      }),
 
     // Record pool action
     context.db.insert(poolAction).values({
@@ -57,23 +63,27 @@ export default async function ({
       timestamp,
       blockNumber,
       transactionHash,
+      chainId: context.network.chainId,
     }),
   ])
 
   // Get user balance
-  const balanceId = `${owner}-${event.log.address}` // wallet-pool format
-  const user = await context.db.find(userBalance, { id: balanceId })
-
-  if (!user) {
-    throw new Error(
-      `User ${owner} attempting to withdraw without existing balance record`
-    )
-  }
+  const user = await context.db.find(userBalance, {
+    wallet: owner,
+    relayPool: event.log.address,
+    chainId: context.network.chainId,
+  })
 
   // Update user balance
-  await context.db.update(userBalance, { id: balanceId }).set({
-    shareBalance: user.shareBalance - shares,
-    totalWithdrawn: user.totalWithdrawn + assets,
-    lastUpdated: timestamp,
-  })
+  await context.db
+    .update(userBalance, {
+      wallet: owner,
+      relayPool: event.log.address,
+      chainId: context.network.chainId,
+    })
+    .set({
+      shareBalance: user.shareBalance - shares,
+      totalWithdrawn: user.totalWithdrawn + assets,
+      lastUpdated: timestamp,
+    })
 }
