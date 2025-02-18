@@ -3,7 +3,6 @@ import { ethers, ignition } from 'hardhat'
 import { MyToken, MyYieldPool, RelayPoolFactory } from '../../typechain-types'
 import RelayPoolFactoryModule from '../../ignition/modules/RelayPoolFactoryModule'
 import { getEvent } from '@relay-protocol/helpers'
-import networks from '@relay-protocol/networks'
 
 describe('RelayPoolFactory: deployment', () => {
   let relayPoolFactory: RelayPoolFactory
@@ -65,6 +64,30 @@ describe('RelayPoolFactory: deployment', () => {
     expect(await relayPoolFactory.timelockTemplate()).to.equal(
       await timelockTemplate.getAddress()
     )
+  })
+
+  it('should fail to deploy a pool with an insufficient deposit', async () => {
+    const initialDeposit = ethers.parseUnits('0.9', await myToken.decimals())
+
+    await myToken.mint(initialDeposit)
+    await myToken.approve(await relayPoolFactory.getAddress(), initialDeposit)
+
+    await expect(
+      relayPoolFactory.deployPool(
+        await myToken.getAddress(),
+        'Test Vault',
+        'RELAY',
+        [],
+        await thirdPartyPool.getAddress(),
+        60 * 60 * 24 * 7,
+        initialDeposit
+      )
+    )
+      .to.be.revertedWithCustomError(
+        relayPoolFactory,
+        'InsufficientInitialDeposit'
+      )
+      .withArgs('900000000000000000')
   })
 
   it('should let user deploy a pool', async () => {

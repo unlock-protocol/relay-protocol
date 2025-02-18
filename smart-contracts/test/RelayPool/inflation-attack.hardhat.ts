@@ -50,8 +50,7 @@ describe('RelayPool: inflation attack', () => {
     await timelockTemplate.waitForDeployment()
 
     // Deploy the factory
-    let relayPoolFactory: RelayPoolFactory
-    ;({ relayPoolFactory } = await ignition.deploy(RelayPoolFactoryModule, {
+    const { relayPoolFactory } = await ignition.deploy(RelayPoolFactoryModule, {
       parameters: {
         RelayPoolFactory: {
           hyperlaneMailbox: networks[1].hyperlaneMailbox,
@@ -60,7 +59,7 @@ describe('RelayPool: inflation attack', () => {
         },
       },
       deploymentId: 'RelayPoolFactory',
-    }))
+    })
 
     initialDeposit = ethers.parseUnits('100', await myToken.decimals())
     await myToken

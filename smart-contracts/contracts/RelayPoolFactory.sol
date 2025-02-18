@@ -6,8 +6,6 @@ import "@openzeppelin/contracts/proxy/Clones.sol";
 
 import {RelayPool, OriginParam} from "./RelayPool.sol";
 
-import "hardhat/console.sol";
-
 interface RelayPoolTimelock {
   function initialize(
     uint256 minDelay,
@@ -33,6 +31,8 @@ contract RelayPoolFactory {
     address timelock
   );
 
+  error InsufficientInitialDeposit(uint deposit);
+
   constructor(address hMailbox, address weth, address timelock) {
     hyperlaneMailbox = hMailbox;
     wrappedEth = weth;
@@ -48,6 +48,11 @@ contract RelayPoolFactory {
     uint timelockDelay,
     uint256 initialDeposit
   ) public returns (address) {
+    // We require an initial deposit of 1 unit
+    uint8 decimals = ERC20(asset).decimals();
+    if (initialDeposit < 10 ** decimals) {
+      revert InsufficientInitialDeposit(initialDeposit);
+    }
     address[] memory curator = new address[](1);
     curator[0] = msg.sender;
 
