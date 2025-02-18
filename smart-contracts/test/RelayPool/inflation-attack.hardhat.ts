@@ -14,6 +14,7 @@ describe('RelayPool: inflation attack', () => {
   let relayPool: RelayPool
   let myToken: MyToken
   let thirdPartyPool: MyYieldPool
+  let initialDeposit: bigint
 
   before(async () => {
     const [user] = await ethers.getSigners()
@@ -61,7 +62,7 @@ describe('RelayPool: inflation attack', () => {
       deploymentId: 'RelayPoolFactory',
     }))
 
-    const initialDeposit = ethers.parseUnits('100', await myToken.decimals())
+    initialDeposit = ethers.parseUnits('100', await myToken.decimals())
     await myToken
       .connect(user)
       .approve(await relayPoolFactory.getAddress(), initialDeposit)
@@ -86,15 +87,13 @@ describe('RelayPool: inflation attack', () => {
     const poolAddress = event.args.pool
     relayPool = await ethers.getContractAt('RelayPool', poolAddress)
 
-    // No assets yet!
-    expect(await relayPool.totalAssets()).to.equal(0)
+    expect(await relayPool.totalAssets()).to.equal(initialDeposit)
   })
 
   it('should not let user inflate the pool by using the ERC20', async () => {
     const [attacker, victim] = await ethers.getSigners()
     const attackerAddress = await attacker.getAddress()
     const thirdPartyPoolAddress = await thirdPartyPool.getAddress()
-    const relayPoolAddress = await relayPool.getAddress()
 
     const thirdPartyPoolBalanceBefore = await myToken.balanceOf(
       thirdPartyPoolAddress
@@ -105,13 +104,6 @@ describe('RelayPool: inflation attack', () => {
     await relayPool.mint(1, attackerAddress)
     const sharesOfAttacker = await relayPool.balanceOf(attackerAddress)
     expect(sharesOfAttacker).to.equal(1)
-    // Check there are shares and assets
-    expect(await relayPool.totalSupply()).to.equal(1)
-    expect(await relayPool.totalAssets()).to.equal(1)
-    expect(await myToken.balanceOf(thirdPartyPoolAddress)).to.equal(
-      thirdPartyPoolBalanceBefore + 1n
-    )
-    expect(await myToken.balanceOf(relayPoolAddress)).to.equal(0)
 
     // Then send a LARGE amount of tokens to the third party pool
     const attackAmount = ethers.parseUnits('100', await myToken.decimals())

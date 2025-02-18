@@ -83,11 +83,9 @@ contract RelayPoolFactory {
     );
 
     // Transfer initial deposit to the pool to prevent inflation attack
+    asset.transferFrom(msg.sender, address(this), initialDeposit);
     asset.approve(address(pool), initialDeposit);
-    console.log("I WAS HERE!");
-    console.log(initialDeposit);
     pool.deposit(initialDeposit, timelock);
-    console.log("BUT NOT HERE!");
 
     return address(pool);
   }
