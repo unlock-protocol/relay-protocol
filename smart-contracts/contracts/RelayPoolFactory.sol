@@ -43,7 +43,8 @@ contract RelayPoolFactory {
     string memory symbol,
     OriginParam[] memory origins,
     address thirdPartyPool,
-    uint timelockDelay
+    uint timelockDelay,
+    uint256 initialDeposit
   ) public returns (address) {
     address[] memory curator = new address[](1);
     curator[0] = msg.sender;
@@ -78,6 +79,9 @@ contract RelayPoolFactory {
       thirdPartyPool,
       timelock
     );
+
+    // Transfer initial deposit to the pool to prevent inflation attack
+    pool.deposit(initialDeposit, timelock);
 
     return address(pool);
   }
