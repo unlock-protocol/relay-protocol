@@ -149,7 +149,8 @@ task('deploy:pool', 'Deploy a relay pool')
         name,
         symbol,
         JSON.parse(origins),
-        yieldPool
+        yieldPool,
+        7 * 24 * 60 * 60
       )
       const receipt = await tx.wait()
       const event = await getEvent(

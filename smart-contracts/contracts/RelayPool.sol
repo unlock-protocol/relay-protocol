@@ -56,6 +56,7 @@ error MessageTooRecent(
   uint32 coolDown
 );
 
+
 contract RelayPool is ERC4626, Ownable {
   // The address of the Hyperlane mailbox
   address public immutable HYPERLANE_MAILBOX;
@@ -94,8 +95,8 @@ contract RelayPool is ERC4626, Ownable {
     address indexed recipient,
     ERC20 asset,
     uint256 amount,
-    uint32 bridgeChainId,
-    address indexed bridge
+    OriginSettings origin,
+    uint256 fees
   );
 
   event BridgeCompleted(
@@ -397,8 +398,8 @@ contract RelayPool is ERC4626, Ownable {
       message.recipient,
       asset,
       message.amount,
-      chainId,
-      bridge
+      origin,
+      feeAmount
     );
   }
 
@@ -505,7 +506,7 @@ contract RelayPool is ERC4626, Ownable {
     uint256 amount,
     uint24 uniswapWethPoolFeeToken,
     uint24 uniswapWethPoolFeeAsset
-  ) public {
+  ) public onlyOwner {
     if (token == address(asset)) {
       revert UnauthorizedSwap(token);
     }
