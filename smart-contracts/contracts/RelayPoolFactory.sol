@@ -6,6 +6,8 @@ import "@openzeppelin/contracts/proxy/Clones.sol";
 
 import {RelayPool, OriginParam} from "./RelayPool.sol";
 
+import "hardhat/console.sol";
+
 interface RelayPoolTimelock {
   function initialize(
     uint256 minDelay,
@@ -81,7 +83,11 @@ contract RelayPoolFactory {
     );
 
     // Transfer initial deposit to the pool to prevent inflation attack
+    asset.approve(address(pool), initialDeposit);
+    console.log("I WAS HERE!");
+    console.log(initialDeposit);
     pool.deposit(initialDeposit, timelock);
+    console.log("BUT NOT HERE!");
 
     return address(pool);
   }

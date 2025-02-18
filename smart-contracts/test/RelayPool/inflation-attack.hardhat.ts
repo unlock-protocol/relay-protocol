@@ -1,8 +1,14 @@
 import { expect } from 'chai'
 import { ethers, ignition } from 'hardhat'
 import networks from '@relay-protocol/networks'
-import RelayPoolModule from '../../ignition/modules/RelayPoolModule'
-import { MyToken, MyYieldPool, RelayPool } from '../../typechain-types'
+import {
+  MyToken,
+  MyYieldPool,
+  RelayPool,
+  RelayPoolFactory,
+} from '../../typechain-types'
+import RelayPoolFactoryModule from '../../ignition/modules/RelayPoolFactoryModule'
+import { getEvent } from '@relay-protocol/helpers'
 
 describe('RelayPool: inflation attack', () => {
   let relayPool: RelayPool
@@ -22,31 +28,64 @@ describe('RelayPool: inflation attack', () => {
     ])
 
     // Deposit in the third party pool
-    const initialDeposit = ethers.parseUnits('100', await myToken.decimals())
+    const initialDepositThirdPartyPool = ethers.parseUnits(
+      '100',
+      await myToken.decimals()
+    )
     await myToken
       .connect(user)
-      .approve(await thirdPartyPool.getAddress(), initialDeposit)
-    await thirdPartyPool.connect(user).deposit(initialDeposit, userAddress)
+      .approve(await thirdPartyPool.getAddress(), initialDepositThirdPartyPool)
+    await thirdPartyPool
+      .connect(user)
+      .deposit(initialDepositThirdPartyPool, userAddress)
     // Check that there are shares!
     expect(await myToken.totalSupply()).to.equal('1000000000000000000000000000')
 
-    // deploy the pool using ignition
-    const parameters = {
-      RelayPool: {
-        hyperlaneMailbox: networks[1].hyperlaneMailbox,
-        asset: await myToken.getAddress(),
-        name: `${await myToken.name()} Relay Pool`,
-        symbol: `${await myToken.symbol()}-REL`,
-        origins: [],
-        thirdPartyPool: await thirdPartyPool.getAddress(),
-        weth: ethers.ZeroAddress,
-        curator: userAddress,
-      },
-    }
+    // Deploy an "empty" timelock for the Pool Factory
+    const TimelockController = await ethers.getContractFactory(
+      'TimelockControllerUpgradeable'
+    )
+    const timelockTemplate = await TimelockController.deploy()
+    await timelockTemplate.waitForDeployment()
 
-    ;({ relayPool } = await ignition.deploy(RelayPoolModule, {
-      parameters,
+    // Deploy the factory
+    let relayPoolFactory: RelayPoolFactory
+    ;({ relayPoolFactory } = await ignition.deploy(RelayPoolFactoryModule, {
+      parameters: {
+        RelayPoolFactory: {
+          hyperlaneMailbox: networks[1].hyperlaneMailbox,
+          weth: ethers.ZeroAddress,
+          timelock: await timelockTemplate.getAddress(),
+        },
+      },
+      deploymentId: 'RelayPoolFactory',
     }))
+
+    const initialDeposit = ethers.parseUnits('100', await myToken.decimals())
+    await myToken
+      .connect(user)
+      .approve(await relayPoolFactory.getAddress(), initialDeposit)
+
+    const tx = await relayPoolFactory.deployPool(
+      await myToken.getAddress(),
+      `${await myToken.name()} Relay Pool`,
+      `${await myToken.symbol()}-REL`,
+      [],
+      await thirdPartyPool.getAddress(),
+      60 * 60 * 24 * 7,
+      initialDeposit
+    )
+
+    const receipt = await tx.wait()
+    const event = await getEvent(
+      receipt!,
+      'PoolDeployed',
+      relayPoolFactory.interface
+    )
+
+    const poolAddress = event.args.pool
+    relayPool = await ethers.getContractAt('RelayPool', poolAddress)
+
     // No assets yet!
     expect(await relayPool.totalAssets()).to.equal(0)
   })
