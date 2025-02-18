@@ -506,7 +506,7 @@ contract RelayPool is ERC4626, Ownable {
     uint256 amount,
     uint24 uniswapWethPoolFeeToken,
     uint24 uniswapWethPoolFeeAsset
-  ) public {
+  ) public onlyOwner {
     if (token == address(asset)) {
       revert UnauthorizedSwap(token);
     }
