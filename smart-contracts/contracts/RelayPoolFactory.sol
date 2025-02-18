@@ -54,7 +54,7 @@ contract RelayPoolFactory {
       timelockDelay,
       curator,
       curator,
-      address(0)
+      address(0) // No admin
     );
 
     RelayPool pool = new RelayPool(
