@@ -76,23 +76,23 @@ contract RelayPoolNativeGateway {
 
   /**
    * @dev redeem native tokens
-   * @param assets amout of native tokens
+   * @param shares amout of native tokens
    * @param receiver the reserve account to be credited
    */
   function redeem(
     address pool,
-    uint256 assets,
+    uint256 shares,
     address receiver
   ) external virtual returns (uint256) {
     // withdraw from pool
-    uint256 shares = IERC4626(pool).redeem(assets, address(this), msg.sender);
+    uint256 assets = IERC4626(pool).redeem(shares, address(this), msg.sender);
 
     // withdraw native tokens and send them back
     WETH.withdraw(assets);
     _safeTransferETH(receiver, assets);
 
     //emit event
-    return shares;
+    return assets;
   }
 
   /**
