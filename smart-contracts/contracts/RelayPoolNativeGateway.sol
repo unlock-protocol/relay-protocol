@@ -43,14 +43,14 @@ contract RelayPoolNativeGateway {
   function mint(
     address pool,
     address receiver
-  ) external payable returns (uint256) {
+  ) external payable returns (uint256 shares) {
     // wrap tokens
     WETH.deposit{value: msg.value}();
     WETH.approve(pool, msg.value);
 
     // do the deposit
-    uint256 shares = IERC4626(pool).mint(msg.value, receiver);
-    return shares;
+    shares = IERC4626(pool).convertToShares(msg.value);
+    IERC4626(pool).mint(shares, receiver);
   }
 
   /**
