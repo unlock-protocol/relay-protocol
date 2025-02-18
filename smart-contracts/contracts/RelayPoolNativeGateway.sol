@@ -4,8 +4,7 @@ pragma solidity ^0.8.28;
 import {IWETH} from "./interfaces/IWETH.sol";
 import {IERC4626} from "@openzeppelin/contracts/interfaces/IERC4626.sol";
 
-// import "hardhat/console.sol";
-
+error remainingEth();
 error ethTransferFailed();
 error onlyWethCanSendEth();
 
@@ -70,6 +69,11 @@ contract RelayPoolNativeGateway {
     WETH.withdraw(assets);
     _safeTransferETH(receiver, assets);
 
+    // make sure no ETH is left in the contract
+    if (address(this).balance != 0) {
+      revert remainingEth();
+    }
+
     //emit event
     return shares;
   }
@@ -90,6 +94,11 @@ contract RelayPoolNativeGateway {
     // withdraw native tokens and send them back
     WETH.withdraw(assets);
     _safeTransferETH(receiver, assets);
+
+    // make sure no ETH is left in the contract
+    if (address(this).balance != 0) {
+      revert remainingEth();
+    }
 
     //emit event
     return assets;
