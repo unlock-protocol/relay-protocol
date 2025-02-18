@@ -96,8 +96,6 @@ contract OPStackNativeBridgeProxy is BridgeProxy {
       proofSubmitter
     );
 
-    // TODO: we MUST get the content of `message` to identify _which_ transfer(s) was received
-    // so we can handle failed "fast transfers"
     return IERC20(currency).balanceOf(address(this));
   }
 }

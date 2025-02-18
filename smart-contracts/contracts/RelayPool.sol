@@ -56,7 +56,6 @@ error MessageTooRecent(
   uint32 coolDown
 );
 
-
 contract RelayPool is ERC4626, Ownable {
   // The address of the Hyperlane mailbox
   address public immutable HYPERLANE_MAILBOX;
@@ -141,8 +140,6 @@ contract RelayPool is ERC4626, Ownable {
     address wrappedEth,
     address curator
   ) ERC4626(asset, name, symbol) Ownable(msg.sender) {
-    // TODO: can we verify that the asset is an ERC20?
-
     // Set the Hyperlane mailbox
     HYPERLANE_MAILBOX = hyperlaneMailbox;
 
@@ -392,7 +389,6 @@ contract RelayPool is ERC4626, Ownable {
     // We only send the amount net of fees
     sendFunds(message.amount - feeAmount, message.recipient);
 
-    // TODO: handle insufficient funds?
     emit LoanEmitted(
       message.nonce,
       message.recipient,
@@ -475,7 +471,6 @@ contract RelayPool is ERC4626, Ownable {
     // We need to account for it in a streaming fashion
     addToStreamingAssets(feeAmount);
 
-    // TODO: include more details about the origin of the funds
     emit BridgeCompleted(chainId, bridge, amount, claimParams);
   }
 
