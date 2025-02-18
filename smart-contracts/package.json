@@ -68,6 +68,7 @@
     "@eth-optimism/contracts-bedrock": "0.17.3",
     "@matterlabs/hardhat-zksync": "1.3.0",
     "@openzeppelin/contracts": "5.2.0",
+    "@openzeppelin/contracts-upgradeable": "5.2.0",
     "@relay-protocol/addresses": "workspace:*",
     "@uniswap/v3-periphery": "1.4.4",
     "solmate": "6.8.0"
