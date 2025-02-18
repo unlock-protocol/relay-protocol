@@ -3,6 +3,7 @@ import { ethers, ignition } from 'hardhat'
 import { MyToken, MyYieldPool, RelayPoolFactory } from '../../typechain-types'
 import RelayPoolFactoryModule from '../../ignition/modules/RelayPoolFactoryModule'
 import { getEvent } from '@relay-protocol/helpers'
+import networks from '@relay-protocol/networks'
 
 describe('RelayPoolFactory: deployment', () => {
   let relayPoolFactory: RelayPoolFactory
@@ -13,24 +14,39 @@ describe('RelayPoolFactory: deployment', () => {
   let thirdPartyPool: MyYieldPool
 
   before(async () => {
-    const { chainId } = await ethers.provider.getNetwork()
-
+    const [user] = await ethers.getSigners()
+    const userAddress = await user.getAddress()
+    myToken = await ethers.deployContract('MyToken', ['My Token', 'TOKEN'])
+    expect(await myToken.totalSupply()).to.equal(1000000000000000000000000000n)
+    // deploy 3rd party pool
     thirdPartyPool = await ethers.deployContract('MyYieldPool', [
       await myToken.getAddress(),
       'My Yield Pool',
       'YIELD',
     ])
 
-    // Deploy an "empty" timelock
+    // Deposit in the third party pool
+    const initialDepositThirdPartyPool = ethers.parseUnits(
+      '100',
+      await myToken.decimals()
+    )
+    await myToken
+      .connect(user)
+      .approve(await thirdPartyPool.getAddress(), initialDepositThirdPartyPool)
+    await thirdPartyPool
+      .connect(user)
+      .deposit(initialDepositThirdPartyPool, userAddress)
+    // Check that there are shares!
+    expect(await myToken.totalSupply()).to.equal('1000000000000000000000000000')
+
+    // Deploy an "empty" timelock for the Pool Factory
     const TimelockController = await ethers.getContractFactory(
       'TimelockControllerUpgradeable'
     )
     timelockTemplate = await TimelockController.deploy()
-    // timelock.ini
     await timelockTemplate.waitForDeployment()
 
-    myToken = await ethers.deployContract('MyToken', ['My Token', 'TOKEN'])
-    expect(await myToken.totalSupply()).to.equal(1000000000000000000000000000n)
+    // Deploy the factory
     ;({ relayPoolFactory } = await ignition.deploy(RelayPoolFactoryModule, {
       parameters: {
         RelayPoolFactory: {
@@ -39,7 +55,7 @@ describe('RelayPoolFactory: deployment', () => {
           timelock: await timelockTemplate.getAddress(),
         },
       },
-      deploymentId: `RelayPoolFactory-${chainId.toString()}`,
+      deploymentId: 'RelayPoolFactory',
     }))
   })
 
@@ -55,7 +71,10 @@ describe('RelayPoolFactory: deployment', () => {
     const [user] = await ethers.getSigners()
     const userAddress = await user.getAddress()
     const initialDeposit = ethers.parseUnits('10', await myToken.decimals())
+
+    await myToken.mint(initialDeposit)
     await myToken.approve(await relayPoolFactory.getAddress(), initialDeposit)
+
     const tx = await relayPoolFactory.deployPool(
       await myToken.getAddress(),
       'Test Vault',
