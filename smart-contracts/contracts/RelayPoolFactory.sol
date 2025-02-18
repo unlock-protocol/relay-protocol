@@ -6,10 +6,19 @@ import "@openzeppelin/contracts/proxy/Clones.sol";
 
 import {RelayPool, OriginParam} from "./RelayPool.sol";
 
+interface RelayPoolTimelock {
+  function initialize(
+    uint256 minDelay,
+    address[] memory proposers,
+    address[] memory executors,
+    address admin
+  ) external;
+}
+
 contract RelayPoolFactory {
-  address immutable hyperlaneMailbox;
-  address immutable wrappedEth;
-  address immutable timelockTemplate;
+  address public immutable hyperlaneMailbox;
+  address public immutable wrappedEth;
+  address public immutable timelockTemplate;
 
   event PoolDeployed(
     address indexed pool,
@@ -41,6 +50,12 @@ contract RelayPoolFactory {
 
     // clone timelock
     address timelock = Clones.clone(timelockTemplate);
+    RelayPoolTimelock(timelock).initialize(
+      timelockDelay,
+      curator,
+      curator,
+      address(0)
+    );
 
     RelayPool pool = new RelayPool(
       hyperlaneMailbox,
