@@ -56,7 +56,6 @@ error MessageTooRecent(
   uint32 coolDown
 );
 
-
 contract RelayPool is ERC4626, Ownable {
   // The address of the Hyperlane mailbox
   address public immutable HYPERLANE_MAILBOX;
