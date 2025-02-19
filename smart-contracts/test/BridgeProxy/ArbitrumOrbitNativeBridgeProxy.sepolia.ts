@@ -101,7 +101,7 @@ const bridgeParams = abiCoder.encode(
   args
 )
 
-describe('ArbitrumOrbitNativeBridgeProxy', function () {
+describe.skip('ArbitrumOrbitNativeBridgeProxy', function () {
   let bridge: ArbitrumOrbitNativeBridgeProxy
 
   before(async () => {

@@ -19,6 +19,9 @@ const {
   assets,
 } = networks[10]
 
+const relayPool = '0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266'
+const l1BridgeProxy = '0x99C9fc46f92E8a1c0deC1b1747d010903E884bE1'
+
 describe('RelayBridge', function () {
   it('should work for the base sequence using ETH', async () => {
     const [user] = await ethers.getSigners()
@@ -29,6 +32,9 @@ describe('RelayBridge', function () {
         parameters: {
           OPStackNativeBridgeProxy: {
             portalProxy: ethers.ZeroAddress,
+            replayPoolChainId: 1,
+            relayPool,
+            l1BridgeProxy,
           },
         },
       }
@@ -49,18 +55,11 @@ describe('RelayBridge', function () {
     const bridgeAddress = await bridge.getAddress()
     const recipient = await user.getAddress()
     const amount = ethers.parseEther('1')
-    const poolAddress = '0x1Bd1dc30F238541D4CAb3Ba0aB766e9eB57050eb'
     const nonce = await bridge.transferNonce()
-    const tx = await bridge.bridge(
-      amount,
-      recipient,
-      1, // chain
-      poolAddress,
-      {
-        value: amount * 2n,
-        gasLimit: 30000000,
-      }
-    )
+    const tx = await bridge.bridge(amount, recipient, {
+      value: amount * 2n,
+      gasLimit: 30000000,
+    })
     const receipt = await tx.wait()
 
     expect(receipt.logs.length).to.equal(10)
@@ -88,8 +87,7 @@ describe('RelayBridge', function () {
           expect(event.args[1]).to.equal(1) // Ethereum mainnet
           // recipient  https://docs.hyperlane.xyz/docs/reference/messaging/receive#handle
           const poolAddressPadded =
-            '0x' +
-            poolAddress.replace(/^0x/, '').toLowerCase().padStart(64, '0')
+            '0x' + relayPool.replace(/^0x/, '').toLowerCase().padStart(64, '0')
           expect(event.args[2]).to.equal(poolAddressPadded)
           // message TODO: decode
           // expect(event.args[3]).to.equal(
@@ -110,8 +108,7 @@ describe('RelayBridge', function () {
         expect(event.args[2]).to.equal(recipient)
         expect(event.args[3]).to.equal(ethers.ZeroAddress)
         expect(event.args[4]).to.equal(amount)
-        expect(event.args[5]).to.equal(1)
-        expect(event.args[6]).to.equal(poolAddress)
+        expect(event.args[5]).to.equal(opProxyBridgeAddress)
       }
     })
   })
@@ -119,9 +116,18 @@ describe('RelayBridge', function () {
   it('should work for the base sequence using an ERC20', async () => {
     const [user] = await ethers.getSigners()
 
-    const opProxyBridge = await ethers.deployContract(
-      'OPStackNativeBridgeProxy',
-      [ethers.ZeroAddress]
+    const { bridge: opProxyBridge } = await ignition.deploy(
+      OPStackNativeBridgeProxyModule,
+      {
+        parameters: {
+          OPStackNativeBridgeProxy: {
+            portalProxy: ethers.ZeroAddress,
+            replayPoolChainId: 1,
+            relayPool,
+            l1BridgeProxy,
+          },
+        },
+      }
     )
     const opProxyBridgeAddress = await opProxyBridge.getAddress()
 
@@ -133,7 +139,6 @@ describe('RelayBridge', function () {
     const bridgeAddress = await bridge.getAddress()
     const recipient = await user.getAddress()
     const amount = ethers.parseEther('1')
-    const poolAddress = '0x1Bd1dc30F238541D4CAb3Ba0aB766e9eB57050eb'
 
     // Transfer UDT to sender/recipient
     await stealERC20(
@@ -149,16 +154,10 @@ describe('RelayBridge', function () {
 
     const nonce = await bridge.transferNonce()
 
-    const tx = await bridge.bridge(
-      amount,
-      recipient,
-      1, // chain
-      poolAddress,
-      {
-        value: amount * 2n,
-        gasLimit: 30000000,
-      }
-    )
+    const tx = await bridge.bridge(amount, recipient, {
+      value: amount * 2n,
+      gasLimit: 30000000,
+    })
     const receipt = await tx.wait()
 
     expect(receipt.logs.length).to.equal(14)
@@ -187,8 +186,7 @@ describe('RelayBridge', function () {
           expect(event.args[1]).to.equal(1) // Ethereum mainnet
           // recipient  https://docs.hyperlane.xyz/docs/reference/messaging/receive#handle
           const poolAddressPadded =
-            '0x' +
-            poolAddress.replace(/^0x/, '').toLowerCase().padStart(64, '0')
+            '0x' + relayPool.replace(/^0x/, '').toLowerCase().padStart(64, '0')
           expect(event.args[2]).to.equal(poolAddressPadded)
           // message TODO: decode
           // expect(event.args[3]).to.equal(
@@ -209,8 +207,7 @@ describe('RelayBridge', function () {
         expect(event.args[2]).to.equal(recipient)
         expect(event.args[3]).to.equal(assets.udt)
         expect(event.args[4]).to.equal(amount)
-        expect(event.args[5]).to.equal(1)
-        expect(event.args[6]).to.equal(poolAddress)
+        expect(event.args[5]).to.equal(opProxyBridgeAddress)
       }
     })
   })
@@ -245,8 +242,6 @@ describe('RelayBridge', function () {
       const bridgeAddress = await bridge.getAddress()
       const recipient = await user.getAddress()
 
-      const poolAddress = '0x1Bd1dc30F238541D4CAb3Ba0aB766e9eB57050eb'
-
       // Get some USDC to sender/recipient
       await mintUSDC(assets.usdc, recipient, amount)
 
@@ -255,16 +250,10 @@ describe('RelayBridge', function () {
       await erc20Contract.approve(bridgeAddress, amount)
 
       const nonce = await bridge.transferNonce()
-      const tx = await bridge.bridge(
-        amount,
-        recipient,
-        1, // chain
-        poolAddress,
-        {
-          value: ethers.parseEther('0.02'), // mailbox fee
-          gasLimit: 30000000,
-        }
-      )
+      const tx = await bridge.bridge(amount, recipient, {
+        value: ethers.parseEther('0.02'), // mailbox fee
+        gasLimit: 30000000,
+      })
       receipt = await tx.wait()
       expect(receipt.logs.length).to.equal(12)
     })

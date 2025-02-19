@@ -12,6 +12,9 @@ const {
 } = networks[1]
 const { assets: op1Assets } = networks[10]
 
+const relayPool = '0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266'
+const l1BridgeProxy = '0x99C9fc46f92E8a1c0deC1b1747d010903E884bE1'
+
 describe('OPStackNativeBridgeProxy: Op1', function () {
   describe('bridge', function () {
     it('should work for the base sequence using ETH', async () => {
@@ -21,6 +24,9 @@ describe('OPStackNativeBridgeProxy: Op1', function () {
       const parameters = {
         OPStackNativeBridgeProxy: {
           portalProxy: op.portalProxy,
+          replayPoolChainId: 1,
+          relayPool,
+          l1BridgeProxy,
         },
       }
       const { bridge } = await ignition.deploy(OPStackNativeBridgeProxyModule, {
@@ -48,8 +54,6 @@ describe('OPStackNativeBridgeProxy: Op1', function () {
         await l2ToL1MessagePasser.messageNonce()
 
       const tx = await bridge.bridge(
-        recipient,
-        1, // chain
         recipient,
         ethers.ZeroAddress,
         amount,
@@ -107,7 +111,7 @@ describe('OPStackNativeBridgeProxy: Op1', function () {
             )
 
           expect(relayFrom).to.equal(bridgeAddress)
-          expect(relayTo).to.equal(recipient)
+          expect(relayTo).to.equal(l1BridgeProxy)
           expect(relayAmount).to.equal(amount)
           expect(extraData).to.equal('0x')
 
@@ -184,7 +188,7 @@ describe('OPStackNativeBridgeProxy: Op1', function () {
             // From
             expect(event.args[2]).to.equal(bridgeAddress)
             // To
-            expect(event.args[3]).to.equal(recipient)
+            expect(event.args[3]).to.equal(l1BridgeProxy)
             // Amount
             expect(event.args[4]).to.equal(amount)
             // ExtraData
@@ -193,7 +197,7 @@ describe('OPStackNativeBridgeProxy: Op1', function () {
             // from
             expect(event.args[0]).to.equal(bridgeAddress)
             // to
-            expect(event.args[1]).to.equal(recipient)
+            expect(event.args[1]).to.equal(l1BridgeProxy)
             // amount
             expect(event.args[2]).to.equal(amount)
             // extraData
@@ -207,8 +211,17 @@ describe('OPStackNativeBridgeProxy: Op1', function () {
       // We use ethereumAssets.udt) for example as it has already been bridged to OP
       const [user] = await ethers.getSigners()
 
-      const Bridge = await ethers.getContractFactory('OPStackNativeBridgeProxy')
-      const bridge = await Bridge.deploy(op.portalProxy)
+      const parameters = {
+        OPStackNativeBridgeProxy: {
+          portalProxy: op.portalProxy,
+          replayPoolChainId: 1,
+          relayPool,
+          l1BridgeProxy,
+        },
+      }
+      const { bridge } = await ignition.deploy(OPStackNativeBridgeProxyModule, {
+        parameters,
+      })
       const bridgeAddress = await bridge.getAddress()
 
       const recipient = await user.getAddress()
@@ -229,8 +242,6 @@ describe('OPStackNativeBridgeProxy: Op1', function () {
       await erc20Contract.approve(bridgeAddress, amount)
 
       const tx = await bridge.bridge(
-        recipient, // recipient
-        1, // chain
         recipient, // sender
         op1Assets.udt,
         amount,
@@ -332,7 +343,7 @@ describe('OPStackNativeBridgeProxy: Op1', function () {
             // From
             expect(event.args[2]).to.equal(bridgeAddress)
             // To
-            expect(event.args[3]).to.equal(recipient)
+            expect(event.args[3]).to.equal(l1BridgeProxy)
             // Amount
             expect(event.args[4]).to.equal(amount)
             // ExtraData
@@ -345,7 +356,7 @@ describe('OPStackNativeBridgeProxy: Op1', function () {
             // from
             expect(event.args[2]).to.equal(bridgeAddress)
             // to
-            expect(event.args[3]).to.equal(recipient)
+            expect(event.args[3]).to.equal(l1BridgeProxy)
             // amount
             expect(event.args[4]).to.equal(amount)
             // extraData

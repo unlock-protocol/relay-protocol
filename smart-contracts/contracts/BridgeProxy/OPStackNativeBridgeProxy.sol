@@ -7,29 +7,30 @@ import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import {IOptimismPortal, Types} from "../interfaces/IOptimismPortal.sol";
 import {IOptimismMintableERC20} from "../interfaces/IOptimismMintableERC20.sol";
 
-// import "hardhat/console.sol";
-
 contract OPStackNativeBridgeProxy is BridgeProxy {
   address public constant STANDARD_BRIDGE =
     address(0x4200000000000000000000000000000000000010);
 
   address public immutable PORTAL_PROXY;
 
-  constructor(address portalProxy) BridgeProxy() {
+  constructor(
+    address portalProxy,
+    uint256 replayPoolChainId,
+    address relayPool,
+    address l1BridgeProxy
+  ) BridgeProxy(replayPoolChainId, relayPool, l1BridgeProxy) {
     PORTAL_PROXY = portalProxy;
   }
 
   function bridge(
     address sender,
-    uint32, // destinationChainId,
-    address recipient,
     address currency,
     uint256 amount,
     bytes calldata data
   ) external payable override {
     if (currency == address(0)) {
       L2StandardBridge(STANDARD_BRIDGE).bridgeETHTo{value: amount}(
-        recipient,
+        L1_BRIDGE_PROXY,
         200000,
         data
       );
@@ -50,52 +51,11 @@ contract OPStackNativeBridgeProxy is BridgeProxy {
       L2StandardBridge(STANDARD_BRIDGE).bridgeERC20To(
         currency,
         l1Token,
-        recipient,
+        L1_BRIDGE_PROXY,
         amount,
         200000,
         data
       );
     }
-  }
-
-  // This should be called as delegateCall from the Pool contract as a way to claim funds
-  function claim(
-    address currency,
-    bytes calldata bridgeParams
-  ) external override returns (uint256) {
-    (bytes memory transaction, address proofSubmitter) = abi.decode(
-      bridgeParams,
-      (bytes, address)
-    );
-
-    (
-      uint256 nonce,
-      address sender,
-      address target,
-      uint256 value,
-      uint256 minGasLimit,
-      bytes memory message
-    ) = abi.decode(
-        transaction,
-        (uint256, address, address, uint256, uint256, bytes)
-      );
-
-    Types.WithdrawalTransaction memory withdrawalTransaction = Types
-      .WithdrawalTransaction({
-        nonce: nonce,
-        sender: sender,
-        target: target,
-        value: value,
-        gasLimit: minGasLimit,
-        data: message
-      });
-
-    // Call portal to withdraw
-    IOptimismPortal(PORTAL_PROXY).finalizeWithdrawalTransactionExternalProof(
-      withdrawalTransaction,
-      proofSubmitter
-    );
-
-    return IERC20(currency).balanceOf(address(this));
   }
 }

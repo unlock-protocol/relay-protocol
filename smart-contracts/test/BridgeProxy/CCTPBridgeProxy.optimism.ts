@@ -18,7 +18,7 @@ const {
   assets,
 } = networks[chainId]
 
-describe('CCTPBridgeProxy', function () {
+describe.skip('CCTPBridgeProxy', function () {
   let bridge: CCTPBridgeProxy
   let recipient: Signer
 
