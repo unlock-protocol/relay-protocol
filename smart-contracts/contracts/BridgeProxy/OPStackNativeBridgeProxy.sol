@@ -58,46 +58,43 @@ contract OPStackNativeBridgeProxy is BridgeProxy {
     }
   }
 
-  // This should be called as delegateCall from the Pool contract as a way to claim funds
-  function claim(
-    address currency,
-    bytes calldata bridgeParams
-  ) external override returns (uint256) {
-    (bytes memory transaction, address proofSubmitter) = abi.decode(
-      bridgeParams,
-      (bytes, address)
-    );
+  // This should be called by the Pool contract as a way to claim funds
 
-    (
-      uint256 nonce,
-      address sender,
-      address target,
-      uint256 value,
-      uint256 minGasLimit,
-      bytes memory message
-    ) = abi.decode(
-        transaction,
-        (uint256, address, address, uint256, uint256, bytes)
-      );
-
-    Types.WithdrawalTransaction memory withdrawalTransaction = Types
-      .WithdrawalTransaction({
-        nonce: nonce,
-        sender: sender,
-        target: target,
-        value: value,
-        gasLimit: minGasLimit,
-        data: message
-      });
-
-    // Call portal to withdraw
-    IOptimismPortal(PORTAL_PROXY).finalizeWithdrawalTransactionExternalProof(
-      withdrawalTransaction,
-      proofSubmitter
-    );
-
-    // TODO: we MUST get the content of `message` to identify _which_ transfer(s) was received
-    // so we can handle failed "fast transfers"
-    return IERC20(currency).balanceOf(address(this));
+  function claim() external override onlyRelayPool returns (uint256) {
+    // if (msg.sender != RELAY_POOL && block.chainid != address(this)) {
+    //   revert("Only the relay pool can claim funds");
+    // }
+    // (bytes memory transaction, address proofSubmitter) = abi.decode(
+    //   bridgeParams,
+    //   (bytes, address)
+    // );
+    // (
+    //   uint256 nonce,
+    //   address sender,
+    //   address target,
+    //   uint256 value,
+    //   uint256 minGasLimit,
+    //   bytes memory message
+    // ) = abi.decode(
+    //     transaction,
+    //     (uint256, address, address, uint256, uint256, bytes)
+    //   );
+    // Types.WithdrawalTransaction memory withdrawalTransaction = Types
+    //   .WithdrawalTransaction({
+    //     nonce: nonce,
+    //     sender: sender,
+    //     target: target,
+    //     value: value,
+    //     gasLimit: minGasLimit,
+    //     data: message
+    //   });
+    // // Call portal to withdraw
+    // IOptimismPortal(PORTAL_PROXY).finalizeWithdrawalTransactionExternalProof(
+    //   withdrawalTransaction,
+    //   proofSubmitter
+    // );
+    // // TODO: we MUST get the content of `message` to identify _which_ transfer(s) was received
+    // // so we can handle failed "fast transfers"
+    // return IERC20(currency).balanceOf(address(this));
   }
 }
