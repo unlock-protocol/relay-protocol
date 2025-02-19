@@ -140,8 +140,6 @@ contract RelayPool is ERC4626, Ownable {
     address wrappedEth,
     address curator
   ) ERC4626(asset, name, symbol) Ownable(msg.sender) {
-    // TODO: can we verify that the asset is an ERC20?
-
     // Set the Hyperlane mailbox
     HYPERLANE_MAILBOX = hyperlaneMailbox;
 
@@ -391,7 +389,6 @@ contract RelayPool is ERC4626, Ownable {
     // We only send the amount net of fees
     sendFunds(message.amount - feeAmount, message.recipient);
 
-    // TODO: handle insufficient funds?
     emit LoanEmitted(
       message.nonce,
       message.recipient,
