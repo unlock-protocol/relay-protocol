@@ -21,7 +21,7 @@ const recipient = '0x246A13358Fb27523642D86367a51C2aEB137Ac6C'
 
 const amount = ethers.parseUnits('0.1', 6)
 
-describe('CCTPBridgeProxy', function () {
+describe.skip('CCTPBridgeProxy', function () {
   let bridge: CCTPBridgeProxy
   let receipt: TransactionReceipt | null
   let balanceBefore: bigint

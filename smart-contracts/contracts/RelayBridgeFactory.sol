@@ -2,6 +2,7 @@
 pragma solidity ^0.8.28;
 
 import {RelayBridge} from "./RelayBridge.sol";
+import {BridgeProxy} from "./BridgeProxy/BridgeProxy.sol";
 
 contract RelayBridgeFactory {
   address public hyperlaneMailbox;
@@ -11,7 +12,7 @@ contract RelayBridgeFactory {
   event BridgeDeployed(
     address bridge,
     address indexed asset,
-    address indexed proxyBridge
+    BridgeProxy indexed proxyBridge
   );
 
   constructor(address hMailbox) {
@@ -20,7 +21,7 @@ contract RelayBridgeFactory {
 
   function deployBridge(
     address asset,
-    address proxyBridge
+    BridgeProxy proxyBridge
   ) public returns (address) {
     RelayBridge bridge = new RelayBridge(asset, proxyBridge, hyperlaneMailbox);
     bridgesByAsset[asset].push(address(bridge));
