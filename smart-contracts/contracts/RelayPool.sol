@@ -9,6 +9,7 @@ import {ITokenSwap} from "./interfaces/ITokenSwap.sol";
 import {TypeCasts} from "./utils/TypeCasts.sol";
 import {HyperlaneMessage} from "./Types.sol";
 import "@openzeppelin/contracts/utils/math/Math.sol";
+import {BridgeProxy} from "./BridgeProxy/BridgeProxy.sol";
 
 struct OriginSettings {
   address curator;
@@ -444,7 +445,9 @@ contract RelayPool is ERC4626, Ownable {
     }
 
     // We need to claim the funds from the bridge
-    uint amount = origin.proxyBridge.claim(asset);
+    uint amount = BridgeProxy(origin.proxyBridge).claim(
+      address(asset) == WETH ? address(0) : address(asset)
+    );
 
     // We should have received funds
     decreaseOutStandingDebt(amount, origin);
