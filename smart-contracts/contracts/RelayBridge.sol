@@ -3,7 +3,6 @@ pragma solidity ^0.8.28;
 
 import {IHyperlaneMailbox} from "./interfaces/IHyperlaneMailbox.sol";
 import {StandardHookMetadata} from "./utils/StandardHookMetadata.sol";
-// import "hardhat/console.sol";
 
 error BridgingFailed(
   address proxyBridge,
