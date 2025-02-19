@@ -4,8 +4,7 @@ pragma solidity ^0.8.28;
 import {IWETH} from "./interfaces/IWETH.sol";
 import {IERC4626} from "@openzeppelin/contracts/interfaces/IERC4626.sol";
 
-// import "hardhat/console.sol";
-
+error remainingEth();
 error ethTransferFailed();
 error onlyWethCanSendEth();
 
@@ -43,14 +42,14 @@ contract RelayPoolNativeGateway {
   function mint(
     address pool,
     address receiver
-  ) external payable returns (uint256) {
+  ) external payable returns (uint256 shares) {
     // wrap tokens
     WETH.deposit{value: msg.value}();
     WETH.approve(pool, msg.value);
 
     // do the deposit
-    uint256 shares = IERC4626(pool).mint(msg.value, receiver);
-    return shares;
+    shares = IERC4626(pool).convertToShares(msg.value);
+    IERC4626(pool).mint(shares, receiver);
   }
 
   /**
@@ -70,29 +69,39 @@ contract RelayPoolNativeGateway {
     WETH.withdraw(assets);
     _safeTransferETH(receiver, assets);
 
+    // make sure no ETH is left in the contract
+    if (address(this).balance != 0) {
+      revert remainingEth();
+    }
+
     //emit event
     return shares;
   }
 
   /**
    * @dev redeem native tokens
-   * @param assets amout of native tokens
+   * @param shares amout of native tokens
    * @param receiver the reserve account to be credited
    */
   function redeem(
     address pool,
-    uint256 assets,
+    uint256 shares,
     address receiver
   ) external virtual returns (uint256) {
     // withdraw from pool
-    uint256 shares = IERC4626(pool).redeem(assets, address(this), msg.sender);
+    uint256 assets = IERC4626(pool).redeem(shares, address(this), msg.sender);
 
     // withdraw native tokens and send them back
     WETH.withdraw(assets);
     _safeTransferETH(receiver, assets);
 
+    // make sure no ETH is left in the contract
+    if (address(this).balance != 0) {
+      revert remainingEth();
+    }
+
     //emit event
-    return shares;
+    return assets;
   }
 
   /**
